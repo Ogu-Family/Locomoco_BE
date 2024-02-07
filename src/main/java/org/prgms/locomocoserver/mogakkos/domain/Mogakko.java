@@ -42,6 +42,9 @@ public class Mogakko {
     @Column(name = "like")
     private int like;
 
+    @Column(name = "max_participant")
+    private int max_participant;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User creator;
