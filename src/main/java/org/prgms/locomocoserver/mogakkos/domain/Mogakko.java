@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -44,4 +45,17 @@ public class Mogakko {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User creator;
+
+    @Builder
+    public Mogakko(Long id, String title, String content, LocalDateTime start, LocalDateTime end,
+        LocalDateTime deadline, int like, User creator) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.start = start;
+        this.end = end;
+        this.deadline = deadline;
+        this.like = like;
+        this.creator = creator;
+    }
 }
