@@ -30,17 +30,17 @@ public class Mogakko {
     @Column(name = "content", columnDefinition = "varchar(500)")
     private String content;
 
-    @Column(name = "start")
-    private LocalDateTime start;
+    @Column(name = "start_time", nullable = false)
+    private LocalDateTime startTime;
 
-    @Column(name = "end")
-    private LocalDateTime end;
+    @Column(name = "end_time", nullable = false)
+    private LocalDateTime endTime;
 
-    @Column(name = "deadline")
+    @Column(name = "deadline", nullable = false)
     private LocalDateTime deadline;
 
-    @Column(name = "like")
-    private int like;
+    @Column(name = "like_count", nullable = false)
+    private int likeCount;
 
     @Column(name = "max_participant")
     private int max_participant;
@@ -50,15 +50,14 @@ public class Mogakko {
     private User creator;
 
     @Builder
-    public Mogakko(Long id, String title, String content, LocalDateTime start, LocalDateTime end,
-        LocalDateTime deadline, int like, User creator) {
-        this.id = id;
+    public Mogakko(String title, String content, LocalDateTime startTime, LocalDateTime endTime,
+        LocalDateTime deadline, int likeCount, User creator) {
         this.title = title;
         this.content = content;
-        this.start = start;
-        this.end = end;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.deadline = deadline;
-        this.like = like;
+        this.likeCount = likeCount;
         this.creator = creator;
     }
 }
