@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.global.common.BaseEntity;
+import org.prgms.locomocoserver.user.vo.EmailVo;
 
 import java.time.LocalDateTime;
 
@@ -19,16 +20,16 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nickname")
+    @Column(name = "nickname", nullable = false)
     private String nickname;
 
-    @Column(name = "birth")
+    @Column(name = "birth", nullable = false)
     private LocalDateTime birth;
 
     @Column(name = "gender", nullable = false)
     private String gender;
 
-    @Column(name = "temperature")
+    @Column(name = "temperature", nullable = false)
     private int temperature;
 
     @Column(name = "job", nullable = false)
@@ -37,7 +38,7 @@ public class User extends BaseEntity {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "vendor")
+    @Column(name = "vendor", nullable = false)
     private String vendor;
 
     @Builder
@@ -47,7 +48,7 @@ public class User extends BaseEntity {
         this.gender = gender;
         this.temperature = temperature;
         this.job = job;
-        this.email = email;
+        this.email = new EmailVo(email).getEmail();
         this.vendor = vendor;
     }
 }
