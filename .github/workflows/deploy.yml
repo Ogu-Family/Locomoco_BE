@@ -1,0 +1,46 @@
+name: App install and start
+
+concurrency:
+  group: production
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: [ self-hosted ]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          clean: false
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Stop old server (ignore error)
+        run: |
+          killall -9 java || true
+
+      - name: Remove old server directory (ignore error)
+        run: |
+          rm -rf ~/source || true
+
+      - name: Build Spring application
+        run: |
+          ./gradlew build
+
+      - name: Copy new server to ~/source
+        run: |
+          mkdir -p ~/source
+          cp -R ./ ~/source
+
+      - name: Run new server (in background)
+        run: |
+          cd ~/source
+          nohup java -jar your-application.jar </dev/null >/dev/null 2>&1 &
