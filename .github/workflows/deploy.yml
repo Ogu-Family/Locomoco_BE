@@ -18,10 +18,10 @@ jobs:
         with:
           clean: false
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
+          java-version: '11' # 사용 가능한 Java 버전으로 변경
 
       - name: Stop old server (ignore error)
         run: |
@@ -38,9 +38,9 @@ jobs:
       - name: Copy new server to ~/source
         run: |
           mkdir -p ~/source
-          cp -R ./ ~/source
+          cp -R ./build/libs/*.jar ~/source/locomoco-server-0.0.1-SNAPSHOT.jar # JAR 파일의 경로를 확인하여 수정
 
       - name: Run new server (in background)
         run: |
           cd ~/source
-          nohup java -jar your-application.jar </dev/null >/dev/null 2>&1 &
+          nohup java -jar locomoco-server-0.0.1-SNAPSHOT.jar </dev/null >/dev/null 2>&1 &
