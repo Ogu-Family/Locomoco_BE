@@ -52,4 +52,4 @@ jobs:
       - name: Run new server (in background)
         run: |
           cd ~/source
-          nohup java -jar locomoco-server-0.0.1-SNAPSHOT.jar </dev/null >/dev/null 2>&1 &
+          nohup java -jar locomoco-server-0.0.1-SNAPSHOT.jar &
