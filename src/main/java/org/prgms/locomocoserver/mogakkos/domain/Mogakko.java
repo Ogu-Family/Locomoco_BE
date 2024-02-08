@@ -24,7 +24,7 @@ public class Mogakko {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "title")
+    @Column(name = "title", columnDefinition = "varchar(255) default '모각코 모집합니다~'")
     private String title;
 
     @Column(name = "content", columnDefinition = "varchar(500)")
@@ -42,8 +42,8 @@ public class Mogakko {
     @Column(name = "like_count", nullable = false)
     private int likeCount;
 
-    @Column(name = "max_participant")
-    private int max_participant;
+    @Column(name = "max_participant", columnDefinition = "int default 10")
+    private Integer max_participant;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
