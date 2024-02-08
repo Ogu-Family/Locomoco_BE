@@ -47,7 +47,7 @@ jobs:
       - name: Copy new server to ~/source
         run: |
           mkdir -p ~/source
-          cp -R ./Locomoco_BE/build/libs/locomoco-server-0.0.1-SNAPSHOT.jar ~/source # JAR 파일의 경로를 확인하여 수정
+          cp -R ~/Locomoco_BE/build/libs/locomoco-server-0.0.1-SNAPSHOT.jar ~/source # JAR 파일의 경로를 확인하여 수정
 
       - name: Run new server (in background)
         run: |
