@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 17
-          distribution: 'adopt'  # JDK 배포자를 선택합니다.
+          distribution: 'adopt'
           java-package: 'jdk'
           architecture: 'x64'
           check-latest: false
@@ -34,12 +34,7 @@ jobs:
 
       - name: Stop old server (ignore error)
         run: |
-          if [ -f server.pid ]; then
-            SERVER_PID=$(cat server.pid)
-            kill -15 $SERVER_PID || true
-            rm server.pid
-            echo "Old server with PID $SERVER_PID stopped"
-          fi
+          killall -9 java || true
 
       - name: Remove old server directory (ignore error)
         run: |
@@ -52,11 +47,9 @@ jobs:
       - name: Copy new server to ~/source
         run: |
           mkdir -p ~/source
-          cp -R ~/Locomoco_BE/build/libs/locomoco-server-0.0.1-SNAPSHOT.jar ~/source # JAR 파일의 경로를 확인하여 수정
+          cp -R ~/Locomoco_BE/build/libs/locomoco-server-0.0.1-SNAPSHOT.jar ~/source
 
       - name: Start the server
         run: |
           nohup java -jar ~/source/locomoco-server-0.0.1-SNAPSHOT.jar > server.log 2>&1 &
-          SERVER_PID=$!
-          echo $SERVER_PID > server.pid
-          echo "Server started with PID $SERVER_PID"
+          echo "Server started"
