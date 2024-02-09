@@ -13,7 +13,6 @@ import org.prgms.locomocoserver.user.vo.EmailVo;
 import org.prgms.locomocoserver.user.vo.TemperatureVo;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -33,30 +32,30 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
-    private String gender;
+    private Gender gender;
 
     @Column(name = "temperature", nullable = false)
     private int temperature;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "job", nullable = false)
-    private String job;
+    private Job job;
 
     @Column(name = "email", nullable = false)
     private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "vendor", nullable = false)
-    private String vendor;
+    private Vendor vendor;
 
     @Builder
     public User(String nickname, LocalDate birth, Gender gender, int temperature, Job job, String email, Vendor vendor) {
         this.nickname = nickname;
         this.birth = birth;
-        this.gender = gender.getDisplayName();
+        this.gender = gender;
         this.temperature = new TemperatureVo(temperature).getTemperature();
-        this.job = job.getDisplayName();
+        this.job = job;
         this.email = new EmailVo(email).getEmail();
-        this.vendor = vendor.getDisplayName();
+        this.vendor = vendor;
     }
 }
