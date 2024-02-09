@@ -49,6 +49,11 @@ jobs:
           mkdir -p ~/source
           cp -R ~/Locomoco_BE/build/libs/locomoco-server-0.0.1-SNAPSHOT.jar ~/source # JAR 파일의 경로를 확인하여 수정
 
-      - name: Run new server (in background)
+      - name: Start the server
         run: |
-          java -jar ~/source/locomoco-server-0.0.1-SNAPSHOT.jar > server.log 2>&1
+          java -jar ~/source/locomoco-server-0.0.1-SNAPSHOT.jar > server.log 2>&1 &
+          SERVER_PID=$!
+          while ! nc -z localhost 8090; do
+            sleep 1
+          done
+          echo "Server started"
