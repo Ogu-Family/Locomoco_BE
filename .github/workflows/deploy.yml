@@ -53,3 +53,5 @@ jobs:
         run: |
           nohup java -jar ~/source/locomoco-server-0.0.1-SNAPSHOT.jar > server.log 2>&1 &
           echo "Server started"
+      - name: Complete job
+        run: |
