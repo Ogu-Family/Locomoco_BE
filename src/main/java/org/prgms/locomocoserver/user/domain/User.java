@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
-import org.prgms.locomocoserver.user.domain.enums.Vendor;
+import org.prgms.locomocoserver.user.domain.enums.Provider;
 import org.prgms.locomocoserver.user.vo.EmailVo;
 import org.prgms.locomocoserver.user.vo.TemperatureVo;
 import java.time.LocalDate;
@@ -45,10 +45,10 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "vendor", nullable = false)
-    private Vendor vendor;
+    private Provider vendor;
 
     @Builder
-    public User(String nickname, LocalDate birth, Gender gender, int temperature, Job job, String email, Vendor vendor) {
+    public User(String nickname, LocalDate birth, Gender gender, int temperature, Job job, String email, Provider vendor) {
         this.nickname = nickname;
         this.birth = birth;
         this.gender = gender;
