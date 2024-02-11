@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.user.application.UserService;
-import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.dto.kakao.KakaoTokenResponseDto;
 import org.prgms.locomocoserver.user.dto.kakao.KakaoUserInfoResponseDto;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,6 +53,9 @@ public class KakaoController {
         ObjectMapper objectMapper = new ObjectMapper();
         KakaoTokenResponseDto tokenResponseDto = objectMapper.readValue(response.getBody(), KakaoTokenResponseDto.class);
 
+        KakaoUserInfoResponseDto kakaoUserInfoResponseDto = loadUserInfo(tokenResponseDto.accessToken());
+        userService.saveOrUpdate(kakaoUserInfoResponseDto);
+
         // Kakao 인증 서버로부터의 응답 반환
         return ResponseEntity.ok(tokenResponseDto);
     }
@@ -61,6 +63,11 @@ public class KakaoController {
     @GetMapping("/users/kakao/me")
     @ResponseBody
     public ResponseEntity<KakaoUserInfoResponseDto> getUserInfo(@RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
+        KakaoUserInfoResponseDto responseDto = loadUserInfo(accessToken);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    private KakaoUserInfoResponseDto loadUserInfo(String accessToken) throws JsonProcessingException {
         // Kakao API 엔드포인트 URL
         String apiUrl = "https://kapi.kakao.com/v2/user/me";
 
@@ -73,9 +80,6 @@ public class KakaoController {
         ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        KakaoUserInfoResponseDto responseDto = objectMapper.readValue(response.getBody(), KakaoUserInfoResponseDto.class);
-
-        // Kakao API로부터의 응답 반환
-        return ResponseEntity.ok(responseDto);
+        return objectMapper.readValue(response.getBody(), KakaoUserInfoResponseDto.class);
     }
 }
