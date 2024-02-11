@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
+import org.prgms.locomocoserver.user.domain.enums.Provider;
 import org.prgms.locomocoserver.user.dto.OAuthUserInfoDto;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record KakaoUserInfoResponseDto(
@@ -17,8 +19,8 @@ public record KakaoUserInfoResponseDto(
     @Override
     public User toEntity() {
         return User.builder()
-                .birth(LocalDate.parse(kakaoAccount.birthyear()+kakaoAccount.birthday()))
-                .gender(Gender.valueOf(kakaoAccount.gender()))
+                .birth(LocalDate.parse(kakaoAccount.birthyear()+kakaoAccount.birthday(), DateTimeFormatter.ofPattern("yyyyMMdd")))
+                .gender(Gender.valueOf(kakaoAccount.gender().toUpperCase()))
                 .temperature(36.5)
                 .email(kakaoAccount().email())
                 .provider("kakao")
@@ -33,7 +35,7 @@ public record KakaoUserInfoResponseDto(
 
     @Override
     public String getProvider() {
-        return "kakao";
+        return Provider.KAKAO.name();
     }
 
     @Override
