@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
-import org.prgms.locomocoserver.user.domain.enums.Provider;
 import org.prgms.locomocoserver.user.vo.EmailVo;
 import org.prgms.locomocoserver.user.vo.TemperatureVo;
 
@@ -24,38 +23,41 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nickname", nullable = false)
+    @Column(name = "nickname")
     private String nickname;
 
-    @Column(name = "birth", nullable = false, columnDefinition = "date")
+    @Column(name = "birth", columnDefinition = "date")
     private LocalDate birth;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender", nullable = false)
+    @Column(name = "gender")
     private Gender gender;
 
     @Column(name = "temperature", nullable = false)
-    private int temperature;
+    private double temperature;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "job", nullable = false)
+    @Column(name = "job")
     private Job job;
 
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "vendor", nullable = false)
-    private Provider vendor;
+    @Column(name = "provider", nullable = false)
+    private String provider;
+
+    @Column(name = "provide_id", nullable = false)
+    private String provideId;
 
     @Builder
-    public User(String nickname, LocalDate birth, Gender gender, int temperature, Job job, String email, Provider vendor) {
+    public User(String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider, String provideId) {
         this.nickname = nickname;
         this.birth = birth;
         this.gender = gender;
         this.temperature = new TemperatureVo(temperature).getTemperature();
         this.job = job;
         this.email = new EmailVo(email).getEmail();
-        this.vendor = vendor;
+        this.provider = provider;
+        this.provideId = provideId;
     }
 }

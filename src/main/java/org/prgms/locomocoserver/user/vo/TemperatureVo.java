@@ -4,15 +4,15 @@ import lombok.Getter;
 
 @Getter
 public class TemperatureVo {
-    private int temperature;
+    private double temperature;
 
-    public TemperatureVo(int temperature) {
+    public TemperatureVo(double temperature) {
         if (!isValidTemperature(temperature)) {
             throw new IllegalArgumentException("Invalid temperature");
         }
         this.temperature = temperature;
     }
-    private boolean isValidTemperature(int temperature){
+    private boolean isValidTemperature(double temperature){
         return temperature >= 0 && temperature <= 100;
     }
 }
