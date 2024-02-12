@@ -34,6 +34,21 @@ public class KakaoController {
 
     @GetMapping("/users/login/kakao/callback")
     public ResponseEntity<KakaoTokenResponseDto> getKakaoLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
+        KakaoTokenResponseDto tokenResponseDto = getTokenDto(code);
+        KakaoUserInfoResponseDto kakaoUserInfoResponseDto = loadUserInfo(tokenResponseDto.accessToken());
+        userService.saveOrUpdate(kakaoUserInfoResponseDto);
+
+        return ResponseEntity.ok(tokenResponseDto);
+    }
+
+    @GetMapping("/users/kakao/me")
+    @ResponseBody
+    public ResponseEntity<KakaoUserInfoResponseDto> getUserInfo(@RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
+        KakaoUserInfoResponseDto responseDto = loadUserInfo(accessToken);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    private KakaoTokenResponseDto getTokenDto(String code) throws JsonProcessingException {
         // Kakao 인증 서버 엔드포인트 URL
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
 
@@ -51,20 +66,7 @@ public class KakaoController {
 
         // 응답 본문에서 DTO로 수동 변환
         ObjectMapper objectMapper = new ObjectMapper();
-        KakaoTokenResponseDto tokenResponseDto = objectMapper.readValue(response.getBody(), KakaoTokenResponseDto.class);
-
-        KakaoUserInfoResponseDto kakaoUserInfoResponseDto = loadUserInfo(tokenResponseDto.accessToken());
-        userService.saveOrUpdate(kakaoUserInfoResponseDto);
-
-        // Kakao 인증 서버로부터의 응답 반환
-        return ResponseEntity.ok(tokenResponseDto);
-    }
-
-    @GetMapping("/users/kakao/me")
-    @ResponseBody
-    public ResponseEntity<KakaoUserInfoResponseDto> getUserInfo(@RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
-        KakaoUserInfoResponseDto responseDto = loadUserInfo(accessToken);
-        return ResponseEntity.ok(responseDto);
+        return objectMapper.readValue(response.getBody(), KakaoTokenResponseDto.class);
     }
 
     private KakaoUserInfoResponseDto loadUserInfo(String accessToken) throws JsonProcessingException {
