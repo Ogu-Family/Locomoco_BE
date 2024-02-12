@@ -42,7 +42,10 @@ jobs:
 
       - name: Build Spring application
         run: |
-          ~/Locomoco_BE/gradlew clean build -x test
+          cd Locomoco_BE
+          git fetch
+          git pull origin master
+          ./gradlew clean build -x test
 
       - name: Copy new server to ~/source
         run: |
@@ -51,7 +54,8 @@ jobs:
 
       - name: Start the server
         run: |
-          nohup java -jar ~/source/locomoco-server-0.0.1-SNAPSHOT.jar > server.log 2>&1 &
+          cd ~/source
+          nohup java -jar locomoco-server-0.0.1-SNAPSHOT.jar > server.log 2>&1 &
           echo "Server started"
       - name: Complete job
         run: |
