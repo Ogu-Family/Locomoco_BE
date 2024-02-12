@@ -42,7 +42,7 @@ jobs:
 
       - name: Build Spring application
         run: |
-          ./gradlew clean build -x test
+          ~/Locomoco_BE/gradlew clean build -x test
 
       - name: Copy new server to ~/source
         run: |
