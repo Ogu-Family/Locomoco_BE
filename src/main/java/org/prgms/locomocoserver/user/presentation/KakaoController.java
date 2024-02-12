@@ -2,6 +2,10 @@ package org.prgms.locomocoserver.user.presentation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -14,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
+@Tag(name = "Kakao Login Controller", description = "카카오 로그인 컨트롤러")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -26,12 +31,16 @@ public class KakaoController {
     @Value("${oauth.kakao.REDIRECT_URI}")
     private String kakao_redirect_uri;
 
+    @Operation(summary = "카카오 로그인 페이지", description = "카카오 로그인 페이지 반환")
     @GetMapping("/users/login/kakao")
     public void getKakaoLoginAuth(HttpServletResponse response) throws IOException {
         response.sendRedirect("https://kauth.kakao.com/oauth/authorize?client_id="
                 + kakao_api_key + "&redirect_uri=" + kakao_redirect_uri + "&response_type=code");
     }
 
+    @Operation(summary = "로그인 후 리다이렉트 uri", description = "자동 redirect 되어 token 정보를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "로그인 성공")
+    @Parameter(name = "code", description = "로그인 정보 입력 시 카카오에서 반환되는 일회성 code")
     @GetMapping("/users/login/kakao/callback")
     public ResponseEntity<KakaoTokenResponseDto> getKakaoLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
         KakaoTokenResponseDto tokenResponseDto = getTokenDto(code);
@@ -41,6 +50,8 @@ public class KakaoController {
         return ResponseEntity.ok(tokenResponseDto);
     }
 
+    @Operation(summary = "로그인된 사용자 정보 조회", description = "access token으로 사용자 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "로그인 정보 조회 성공")
     @GetMapping("/users/kakao/me")
     @ResponseBody
     public ResponseEntity<KakaoUserInfoResponseDto> getUserInfo(@RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
