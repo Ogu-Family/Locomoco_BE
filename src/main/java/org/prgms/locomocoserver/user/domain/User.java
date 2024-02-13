@@ -45,11 +45,8 @@ public class User extends BaseEntity {
     @Column(name = "provider", nullable = false)
     private String provider;
 
-    @Column(name = "provide_id", nullable = false)
-    private String provideId;
-
     @Builder
-    public User(String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider, String provideId) {
+    public User(String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider) {
         this.nickname = nickname;
         this.birth = birth;
         this.gender = gender;
@@ -57,6 +54,5 @@ public class User extends BaseEntity {
         this.job = job;
         this.email = new EmailVo(email).getEmail();
         this.provider = provider;
-        this.provideId = provideId;
     }
 }
