@@ -17,9 +17,6 @@ public record KakaoUserInfoResponseDto(
         @JsonProperty("kakao_account") KakaoAccountDto kakaoAccount
 
 ) implements OAuthUserInfoDto {
-
-    private static double DEFAULT_TEMPERATURE = 36.5;
-
     @Override
     public User toEntity() {
         return User.builder()
