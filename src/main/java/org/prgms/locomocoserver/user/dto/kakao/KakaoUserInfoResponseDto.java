@@ -15,6 +15,7 @@ public record KakaoUserInfoResponseDto(
         @JsonProperty("id") long id,
         @JsonProperty("connected_at") String connectedAt,
         @JsonProperty("kakao_account") KakaoAccountDto kakaoAccount
+
 ) implements OAuthUserInfoDto {
 
     private static double DEFAULT_TEMPERATURE = 36.5;
@@ -26,22 +27,12 @@ public record KakaoUserInfoResponseDto(
                 .gender(Gender.valueOf(kakaoAccount.gender().toUpperCase()))
                 .temperature(DEFAULT_TEMPERATURE)
                 .email(kakaoAccount().email())
-                .provider("kakao")
+                .provider(this.getProvider())
                 .build();
-    }
-
-    @Override
-    public String getEmail() {
-        return kakaoAccount.email();
     }
 
     @Override
     public String getProvider() {
         return Provider.KAKAO.name();
-    }
-
-    @Override
-    public String getProvideId() {
-        return String.valueOf(id);
     }
 }
