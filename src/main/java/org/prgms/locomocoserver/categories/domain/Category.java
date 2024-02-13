@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.global.categories.domain;
+package org.prgms.locomocoserver.categories.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +14,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.prgms.locomocoserver.global.tags.domain.Tag;
+import org.prgms.locomocoserver.tags.domain.Tag;
 
 @Entity
 @Getter

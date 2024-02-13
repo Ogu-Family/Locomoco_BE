@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.prgms.locomocoserver.global.tags.domain.Tag;
+import org.prgms.locomocoserver.tags.domain.Tag;
 
 @Entity
 @Getter
