@@ -9,15 +9,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.tags.domain.Tag;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "mogakko_tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MogakkoTags {
+public class MogakkoTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,4 +32,10 @@ public class MogakkoTags {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
+
+    public MogakkoTag(Long id, Mogakko mogakko, Tag tag) {
+        this.id = id;
+        this.mogakko = mogakko;
+        this.tag = tag;
+    }
 }
