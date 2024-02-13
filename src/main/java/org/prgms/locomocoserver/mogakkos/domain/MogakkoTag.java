@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,5 +38,14 @@ public class MogakkoTag {
         this.id = id;
         this.mogakko = mogakko;
         this.tag = tag;
+    }
+
+    public void updateMogakko(Mogakko mogakko) {
+        if (Objects.nonNull(mogakko)) {
+            mogakko.getMogakkoTags().remove(this);
+        }
+
+        mogakko.getMogakkoTags().add(this);
+        this.mogakko = mogakko;
     }
 }
