@@ -23,7 +23,7 @@ public record KakaoUserInfoResponseDto(
     @Override
     public User toEntity() {
         return User.builder()
-                .birth(LocalDate.parse(kakaoAccount.birthyear()+kakaoAccount.birthday(), DateTimeFormatter.ofPattern("yyyyMMdd")))
+                .birth(LocalDate.parse(kakaoAccount.birthyear() + kakaoAccount.birthday(), DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .gender(Gender.valueOf(kakaoAccount.gender().toUpperCase()))
                 .temperature(DEFAULT_TEMPERATURE)
                 .email(this.getEmail())

@@ -10,6 +10,7 @@ import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.prgms.locomocoserver.user.vo.EmailVo;
 import org.prgms.locomocoserver.user.vo.TemperatureVo;
+
 import java.time.LocalDate;
 
 @Entity
