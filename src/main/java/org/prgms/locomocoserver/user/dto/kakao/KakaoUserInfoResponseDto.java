@@ -26,7 +26,7 @@ public record KakaoUserInfoResponseDto(
                 .birth(LocalDate.parse(kakaoAccount.birthyear()+kakaoAccount.birthday(), DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .gender(Gender.valueOf(kakaoAccount.gender().toUpperCase()))
                 .temperature(DEFAULT_TEMPERATURE)
-                .email(kakaoAccount().email())
+                .email(this.getEmail())
                 .provider(this.getProvider())
                 .build();
     }
@@ -34,5 +34,10 @@ public record KakaoUserInfoResponseDto(
     @Override
     public String getProvider() {
         return Provider.KAKAO.name();
+    }
+
+    @Override
+    public String getEmail() {
+        return kakaoAccount.email();
     }
 }
