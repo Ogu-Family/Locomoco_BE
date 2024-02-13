@@ -2,6 +2,8 @@ package org.prgms.locomocoserver.mogakkos.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,14 +45,22 @@ public class Mogakko {
     @Column(name = "max_participant", columnDefinition = "int default 10")
     private Integer max_participant;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private MGCType mgcType;
+
     @Builder
-    public Mogakko(String title, String content, LocalDateTime startTime, LocalDateTime endTime,
-        LocalDateTime deadline, int likeCount) {
+    public Mogakko(Long id, String title, String content, LocalDateTime startTime,
+        LocalDateTime endTime, LocalDateTime deadline, int likeCount, Integer max_participant,
+        MGCType mgcType) {
+        this.id = id;
         this.title = title;
         this.content = content;
         this.startTime = startTime;
         this.endTime = endTime;
         this.deadline = deadline;
         this.likeCount = likeCount;
+        this.max_participant = max_participant;
+        this.mgcType = mgcType;
     }
 }
