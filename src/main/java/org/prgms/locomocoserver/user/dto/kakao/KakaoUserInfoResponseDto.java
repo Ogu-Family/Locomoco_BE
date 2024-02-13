@@ -27,7 +27,6 @@ public record KakaoUserInfoResponseDto(
                 .temperature(DEFAULT_TEMPERATURE)
                 .email(kakaoAccount().email())
                 .provider("kakao")
-                .provideId(String.valueOf(id))
                 .build();
     }
 

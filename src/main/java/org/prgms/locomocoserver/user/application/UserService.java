@@ -22,7 +22,7 @@ public class UserService {
 
         // UserDto 생성
         UserDto userDto = new UserDto(user.getId(), user.getNickname(), user.getBirth().toString(), user.getGender().name(), user.getTemperature(),
-                null, user.getEmail(), user.getProvider(), user.getProvideId());
+                null, user.getEmail(), user.getProvider());
         return userDto;
     }
 }
