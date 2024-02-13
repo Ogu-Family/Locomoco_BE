@@ -35,7 +35,7 @@ public record KakaoUserInfoResponseDto(
     public String getProvider() {
         return Provider.KAKAO.name();
     }
-
+    
     @Override
     public String getEmail() {
         return kakaoAccount.email();

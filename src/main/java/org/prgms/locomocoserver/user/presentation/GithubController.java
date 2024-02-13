@@ -1,16 +1,18 @@
 package org.prgms.locomocoserver.user.presentation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.dto.github.GithubTokenResponseDto;
+import org.prgms.locomocoserver.user.dto.github.GithubUserInfoResponseDto;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -44,6 +46,12 @@ public class GithubController {
         return ResponseEntity.ok(githubTokenResponseDto);
     }
 
+    @GetMapping("/users/github/me")
+    public ResponseEntity<GithubUserInfoResponseDto> getUserInfo(@RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
+        GithubUserInfoResponseDto userInfo = loadUserInfo(accessToken);
+        return ResponseEntity.ok(userInfo);
+    }
+
     private GithubTokenResponseDto getTokenDto(String code) {
         String tokenUrl = "https://github.com/login/oauth/access_token";
 
@@ -52,6 +60,30 @@ public class GithubController {
                 tokenUrl + "?client_id={clientId}&client_secret={clientSecret}&code={code}&redirect_uri={redirectUri}",
                 null, GithubTokenResponseDto.class, github_client_id, github_client_secret_key, code, github_redirect_url);
         return response.getBody();
+    }
+
+    private GithubUserInfoResponseDto loadUserInfo(String accessToken) throws JsonProcessingException {
+        String apiUrl = "https://api.github.com/user/emails";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+
+        // 응답으로 받은 JSON 데이터를 배열로 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        GithubUserInfoResponseDto[] userInfos = objectMapper.readValue(response.getBody(), GithubUserInfoResponseDto[].class);
+
+        // primary 값이 true인 이메일 찾기
+        for (GithubUserInfoResponseDto userInfo : userInfos) {
+            if (userInfo.primary()) {
+                return userInfo;
+            }
+        }
+
+        // primary email이 없는 경우
+        return null;
     }
 
 }
