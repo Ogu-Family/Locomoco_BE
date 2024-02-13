@@ -40,8 +40,10 @@ public class GithubController {
     }
 
     @GetMapping("/users/login/github/callback")
-    public ResponseEntity<GithubTokenResponseDto> getGithubLoginCallback(@RequestParam(name = "code") String code) {
+    public ResponseEntity<GithubTokenResponseDto> getGithubLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
         GithubTokenResponseDto githubTokenResponseDto = getTokenDto(code);
+        GithubUserInfoResponseDto githubUserInfoResponseDto = loadUserInfo(githubTokenResponseDto.accessToken());
+        userService.saveOrUpdate(githubUserInfoResponseDto);
 
         return ResponseEntity.ok(githubTokenResponseDto);
     }
