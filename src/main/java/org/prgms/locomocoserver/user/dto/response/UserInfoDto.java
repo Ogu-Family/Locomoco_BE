@@ -7,7 +7,7 @@ import org.prgms.locomocoserver.user.domain.enums.Provider;
 
 import java.time.LocalDate;
 
-public record UserDto(
+public record UserInfoDto(
         @Schema(description = "사용자 id", example = "1L")
         Long userId,
         @Schema(description = "사용자 닉네임", example = "nickname")
