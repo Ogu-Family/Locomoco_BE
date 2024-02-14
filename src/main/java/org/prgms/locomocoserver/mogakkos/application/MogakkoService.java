@@ -7,6 +7,7 @@ import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.SelectedTagsDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class MogakkoService {
     private final MogakkoRepository mogakkoRepository;
     private final TagRepository tagRepository;
 
-    public long create(MogakkoCreateRequestDto requestDto) { // TODO: 생성한 사용자 관련 로직 추가
+    public MogakkoCreateResponseDto create(MogakkoCreateRequestDto requestDto) { // TODO: 생성한 사용자 관련 로직 추가
         List<SelectedTagsDto> selectedTagsDtos = requestDto.tags();
         Mogakko mogakko = requestDto.toMogakkoWithoutTags();
 
@@ -32,6 +33,6 @@ public class MogakkoService {
 
         Mogakko savedMogakko = mogakkoRepository.save(mogakko);
 
-        return savedMogakko.getId();
+        return new MogakkoCreateResponseDto(savedMogakko.getId()); // TODO: FE가 원하는 포맷이 있으면 그것으로 DTO 변환.
     }
 }

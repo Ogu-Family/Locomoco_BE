@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,9 +27,9 @@ public class MogakkoController {
     @ApiResponses(
         @ApiResponse(responseCode = "200", description = "모각코 생성 성공")
     )
-    public ResponseEntity<Long> create(@RequestBody MogakkoCreateRequestDto requestDto) {
-        long mogakkoId = mogakkoService.create(requestDto);
+    public ResponseEntity<MogakkoCreateResponseDto> create(@RequestBody MogakkoCreateRequestDto requestDto) {
+        MogakkoCreateResponseDto responseDto = mogakkoService.create(requestDto);
 
-        return ResponseEntity.ok(mogakkoId);
+        return ResponseEntity.ok(responseDto);
     }
 }

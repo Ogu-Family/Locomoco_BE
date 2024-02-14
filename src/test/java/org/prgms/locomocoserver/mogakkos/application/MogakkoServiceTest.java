@@ -19,6 +19,7 @@ import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoTagRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.SelectedTagsDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,10 +79,10 @@ class MogakkoServiceTest {
                 new SelectedTagsDto(2L, List.of(3L, 4L))));
 
         // when
-        long createdMogakkoId = mogakkoService.create(mogakkoCreateRequestDto);
+        MogakkoCreateResponseDto responseDto = mogakkoService.create(mogakkoCreateRequestDto);
 
         // then
-        Optional<Mogakko> mogakkoOptional = mogakkoRepository.findById(createdMogakkoId);
+        Optional<Mogakko> mogakkoOptional = mogakkoRepository.findById(responseDto.id());
         assertThat(mogakkoOptional.isPresent()).isTrue();
 
         Mogakko createdMogakko = mogakkoOptional.get();
