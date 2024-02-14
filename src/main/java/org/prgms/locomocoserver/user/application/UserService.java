@@ -6,7 +6,6 @@ import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
-import org.prgms.locomocoserver.user.domain.enums.Provider;
 import org.prgms.locomocoserver.user.dto.OAuthUserInfoDto;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
@@ -42,6 +41,7 @@ public class UserService {
         return new UserLoginResponse(tokenResponseDto, userDto, isNewUser);
     }
 
+    @Transactional
     public UserInfoDto getInitInfo(Long userId, UserInitInfoRequestDto requestDto) {
         User user = getById(userId);
         user.setInitInfo(requestDto.nickname(), requestDto.birth(),
@@ -49,6 +49,10 @@ public class UserService {
         user = userRepository.save(user);
 
         return new UserInfoDto(user.getId(), user.getNickname(), user.getBirth(), user.getGender(), user.getTemperature(), user.getJob(), user.getEmail(), user.getProvider());
+    }
+
+    public boolean isNicknameUnique(String nickname) {
+        return !userRepository.findByNicknameAndDeletedAtIsNull(nickname).isPresent();
     }
 
     private User getById(Long userId) {
