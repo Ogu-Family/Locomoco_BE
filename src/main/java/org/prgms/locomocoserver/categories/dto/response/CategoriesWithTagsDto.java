@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.categories.dto;
+package org.prgms.locomocoserver.categories.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
