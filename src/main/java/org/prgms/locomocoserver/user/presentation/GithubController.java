@@ -2,6 +2,10 @@ package org.prgms.locomocoserver.user.presentation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -16,8 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.Map;
 
+@Tag(name = "Github Login Controller", description = "깃허브 로그인 컨트롤러")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -34,11 +38,15 @@ public class GithubController {
     @Value("${oauth.github.REDIRECT_URI}")
     private String github_redirect_url;
 
+    @Operation(summary = "깃허브 로그인 페이지", description = "깃허브 로그인 페이지 반환")
     @GetMapping("/users/login/github")
     public void getGithubAuth(HttpServletResponse response) throws IOException {
         response.sendRedirect("https://github.com/login/oauth/authorize?client_id=" + github_client_id);
     }
 
+    @Operation(summary = "로그인 후 리다이렉트 uri", description = "자동 redirect 되어 token 정보를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "로그인 성공")
+    @Parameter(name = "code", description = "로그인 정보 입력 시 깃허브에서 반환되는 일회성 code")
     @GetMapping("/users/login/github/callback")
     public ResponseEntity<GithubTokenResponseDto> getGithubLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
         GithubTokenResponseDto githubTokenResponseDto = getTokenDto(code);
@@ -48,6 +56,8 @@ public class GithubController {
         return ResponseEntity.ok(githubTokenResponseDto);
     }
 
+    @Operation(summary = "로그인된 사용자 정보 조회", description = "access token으로 사용자 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "로그인 정보 조회 성공")
     @GetMapping("/users/github/me")
     public ResponseEntity<GithubUserInfoResponseDto> getUserInfo(@RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
         GithubUserInfoResponseDto userInfo = loadUserInfo(accessToken);
