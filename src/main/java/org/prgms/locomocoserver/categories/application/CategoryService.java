@@ -18,8 +18,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public Results<CategoriesWithTagsDto> findAllBy(String type) {
-        CategoryType categoryType = CategoryType.valueOf(type);
+    public Results<CategoriesWithTagsDto> findAllBy(CategoryType categoryType) {
 
         List<Category> categories = categoryRepository.findAllByType(categoryType);
 

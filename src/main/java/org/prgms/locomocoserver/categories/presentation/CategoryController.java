@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.categories.application.CategoryService;
+import org.prgms.locomocoserver.categories.domain.CategoryType;
 import org.prgms.locomocoserver.categories.dto.response.CategoriesWithTagsDto;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,8 @@ public class CategoryController {
     )
     public ResponseEntity<Results<CategoriesWithTagsDto>> findAllByType(
         @Parameter(description = "마이페이지 관련인지, 모각코 관련인지 적어주는 파라미터", example = "MOGAKKO")
-        @RequestParam(name = "type") String type) {
-        Results<CategoriesWithTagsDto> results = categoryService.findAllBy(type);
+        @RequestParam(name = "type") CategoryType categoryType) {
+        Results<CategoriesWithTagsDto> results = categoryService.findAllBy(categoryType);
 
         return ResponseEntity.ok(results);
     }

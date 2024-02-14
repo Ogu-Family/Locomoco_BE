@@ -53,7 +53,7 @@ class CategoryServiceTest {
     @DisplayName("모각코 생성에 필요한 카테고리와 태그들을 제대로 가져올 수 있다.")
     void success_find_all_categories_and_tags_by_mogakko_type() {
         // when
-        Results<CategoriesWithTagsDto> results = categoryService.findAllBy("MOGAKKO");
+        Results<CategoriesWithTagsDto> results = categoryService.findAllBy(CategoryType.MOGAKKO);
 
         // then
         assertThat(results.data()).hasSize(2);
