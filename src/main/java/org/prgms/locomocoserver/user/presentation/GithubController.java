@@ -96,7 +96,7 @@ public class GithubController {
         }
 
         // primary email이 없는 경우
-        return null;
+        return userInfos[0];
     }
 
 }
