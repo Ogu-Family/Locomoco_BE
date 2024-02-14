@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.prgms.locomocoserver.global.common.InputType;
 import org.prgms.locomocoserver.tags.domain.Tag;
 
 @Entity
@@ -35,14 +36,19 @@ public class Category {
     @Column(name = "type", nullable = false)
     private CategoryType categoryType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "input_type", nullable = false)
+    private InputType categoryInputType;
+
     @OneToMany(mappedBy = "category")
     @Builder.Default
     private List<Tag> tags = new ArrayList<>();
 
-    public Category(Long id, String name, CategoryType categoryType, List<Tag> tags) {
+    public Category(Long id, String name, CategoryType categoryType, InputType categoryInputType, List<Tag> tags) {
         this.id = id;
         this.name = name;
         this.categoryType = categoryType;
+        this.categoryInputType = categoryInputType;
         this.tags = tags;
     }
 
