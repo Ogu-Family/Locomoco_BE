@@ -7,7 +7,6 @@ public record GithubTokenResponseDto(
         @JsonProperty("token_type") String tokenType,
         @JsonProperty("refresh_token") String refreshToken,
         @JsonProperty("expires_in") int expiresIn,
-        @JsonProperty("refresh_token_expires_in") int refreshTokenExpiresIn,
-        @JsonProperty("scope") String scope
+        @JsonProperty("refresh_token_expires_in") int refreshTokenExpiresIn
 ) {
 }
