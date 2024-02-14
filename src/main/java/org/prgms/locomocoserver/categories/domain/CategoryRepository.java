@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    @Query(value = "SELECT c FROM Category c JOIN FETCH Tag t WHERE c.categoryType = :categoryType")
+    @Query(value = "SELECT c FROM Category c JOIN FETCH Tag t ON t.category = c WHERE c.categoryType = :categoryType")
     List<Category> findAllByType(CategoryType categoryType);
 }
