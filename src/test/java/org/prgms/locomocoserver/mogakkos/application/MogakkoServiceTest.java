@@ -64,7 +64,7 @@ class MogakkoServiceTest {
 
     @Test
     @DisplayName("모각코 생성이 제대로 되는지 확인한다")
-    void success_create_Mogakko() {
+    void success_create_mogakko() {
         // given
         LocalDateTime startTime = LocalDateTime.now();
         MogakkoCreateRequestDto mogakkoCreateRequestDto = new MogakkoCreateRequestDto("제목",
@@ -82,7 +82,7 @@ class MogakkoServiceTest {
         MogakkoCreateResponseDto responseDto = mogakkoService.create(mogakkoCreateRequestDto);
 
         // then
-        Optional<Mogakko> mogakkoOptional = mogakkoRepository.findById(responseDto.id());
+        Optional<Mogakko> mogakkoOptional = mogakkoRepository.findByIdAndDeletedAtIsNull(responseDto.id());
         assertThat(mogakkoOptional.isPresent()).isTrue();
 
         Mogakko createdMogakko = mogakkoOptional.get();

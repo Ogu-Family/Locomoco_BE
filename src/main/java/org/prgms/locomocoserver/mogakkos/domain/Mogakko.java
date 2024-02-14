@@ -17,13 +17,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.prgms.locomocoserver.global.common.BaseEntity;
 
 @Entity
 @Getter
 @Builder
 @Table(name = "mogakko")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Mogakko { // TODO: User 연동
+public class Mogakko extends BaseEntity { // TODO: User 연동
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
