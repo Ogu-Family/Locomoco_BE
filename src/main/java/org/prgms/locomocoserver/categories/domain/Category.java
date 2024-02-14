@@ -45,4 +45,8 @@ public class Category {
         this.categoryType = categoryType;
         this.tags = tags;
     }
+
+    public void addTag(Tag tag) {
+        tag.updateCategory(this);
+    }
 }

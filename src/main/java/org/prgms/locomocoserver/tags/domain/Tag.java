@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,6 +37,15 @@ public class Tag {
     public Tag(Long id, String name, Category category) {
         this.id = id;
         this.name = name;
+        this.category = category;
+    }
+
+    public void updateCategory(Category category) {
+        if (Objects.nonNull(category)) {
+            category.getTags().remove(this);
+        }
+
+        category.getTags().add(this);
         this.category = category;
     }
 }
