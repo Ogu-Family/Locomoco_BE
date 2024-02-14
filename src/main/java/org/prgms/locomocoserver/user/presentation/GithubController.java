@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.dto.github.GithubUserInfoResponseDto;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
+import org.prgms.locomocoserver.user.dto.response.UserLoginResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -48,12 +49,12 @@ public class GithubController {
     @ApiResponse(responseCode = "200", description = "로그인 성공")
     @Parameter(name = "code", description = "로그인 정보 입력 시 깃허브에서 반환되는 일회성 code")
     @GetMapping("/users/login/github/callback")
-    public ResponseEntity<TokenResponseDto> getGithubLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
-        TokenResponseDto githubTokenResponseDto = getTokenDto(code);
-        GithubUserInfoResponseDto githubUserInfoResponseDto = loadUserInfo(githubTokenResponseDto.accessToken());
-        userService.saveOrUpdate(githubUserInfoResponseDto);
+    public ResponseEntity<UserLoginResponse> getGithubLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
+        TokenResponseDto tokenResponseDto = getTokenDto(code);
+        GithubUserInfoResponseDto githubUserInfoResponseDto = loadUserInfo(tokenResponseDto.accessToken());
+        UserLoginResponse userLoginResponse = userService.saveOrUpdate(githubUserInfoResponseDto, tokenResponseDto);
 
-        return ResponseEntity.ok(githubTokenResponseDto);
+        return ResponseEntity.ok(userLoginResponse);
     }
 
     @Operation(summary = "로그인된 사용자 정보 조회", description = "access token으로 사용자 정보를 조회합니다.")
