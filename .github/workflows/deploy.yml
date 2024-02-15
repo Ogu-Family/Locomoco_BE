@@ -1,29 +1,21 @@
-name: App install and start
+name: Run Ubuntu Script
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  run_script:
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Make scripts directory
-        run: mkdir -p ~/scripts
-
-      - name: Copy deployment script
-        run: cp scripts/deploy.sh ~/scripts/deploy.sh
-      
-      - name: Add execute permission to the script
-        run: chmod +x ~/scripts/deploy.sh
-
-      - name: Run deployment script
+      - name: Run script
         run: ~/scripts/deploy.sh
+
 
 
 # jobs:
