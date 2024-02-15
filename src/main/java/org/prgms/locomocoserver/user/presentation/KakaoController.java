@@ -22,7 +22,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-@CrossOrigin(origins = "*")
+@CrossOrigin("*")
 public class KakaoController {
 
     private final UserService userService;
