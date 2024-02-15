@@ -30,7 +30,7 @@ public class MogakkoController {
         @ApiResponse(responseCode = "200", description = "모각코 생성 성공")
     )
     public ResponseEntity<MogakkoCreateResponseDto> create(@RequestBody MogakkoCreateRequestDto requestDto) {
-        MogakkoCreateResponseDto responseDto = mogakkoService.create(requestDto);
+        MogakkoCreateResponseDto responseDto = mogakkoService.save(requestDto);
 
         return ResponseEntity.ok(responseDto);
     }

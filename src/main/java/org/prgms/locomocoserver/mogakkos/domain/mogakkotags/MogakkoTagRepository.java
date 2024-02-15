@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.mogakkos.domain;
+package org.prgms.locomocoserver.mogakkos.domain.mogakkotags;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

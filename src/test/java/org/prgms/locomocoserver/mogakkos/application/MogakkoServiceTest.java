@@ -16,7 +16,7 @@ import org.prgms.locomocoserver.categories.domain.CategoryType;
 import org.prgms.locomocoserver.mogakkos.domain.MGCType;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
-import org.prgms.locomocoserver.mogakkos.domain.MogakkoTagRepository;
+import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.SelectedTagsDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
@@ -77,7 +77,7 @@ class MogakkoServiceTest {
                 new SelectedTagsDto(2L, List.of(3L, 4L))));
 
         // when
-        MogakkoCreateResponseDto responseDto = mogakkoService.create(mogakkoCreateRequestDto);
+        MogakkoCreateResponseDto responseDto = mogakkoService.save(mogakkoCreateRequestDto);
 
         // then
         Optional<Mogakko> mogakkoOptional = mogakkoRepository.findByIdAndDeletedAtIsNull(responseDto.id());

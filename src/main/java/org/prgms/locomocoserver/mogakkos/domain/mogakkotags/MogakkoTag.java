@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.mogakkos.domain;
+package org.prgms.locomocoserver.mogakkos.domain.mogakkotags;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.tags.domain.Tag;
 
 @Entity
