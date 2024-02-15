@@ -10,7 +10,6 @@ import org.prgms.locomocoserver.categories.domain.Category;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
 import org.prgms.locomocoserver.categories.dto.response.CategoriesWithTagsDto;
-import org.prgms.locomocoserver.global.common.InputType;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
@@ -29,10 +28,8 @@ class CategoryServiceTest {
 
     @BeforeEach
     void setUp() {
-        Category langs = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 언어")
-            .categoryInputType(InputType.DROPDOWN).build();
-        Category coding = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 유형")
-            .categoryInputType(InputType.RADIO).build();
+        Category langs = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 언어").build();
+        Category coding = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 유형").build();
 
         categoryRepository.saveAll(List.of(langs, coding));
 
