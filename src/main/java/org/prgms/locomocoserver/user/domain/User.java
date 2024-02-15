@@ -56,4 +56,11 @@ public class User extends BaseEntity {
         this.email = new EmailVo(email).getEmail();
         this.provider = provider;
     }
+
+    public void setInitInfo(String nickname, LocalDate birth, Gender gender, Job job) {
+        this.nickname = nickname;
+        this.birth = birth;
+        this.gender = gender;
+        this.job = job;
+    }
 }

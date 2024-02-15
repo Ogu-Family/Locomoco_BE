@@ -9,8 +9,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.user.application.UserService;
-import org.prgms.locomocoserver.user.dto.kakao.KakaoTokenResponseDto;
 import org.prgms.locomocoserver.user.dto.kakao.KakaoUserInfoResponseDto;
+import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
+import org.prgms.locomocoserver.user.dto.response.UserLoginResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -43,12 +44,12 @@ public class KakaoController {
     @ApiResponse(responseCode = "200", description = "로그인 성공")
     @Parameter(name = "code", description = "로그인 정보 입력 시 카카오에서 반환되는 일회성 code")
     @GetMapping("/users/login/kakao/callback")
-    public ResponseEntity<KakaoTokenResponseDto> getKakaoLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
-        KakaoTokenResponseDto tokenResponseDto = getTokenDto(code);
+    public ResponseEntity<UserLoginResponse> getKakaoLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
+        TokenResponseDto tokenResponseDto = getTokenDto(code);
         KakaoUserInfoResponseDto kakaoUserInfoResponseDto = loadUserInfo(tokenResponseDto.accessToken());
-        userService.saveOrUpdate(kakaoUserInfoResponseDto);
+        UserLoginResponse userLoginResponse = userService.saveOrUpdate(kakaoUserInfoResponseDto, tokenResponseDto);
 
-        return ResponseEntity.ok(tokenResponseDto);
+        return ResponseEntity.ok(userLoginResponse);
     }
 
     @Operation(summary = "로그인된 사용자 정보 조회", description = "access token으로 사용자 정보를 조회합니다.")
@@ -60,7 +61,7 @@ public class KakaoController {
         return ResponseEntity.ok(responseDto);
     }
 
-    private KakaoTokenResponseDto getTokenDto(String code) throws JsonProcessingException {
+    private TokenResponseDto getTokenDto(String code) throws JsonProcessingException {
         // Kakao 인증 서버 엔드포인트 URL
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
 
@@ -78,7 +79,7 @@ public class KakaoController {
 
         // 응답 본문에서 DTO로 수동 변환
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(response.getBody(), KakaoTokenResponseDto.class);
+        return objectMapper.readValue(response.getBody(), TokenResponseDto.class);
     }
 
     private KakaoUserInfoResponseDto loadUserInfo(String accessToken) throws JsonProcessingException {
