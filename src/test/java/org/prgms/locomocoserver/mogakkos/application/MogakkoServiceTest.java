@@ -42,10 +42,8 @@ class MogakkoServiceTest {
 
     @BeforeAll
     void setUp() {
-        Category langs = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 언어")
-            .build();
-        Category coding = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 유형")
-            .build();
+        Category langs = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 언어").build();
+        Category coding = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 유형").build();
 
         categoryRepository.saveAll(List.of(langs, coding));
 
