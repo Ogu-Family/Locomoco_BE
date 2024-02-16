@@ -83,7 +83,8 @@ class MogakkoServiceTest {
 
         Mogakko createdMogakko = mogakkoOptional.get();
         assertThat(createdMogakko.getTitle()).isEqualTo("제목");
-        assertThat(createdMogakko.getMaxParticipants()).isEqualTo(10);
+        assertThat(createdMogakko.getMaxParticipants()).isEqualTo(Mogakko.DEFAULT_MAX_PARTICIPANTS);
+        assertThat(createdMogakko.getViews()).isEqualTo(0);
 
         assertThat(mogakkoTagRepository.findAll()).hasSize(3);
     }

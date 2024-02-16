@@ -23,6 +23,7 @@ public record MogakkoCreateRequestDto(@Schema(description = "모각코 글 제�
             .deadline(deadline)
             .likeCount(0)
             .location(location)
+            .views(0)
             .maxParticipants(maxParticipants != null ? maxParticipants : Mogakko.DEFAULT_MAX_PARTICIPANTS)
             .build();
     }

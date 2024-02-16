@@ -26,6 +26,7 @@ import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 @Table(name = "mogakko")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Mogakko extends BaseEntity { // TODO: User 연동
+
     public static final int DEFAULT_MAX_PARTICIPANTS = 10;
 
     @Id
@@ -50,11 +51,15 @@ public class Mogakko extends BaseEntity { // TODO: User 연동
     @Column(name = "like_count", nullable = false)
     private int likeCount;
 
-    @Column(name = "max_participants", columnDefinition = "int default " + DEFAULT_MAX_PARTICIPANTS, nullable = false)
+    @Column(name = "max_participants", columnDefinition = "int default "
+        + DEFAULT_MAX_PARTICIPANTS, nullable = false)
     private int maxParticipants;
 
     @Column(name = "location") // TODO: 임시 컬럼. 추후 리스트 구현 시에 Location 테이블과 연동
     private String location;
+
+    @Column(name = "views")
+    private long views;
 
     @OneToMany(mappedBy = "mogakko", cascade = CascadeType.PERSIST)
     @Builder.Default
@@ -70,7 +75,7 @@ public class Mogakko extends BaseEntity { // TODO: User 연동
 
     public Mogakko(Long id, String title, String content, LocalDateTime startTime,
         LocalDateTime endTime, LocalDateTime deadline, int likeCount, int maxParticipants,
-        String location, List<MogakkoTag> mogakkoTags, List<Participant> participants,
+        String location, long views, List<MogakkoTag> mogakkoTags, List<Participant> participants,
         List<Inquiry> inquiries) {
         this.id = id;
         this.title = title;
@@ -81,6 +86,7 @@ public class Mogakko extends BaseEntity { // TODO: User 연동
         this.likeCount = likeCount;
         this.maxParticipants = maxParticipants;
         this.location = location; // TODO: 추후 삭제
+        this.views = views;
         this.mogakkoTags = mogakkoTags;
         this.participants = participants;
         this.inquiries = inquiries;
