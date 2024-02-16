@@ -1,5 +1,6 @@
-package org.prgms.locomocoserver.mogakkos.domain;
+package org.prgms.locomocoserver.inquiries.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,39 +14,47 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.prgms.locomocoserver.tags.domain.Tag;
+import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
+import org.prgms.locomocoserver.user.domain.User;
 
 @Entity
 @Getter
-@Builder
-@Table(name = "mogakko_tags")
+@Table(name = "inquiries")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MogakkoTag {
+public class Inquiry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "content")
+    private String content;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mogakko_id", nullable = false)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mogakko_id")
     private Mogakko mogakko;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id", nullable = false)
-    private Tag tag;
-
-    public MogakkoTag(Long id, Mogakko mogakko, Tag tag) {
-        this.id = id;
+    @Builder
+    public Inquiry(String content, User user, Mogakko mogakko) {
+        this.content = content;
+        this.user = user;
         this.mogakko = mogakko;
-        this.tag = tag;
+    }
+
+    public void updateUser(User user) {
+        this.user = user;
     }
 
     public void updateMogakko(Mogakko mogakko) {
         if (Objects.nonNull(mogakko)) {
-            mogakko.getMogakkoTags().remove(this);
+            mogakko.getInquiries().remove(this);
         }
 
-        mogakko.getMogakkoTags().add(this);
         this.mogakko = mogakko;
+        mogakko.getInquiries().add(this);
     }
 }
