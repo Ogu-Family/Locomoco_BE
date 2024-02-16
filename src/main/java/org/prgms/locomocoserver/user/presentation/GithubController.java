@@ -26,7 +26,6 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-@CrossOrigin("*")
 public class GithubController {
 
     private final UserService userService;
