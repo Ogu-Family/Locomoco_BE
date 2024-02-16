@@ -11,8 +11,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-      - uses: actions/checkout@v2
-      - run: ls -al
+        uses: actions/checkout@v2
+        
+      - name: Show file list
+        run: ls -al
 
       - name: Run script
         run: ~/scripts/deploy.sh
