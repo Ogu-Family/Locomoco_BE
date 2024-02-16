@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.inquires.domain;
+package org.prgms.locomocoserver.inquiries.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "inquires")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Inquire {
+public class Inquiry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
