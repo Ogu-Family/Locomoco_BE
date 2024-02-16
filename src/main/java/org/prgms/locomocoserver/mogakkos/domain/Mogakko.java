@@ -16,7 +16,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.global.common.BaseEntity;
+import org.prgms.locomocoserver.inquiries.domain.Inquiry;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
+import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 
 @Entity
 @Getter
@@ -58,9 +60,18 @@ public class Mogakko extends BaseEntity { // TODO: User 연동
     @Builder.Default
     private List<MogakkoTag> mogakkoTags = new ArrayList<>();
 
+    @OneToMany(mappedBy = "mogakko")
+    @Builder.Default
+    private List<Participant> participants = new ArrayList<>();
+
+    @OneToMany(mappedBy = "mogakko")
+    @Builder.Default
+    private List<Inquiry> inquiries = new ArrayList<>();
+
     public Mogakko(Long id, String title, String content, LocalDateTime startTime,
-        LocalDateTime endTime, LocalDateTime deadline, int likeCount, Integer maxParticipants,
-        String location, List<MogakkoTag> mogakkoTags) {
+        LocalDateTime endTime, LocalDateTime deadline, int likeCount, int maxParticipants,
+        String location, List<MogakkoTag> mogakkoTags, List<Participant> participants,
+        List<Inquiry> inquiries) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -71,9 +82,19 @@ public class Mogakko extends BaseEntity { // TODO: User 연동
         this.maxParticipants = maxParticipants;
         this.location = location; // TODO: 추후 삭제
         this.mogakkoTags = mogakkoTags;
+        this.participants = participants;
+        this.inquiries = inquiries;
     }
 
     public void addMogakkoTag(MogakkoTag mogakkoTag) {
         mogakkoTag.updateMogakko(this);
+    }
+
+    public void addParticipant(Participant participant) {
+        participant.updateMogakko(this);
+    }
+
+    public void addInquiry(Inquiry inquiry) {
+        inquiry.updateMogakko(this);
     }
 }

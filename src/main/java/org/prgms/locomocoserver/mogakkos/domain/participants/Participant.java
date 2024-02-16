@@ -1,6 +1,5 @@
-package org.prgms.locomocoserver.inquiries.domain;
+package org.prgms.locomocoserver.mogakkos.domain.participants;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,16 +18,13 @@ import org.prgms.locomocoserver.user.domain.User;
 
 @Entity
 @Getter
-@Table(name = "inquiries")
+@Table(name = "participants")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Inquiry {
+public class Participant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "content")
-    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -39,8 +35,7 @@ public class Inquiry {
     private Mogakko mogakko;
 
     @Builder
-    public Inquiry(String content, User user, Mogakko mogakko) {
-        this.content = content;
+    public Participant(User user, Mogakko mogakko) {
         this.user = user;
         this.mogakko = mogakko;
     }
@@ -51,10 +46,10 @@ public class Inquiry {
 
     public void updateMogakko(Mogakko mogakko) {
         if (Objects.nonNull(mogakko)) {
-            mogakko.getInquiries().remove(this);
+            mogakko.getParticipants().remove(this);
         }
 
         this.mogakko = mogakko;
-        mogakko.getInquiries().add(this);
+        mogakko.getParticipants().add(this);
     }
 }
