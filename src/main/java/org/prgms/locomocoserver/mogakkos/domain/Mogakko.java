@@ -3,8 +3,6 @@ package org.prgms.locomocoserver.mogakkos.domain;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +24,7 @@ import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 @Table(name = "mogakko")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Mogakko extends BaseEntity { // TODO: User 연동
+    public static final int DEFAULT_MAX_PARTICIPANTS = 10;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,15 +48,11 @@ public class Mogakko extends BaseEntity { // TODO: User 연동
     @Column(name = "like_count", nullable = false)
     private int likeCount;
 
-    @Column(name = "max_participants", columnDefinition = "int default 10")
-    private Integer maxParticipants;
+    @Column(name = "max_participants", columnDefinition = "int default " + DEFAULT_MAX_PARTICIPANTS, nullable = false)
+    private int maxParticipants;
 
     @Column(name = "location") // TODO: 임시 컬럼. 추후 리스트 구현 시에 Location 테이블과 연동
     private String location;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type")
-    private MGCType mgcType;
 
     @OneToMany(mappedBy = "mogakko", cascade = CascadeType.PERSIST)
     @Builder.Default
@@ -65,7 +60,7 @@ public class Mogakko extends BaseEntity { // TODO: User 연동
 
     public Mogakko(Long id, String title, String content, LocalDateTime startTime,
         LocalDateTime endTime, LocalDateTime deadline, int likeCount, Integer maxParticipants,
-        String location, MGCType mgcType, List<MogakkoTag> mogakkoTags) {
+        String location, List<MogakkoTag> mogakkoTags) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -75,7 +70,6 @@ public class Mogakko extends BaseEntity { // TODO: User 연동
         this.likeCount = likeCount;
         this.maxParticipants = maxParticipants;
         this.location = location; // TODO: 추후 삭제
-        this.mgcType = mgcType;
         this.mogakkoTags = mogakkoTags;
     }
 

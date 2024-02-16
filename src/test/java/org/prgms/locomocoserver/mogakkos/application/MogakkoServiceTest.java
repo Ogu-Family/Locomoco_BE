@@ -13,7 +13,6 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.prgms.locomocoserver.categories.domain.Category;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
-import org.prgms.locomocoserver.mogakkos.domain.MGCType;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
@@ -67,7 +66,6 @@ class MogakkoServiceTest {
         LocalDateTime startTime = LocalDateTime.now();
         MogakkoCreateRequestDto mogakkoCreateRequestDto = new MogakkoCreateRequestDto("제목",
             "장소",
-            MGCType.LOCATION,
             startTime,
             startTime.plusHours(2),
             startTime.plusHours(1),
@@ -85,6 +83,7 @@ class MogakkoServiceTest {
 
         Mogakko createdMogakko = mogakkoOptional.get();
         assertThat(createdMogakko.getTitle()).isEqualTo("제목");
+        assertThat(createdMogakko.getMaxParticipants()).isEqualTo(10);
 
         assertThat(mogakkoTagRepository.findAll()).hasSize(3);
     }
