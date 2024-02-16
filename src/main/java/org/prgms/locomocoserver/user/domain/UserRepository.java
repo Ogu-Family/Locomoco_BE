@@ -11,6 +11,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailAndDeletedAtIsNull(String email);
     Optional<User> findByIdAndDeletedAtIsNull(Long id);
     Optional<User> findByNicknameAndDeletedAtIsNull(String nickname);
-    @Query("SELECT u FROM User u WHERE u.id IN (SELECT p.user.id FROM Participant p WHERE p.mogakko = :mogakko)") // 검증 필
+    @Query("SELECT u FROM User u WHERE u.id IN (SELECT p.user.id FROM Participant p WHERE p.mogakko = :mogakko)")
     List<User> findAllParticipantsByMogakko(Mogakko mogakko);
 }
