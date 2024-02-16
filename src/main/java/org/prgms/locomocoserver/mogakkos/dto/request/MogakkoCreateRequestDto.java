@@ -21,6 +21,8 @@ public record MogakkoCreateRequestDto(@Schema(description = "모각코 글 제�
             .startTime(startTime)
             .endTime(endTime)
             .deadline(deadline)
+            .likeCount(0)
+            .location(location)
             .maxParticipants(maxParticipants != null ? maxParticipants : Mogakko.DEFAULT_MAX_PARTICIPANTS)
             .build();
     }
