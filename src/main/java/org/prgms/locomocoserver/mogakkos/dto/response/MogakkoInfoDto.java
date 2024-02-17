@@ -2,8 +2,8 @@ package org.prgms.locomocoserver.mogakkos.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import org.prgms.locomocoserver.categories.dto.response.CategoriesWithTagsDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
+import org.prgms.locomocoserver.tags.dto.TagsInfoDto;
 
 public record MogakkoInfoDto(Long mogakkoId,
                              String title,
@@ -15,9 +15,9 @@ public record MogakkoInfoDto(Long mogakkoId,
                              String location,
                              int maxParticipants,
                              int likeCount,
-                             List<CategoriesWithTagsDto> tags) {
+                             List<TagsInfoDto> tags) {
 
-    public static MogakkoInfoDto create(Mogakko mogakko, List<CategoriesWithTagsDto> tags) {
+    public static MogakkoInfoDto create(Mogakko mogakko, List<TagsInfoDto> tags) {
         return new MogakkoInfoDto(mogakko.getId(),
             mogakko.getTitle(),
             mogakko.getContent(),
