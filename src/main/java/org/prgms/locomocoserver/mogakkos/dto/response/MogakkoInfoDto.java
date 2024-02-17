@@ -15,9 +15,9 @@ public record MogakkoInfoDto(Long mogakkoId,
                              String location,
                              int maxParticipants,
                              int likeCount,
-                             List<TagsInfoDto> tags) {
+                             List<Long> tagIds) {
 
-    public static MogakkoInfoDto create(Mogakko mogakko, List<TagsInfoDto> tags) {
+    public static MogakkoInfoDto create(Mogakko mogakko, List<Long> tagIds) {
         return new MogakkoInfoDto(mogakko.getId(),
             mogakko.getTitle(),
             mogakko.getContent(),
@@ -28,6 +28,6 @@ public record MogakkoInfoDto(Long mogakkoId,
             mogakko.getLocation(),
             mogakko.getMaxParticipants(),
             mogakko.getLikeCount(),
-            tags);
+            tagIds);
     }
 }
