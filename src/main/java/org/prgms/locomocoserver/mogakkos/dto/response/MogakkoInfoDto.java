@@ -3,7 +3,6 @@ package org.prgms.locomocoserver.mogakkos.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
-import org.prgms.locomocoserver.tags.dto.TagsInfoDto;
 
 public record MogakkoInfoDto(Long mogakkoId,
                              String title,

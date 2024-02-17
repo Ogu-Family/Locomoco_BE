@@ -2,6 +2,7 @@ package org.prgms.locomocoserver.mogakkos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,12 +16,20 @@ import org.prgms.locomocoserver.categories.domain.CategoryRepository;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
+import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
+import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
+import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.SelectedTagsDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
+import org.prgms.locomocoserver.user.domain.User;
+import org.prgms.locomocoserver.user.domain.UserRepository;
+import org.prgms.locomocoserver.user.domain.enums.Gender;
+import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -38,6 +47,10 @@ class MogakkoServiceTest {
     private MogakkoTagRepository mogakkoTagRepository;
     @Autowired
     private MogakkoRepository mogakkoRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ParticipantRepository participantRepository;
 
     @BeforeAll
     void setUp() {
@@ -87,5 +100,36 @@ class MogakkoServiceTest {
         assertThat(createdMogakko.getViews()).isEqualTo(0);
 
         assertThat(mogakkoTagRepository.findAll()).hasSize(3);
+    }
+
+    @Test
+    @DisplayName("id 값으로 특정 모각코 디테일 정보를 가져올 수 있다")
+    void success_find_mogakko_info_in_detail() {
+        // given
+        User savedCreator = userRepository.save(
+            User.builder().nickname("생성자").email("cho@gmail.com").job(Job.JOB_SEEKER).birth(
+                LocalDate.EPOCH).gender(Gender.MALE).temperature(36.5).provider("github").build());
+        User participant = userRepository.save(
+            User.builder().nickname("참여자1").email("part@gmail.com").job(Job.DEVELOPER).birth(
+                LocalDate.EPOCH).gender(Gender.FEMALE).temperature(42.1).provider("kakao").build());
+        Mogakko mogakko = Mogakko.builder().title("title").content("제곧내").views(20).likeCount(10)
+            .location("어딘가").startTime(LocalDateTime.now())
+            .endTime(LocalDateTime.now().plusHours(2)).deadline(LocalDateTime.now().plusHours(1))
+            .creator(savedCreator).build();
+
+        mogakkoRepository.save(mogakko);
+        tagRepository.findAll().forEach(tag -> mogakkoTagRepository.save(MogakkoTag.builder()
+            .tag(tag).mogakko(mogakko).build()));
+        participantRepository.save(Participant.builder().user(participant).mogakko(mogakko).build());
+
+        // when
+        MogakkoDetailResponseDto responseDto = mogakkoService.findDetail(mogakko.getId());
+
+        // then
+        assertThat(responseDto.creatorInfo()).isNotNull();
+        assertThat(responseDto.creatorInfo().nickname()).isEqualTo("생성자");
+        assertThat(responseDto.participants()).hasSize(1);
+        assertThat(responseDto.MogakkoInfo().title()).isEqualTo("title");
+        assertThat(responseDto.MogakkoInfo().tagIds()).hasSize(4);
     }
 }
