@@ -28,8 +28,12 @@ public class MogakkoService {
     private final UserRepository userRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
 
-    public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) { // TODO: 생성한 사용자 관련 로직 추가
+    public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) {
         Mogakko mogakko = createMogakkoBy(requestDto);
+
+        User creator = userRepository.findById(requestDto.creatorId())
+            .orElseThrow(RuntimeException::new);// TODO: 유저 에러 반환
+        mogakko.updateCreator(creator);
 
         Mogakko savedMogakko = mogakkoRepository.save(mogakko);
 
