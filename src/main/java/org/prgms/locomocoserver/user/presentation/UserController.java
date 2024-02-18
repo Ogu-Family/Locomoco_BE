@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final KakaoController kakaoController;
+    private final GithubController githubController;
 
     @PutMapping("/users/init/{userId}")
     public ResponseEntity<UserInfoDto> getInitInfo(@PathVariable Long userId,
