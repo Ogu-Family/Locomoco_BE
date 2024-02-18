@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.mogakkos.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,8 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +34,18 @@ public class MogakkoController {
     )
     public ResponseEntity<MogakkoCreateResponseDto> create(@RequestBody MogakkoCreateRequestDto requestDto) {
         MogakkoCreateResponseDto responseDto = mogakkoService.save(requestDto);
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/mogakko/map/{id}")
+    @Operation(summary = "모각코 디테일 정보 반환", description = "모각코 디테일 페이지에 사용자가 접속하면, 해당 모각코 관련 정보들을 띄웁니다. 정보에는 생성자 정보, 참여자 정보, 모각코 정보가 포함되어 있습니다.")
+    @ApiResponses(
+        @ApiResponse(responseCode = "200", description = "모각코 디테일 조회 성공")
+    )
+    public ResponseEntity<MogakkoDetailResponseDto> findDetail(
+        @Parameter(description = "조회할 모각코 id") @PathVariable Long id) {
+        MogakkoDetailResponseDto responseDto = mogakkoService.findDetail(id);
 
         return ResponseEntity.ok(responseDto);
     }
