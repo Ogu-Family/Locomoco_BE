@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.chat;
+package org.prgms.locomocoserver.chat.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
