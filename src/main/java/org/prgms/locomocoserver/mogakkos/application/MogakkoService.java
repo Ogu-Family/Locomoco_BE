@@ -7,7 +7,6 @@ import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
-import org.prgms.locomocoserver.mogakkos.dto.request.SelectedTagsDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
@@ -58,10 +57,9 @@ public class MogakkoService {
     }
 
     private Mogakko createMogakkoBy(MogakkoCreateRequestDto requestDto) {
-        List<SelectedTagsDto> selectedTagsDtos = requestDto.tags();
         Mogakko mogakko = requestDto.toMogakkoWithoutTags();
 
-        List<Long> tagIds = selectedTagsDtos.stream().flatMap(dto -> dto.tagIds().stream()).toList();
+        List<Long> tagIds = requestDto.tags();
         List<Tag> tags = tagRepository.findAllById(tagIds);
 
         tags.forEach(tag -> {

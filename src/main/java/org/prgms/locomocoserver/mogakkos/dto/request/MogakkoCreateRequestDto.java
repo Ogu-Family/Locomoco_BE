@@ -13,7 +13,7 @@ public record MogakkoCreateRequestDto(@Schema(description = "작성자 id") Long
                                       @Schema(description = "모각코 모집 데드라인 시간") LocalDateTime deadline,
                                       @Schema(description = "최대 참여자 수") Integer maxParticipants,
                                       @Schema(description = "모각코 글 내용") String content,
-                                      @Schema(description = "선택된 태그 id 모음") List<SelectedTagsDto> tags) {
+                                      @Schema(description = "선택된 태그 id 모음") List<Long> tags) {
 
     public Mogakko toMogakkoWithoutTags() {
         return Mogakko.builder()
