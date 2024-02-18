@@ -3,6 +3,7 @@ package org.prgms.locomocoserver.categories.application;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,12 @@ class CategoryServiceTest {
         coding.addTag(backend);
 
         tagRepository.saveAll(List.of(js, python, codingTest, backend));
+    }
+
+    @AfterEach
+    void tearDown() {
+        tagRepository.deleteAll();
+        categoryRepository.deleteAll();
     }
 
     @Test

@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +23,6 @@ import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository
 import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
-import org.prgms.locomocoserver.mogakkos.dto.request.SelectedTagsDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.tags.domain.Tag;
@@ -52,6 +53,8 @@ class MogakkoServiceTest {
     @Autowired
     private ParticipantRepository participantRepository;
 
+    private final List<Long> tagIds = new ArrayList<>();
+
     @BeforeAll
     void setUp() {
         Category langs = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 언어").build();
@@ -70,22 +73,39 @@ class MogakkoServiceTest {
         coding.addTag(backend);
 
         tagRepository.saveAll(List.of(js, python, codingTest, backend));
+
+        tagIds.addAll(List.of(js.getId(), python.getId(), codingTest.getId(), backend.getId()));
+    }
+
+    @AfterAll
+    void tearDown() {
+        participantRepository.deleteAll();
+        mogakkoTagRepository.deleteAll();
+        mogakkoRepository.deleteAll();
+        userRepository.deleteAll();
+        tagRepository.deleteAll();
+        categoryRepository.deleteAll();
     }
 
     @Test
     @DisplayName("모각코 생성이 제대로 되는지 확인한다")
     void success_create_mogakko() {
         // given
+        User savedCreator = userRepository.save(
+            User.builder().nickname("생성자").email("cho@gmail.com").job(Job.JOB_SEEKER).birth(
+                LocalDate.EPOCH).gender(Gender.MALE).temperature(36.5).provider("github").build());
+
         LocalDateTime startTime = LocalDateTime.now();
-        MogakkoCreateRequestDto mogakkoCreateRequestDto = new MogakkoCreateRequestDto("제목",
+        MogakkoCreateRequestDto mogakkoCreateRequestDto = new MogakkoCreateRequestDto(
+            savedCreator.getId(),
+            "제목",
             "장소",
             startTime,
             startTime.plusHours(2),
             startTime.plusHours(1),
             null,
             "내용",
-            List.of(new SelectedTagsDto(1L, List.of(1L)),
-                new SelectedTagsDto(2L, List.of(3L, 4L))));
+            List.of(tagIds.get(0), tagIds.get(1), tagIds.get(2)));
 
         // when
         MogakkoCreateResponseDto responseDto = mogakkoService.save(mogakkoCreateRequestDto);
@@ -98,8 +118,9 @@ class MogakkoServiceTest {
         assertThat(createdMogakko.getTitle()).isEqualTo("제목");
         assertThat(createdMogakko.getMaxParticipants()).isEqualTo(Mogakko.DEFAULT_MAX_PARTICIPANTS);
         assertThat(createdMogakko.getViews()).isEqualTo(0);
+        assertThat(createdMogakko.getCreator().getId()).isEqualTo(savedCreator.getId());
 
-        assertThat(mogakkoTagRepository.findAll()).hasSize(3);
+        assertThat(mogakkoTagRepository.findAllByMogakko(createdMogakko)).hasSize(3);
     }
 
     @Test

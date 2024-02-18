@@ -26,7 +26,7 @@ class UserRepositoryTest {
     private MogakkoRepository mogakkoRepository;
 
     @Test
-    @DisplayName("특정 모각코에 참여중인 목록들을 전부 가져올 수 있다.")
+    @DisplayName("특정 모각코에 참여중인 인원 목록을 전부 가져올 수 있다.")
     void success_find_all_participants_by_mogakko() {
         // given
         LocalDateTime startTime = LocalDateTime.now();
@@ -42,7 +42,7 @@ class UserRepositoryTest {
 
         Mogakko mogakko = Mogakko.builder().title("title").content("content").startTime(
                 startTime).endTime(startTime.plusHours(2)).deadline(startTime.plusHours(1))
-            .likeCount(0).location("어떤 곳").views(0).build();
+            .likeCount(0).location("어떤 곳").views(0).creator(user1).build();
 
         Participant participant1 = participantRepository.save(
             Participant.builder().user(user1).build());
