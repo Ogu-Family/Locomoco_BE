@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 
-public record MogakkoCreateRequestDto(@Schema(description = "모각코 글 제목") String title,
+public record MogakkoCreateRequestDto(@Schema(description = "작성자 id") Long creatorId,
+                                      @Schema(description = "모각코 글 제목") String title,
                                       @Schema(description = "모각코 장소") String location,
                                       @Schema(description = "모각코 시작 시간") LocalDateTime startTime,
                                       @Schema(description = "모각코 종료 시간") LocalDateTime endTime,
