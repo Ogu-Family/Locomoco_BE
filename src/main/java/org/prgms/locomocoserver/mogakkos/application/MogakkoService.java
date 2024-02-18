@@ -35,4 +35,9 @@ public class MogakkoService {
 
         return new MogakkoCreateResponseDto(savedMogakko.getId()); // TODO: FE가 원하는 포맷이 있으면 그것으로 DTO 변환.
     }
+
+    public Mogakko getById(Long id) {
+        return mogakkoRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new IllegalArgumentException("Mogakko Not Found mogakkoId: " + id));
+    }
 }
