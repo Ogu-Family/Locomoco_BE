@@ -79,9 +79,7 @@ public class MogakkoService {
     public void delete(Long id) {
         Mogakko foundMogakko = getByIdNotDeleted(id);
 
-        foundMogakko.remove();
-
-        mogakkoRepository.save(foundMogakko);
+        foundMogakko.delete();
     }
 
     public Mogakko getByIdNotDeleted(Long id) {
