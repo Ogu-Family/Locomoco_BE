@@ -35,8 +35,6 @@ public class MogakkoService {
     public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) {
         Mogakko mogakko = createMogakkoBy(requestDto);
 
-
-        
         User creator = userRepository.findById(requestDto.creatorId())
             .orElseThrow(RuntimeException::new);// TODO: 유저 에러 반환
         mogakko.updateCreator(creator);
@@ -47,7 +45,7 @@ public class MogakkoService {
     }
 
     public MogakkoDetailResponseDto findDetail(Long id) {
-        Mogakko foundMogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(id).orElseThrow(RuntimeException::new); // TODO: 모각코 에러 반환
+        Mogakko foundMogakko = getByIdNotDeleted(id);
         User creator = userRepository.findByIdAndDeletedAtIsNull(foundMogakko.getCreator().getId())
             .orElseGet(() -> User.builder().nickname("(알 수 없음)").build());
         List<User> participants = userRepository.findAllParticipantsByMogakko(foundMogakko);
