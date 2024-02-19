@@ -55,7 +55,7 @@ public class UserService {
         return !userRepository.findByNicknameAndDeletedAtIsNull(nickname).isPresent();
     }
 
-    private User getById(Long userId) {
+    public User getById(Long userId) {
         return userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     }
