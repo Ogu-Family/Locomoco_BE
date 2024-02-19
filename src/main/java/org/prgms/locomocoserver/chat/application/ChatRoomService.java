@@ -5,7 +5,6 @@ import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
-import org.prgms.locomocoserver.chat.dto.request.CreateChatRoomRequest;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -30,6 +29,6 @@ public class ChatRoomService {
 
     public ChatRoom getById(Long id) {
         return chatRoomRepository.findByIdAndDeletedAtIsNull(id)
-             .orElseThrow(() -> new IllegalArgumentException("ChatRoom Not Found chatRoomId: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("ChatRoom Not Found chatRoomId: " + id));
     }
 }

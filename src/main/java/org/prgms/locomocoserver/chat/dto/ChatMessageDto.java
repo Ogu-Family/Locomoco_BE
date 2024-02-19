@@ -10,9 +10,6 @@ public record ChatMessageDto(
         Long senderId,
         String message
 ) {
-    public ChatMessageDto updateEnterMessage(String newMessage) {
-        return new ChatMessageDto(this.chatRoomId, this.mogakkoId, this.senderId, newMessage);
-    }
 
     public ChatRoom toChatRoomEntity(Mogakko mogakko, User creator) {
         return ChatRoom.builder()
