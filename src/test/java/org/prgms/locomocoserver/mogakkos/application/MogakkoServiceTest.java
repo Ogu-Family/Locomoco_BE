@@ -185,7 +185,7 @@ class MogakkoServiceTest {
         MogakkoUpdateResponseDto responseDto = mogakkoService.update(requestDto, testMogakko.getId());
 
         // then
-        assertThat(responseDto.mogakkoId()).isEqualTo(testMogakko.getId());
+        assertThat(responseDto.id()).isEqualTo(testMogakko.getId());
 
         Optional<Mogakko> mogakkoOptional = mogakkoRepository.findById(testMogakko.getId());
         assertThat(mogakkoOptional.isPresent()).isTrue();

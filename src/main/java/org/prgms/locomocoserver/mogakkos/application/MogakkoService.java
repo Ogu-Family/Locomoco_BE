@@ -81,7 +81,7 @@ public class MogakkoService {
     }
 
     private static void validateCreator(MogakkoUpdateRequestDto requestDto, Mogakko foundMogakko) {
-        if (!foundMogakko.isSameCreatorId(requestDto.updateUserId())) {
+        if (!foundMogakko.isSameCreatorId(requestDto.creatorId())) {
             throw new RuntimeException(); // TODO: 유저 예외 반환
         }
     }
