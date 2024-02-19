@@ -131,4 +131,8 @@ public class Mogakko extends BaseEntity {
         this.maxParticipants = maxParticipants;
         this.location = location;
     }
+
+    public void remove() {
+        delete();
+    }
 }

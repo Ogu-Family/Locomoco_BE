@@ -75,6 +75,15 @@ public class MogakkoService {
         return new MogakkoUpdateResponseDto(foundMogakko.getId());
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Mogakko foundMogakko = getByIdNotDeleted(id);
+
+        foundMogakko.remove();
+
+        mogakkoRepository.save(foundMogakko);
+    }
+
     public Mogakko getByIdNotDeleted(Long id) {
         return mogakkoRepository.findByIdAndDeletedAtIsNull(id)
             .orElseThrow(RuntimeException::new); // TODO: 모각코 에러 반환
@@ -82,7 +91,7 @@ public class MogakkoService {
 
     private static void validateCreator(MogakkoUpdateRequestDto requestDto, Mogakko foundMogakko) {
         if (!foundMogakko.isSameCreatorId(requestDto.creatorId())) {
-            throw new RuntimeException(); // TODO: 유저 예외 반환
+            throw new RuntimeException(); // TODO: 모각코 예외 반환
         }
     }
 
