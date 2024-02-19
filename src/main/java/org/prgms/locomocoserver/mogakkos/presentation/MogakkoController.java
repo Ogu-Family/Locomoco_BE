@@ -12,7 +12,9 @@ import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,9 +60,18 @@ public class MogakkoController {
         @ApiResponse(responseCode = "200", description = "모각코 수정 성공")
     )
     public ResponseEntity<MogakkoUpdateResponseDto> update(
-        @RequestBody MogakkoUpdateRequestDto requestDto, @PathVariable Long id) {
+        @RequestBody MogakkoUpdateRequestDto requestDto,
+        @Parameter(description = "수정하려는 모각코 id") @PathVariable Long id) {
         MogakkoUpdateResponseDto responseDto = mogakkoService.update(requestDto, id);
 
         return ResponseEntity.ok(responseDto);
+    }
+
+    @DeleteMapping("/mogakko/map/{id}")
+    public ResponseEntity<Void> delete(
+        @Parameter(description = "삭제할 모각코 id") @PathVariable Long id) {
+        mogakkoService.delete(id);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 }
