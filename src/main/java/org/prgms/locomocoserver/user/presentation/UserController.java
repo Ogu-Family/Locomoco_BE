@@ -23,12 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/users/nickname/{nickname}/check")
-    public ResponseEntity<Void> checkNicknameAvailability(@PathVariable String nickname) {
-        boolean isUnique = userService.isNicknameUnique(nickname);
-        if (isUnique) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    public ResponseEntity<Boolean> checkNicknameAvailability(@PathVariable String nickname) {
+        return ResponseEntity.ok(userService.isNicknameUnique(nickname));
     }
 }
