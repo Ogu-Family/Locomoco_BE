@@ -18,13 +18,10 @@ public class ChatController {
     private final SimpMessagingTemplate template;
     private final ChatRoomService chatRoomService;
 
-    //Client가 SEND할 수 있는 경로
-    //stompConfig에서 설정한 applicationDestinationPrefixes와 @MessageMapping 경로가 병합됨
-    //"/pub/chat/enter"
     @MessageMapping(value = "/chats/enter")
     public void enter(ChatMessageDto message) {
 
-        // 채팅방이 이미 존재하는지 확인합니다.
+        // 채팅방이 이미 존재하는지 확인
         ChatRoom existingRoom = chatRoomService.getById(message.chatRoomId());
 
         // 채팅방이 존재하지 않으면 새로운 채팅방을 생성
