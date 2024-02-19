@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
+import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +48,18 @@ public class MogakkoController {
     public ResponseEntity<MogakkoDetailResponseDto> findDetail(
         @Parameter(description = "조회할 모각코 id") @PathVariable Long id) {
         MogakkoDetailResponseDto responseDto = mogakkoService.findDetail(id);
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @PatchMapping("/mogakko/map/{id}")
+    @Operation(summary = "모각코 수정", description = "수정할 정보를 넘겨주면 해당 내용을 기반으로 DB에서 값을 수정하고 응답 값으로 수정된 모각코 id를 넘겨줍니다.")
+    @ApiResponses(
+        @ApiResponse(responseCode = "200", description = "모각코 수정 성공")
+    )
+    public ResponseEntity<MogakkoUpdateResponseDto> update(
+        @RequestBody MogakkoUpdateRequestDto requestDto, @PathVariable Long id) {
+        MogakkoUpdateResponseDto responseDto = mogakkoService.update(requestDto, id);
 
         return ResponseEntity.ok(responseDto);
     }

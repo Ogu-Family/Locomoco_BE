@@ -30,7 +30,7 @@ public abstract class BaseEntity {
         return this.deletedAt != null;
     }
 
-    protected void delete() {
+    public void delete() {
         if (isDeleted()) throw new IllegalArgumentException("이미 삭제된 엔티티 입니다.");
         this.deletedAt = LocalDateTime.now();
     }
