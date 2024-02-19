@@ -116,4 +116,19 @@ public class Mogakko extends BaseEntity {
     public void updateCreator(User creator) {
         this.creator = creator;
     }
+
+    public boolean isSameCreatorId(Long creatorId) {
+        return this.creator.getId().equals(creatorId);
+    }
+
+    public void updateInfo(String title, String content, LocalDateTime startTime, LocalDateTime endTime,
+        LocalDateTime deadline, int maxParticipants, String location) {
+        this.title = title;
+        this.content = content;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.deadline = deadline;
+        this.maxParticipants = maxParticipants;
+        this.location = location;
+    }
 }
