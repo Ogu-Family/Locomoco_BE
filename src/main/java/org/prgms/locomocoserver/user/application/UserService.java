@@ -61,10 +61,9 @@ public class UserService {
     }
 
     public List<MogakkoInfoDto> getOngoingMogakkos(Long userId) {
-        List<Mogakko> mogakkos = userRepository.findOngoingMogakkosByUserId(userId);
+        // TODO: ongoingMogakkos 조회 쿼리 작성
 
         List<MogakkoInfoDto> mogakkoInfoDtos = new ArrayList<>();
-        mogakkos.forEach(mogakko -> mogakkoInfoDtos.add(MogakkoInfoDto.create(mogakko, null)));
 
         return mogakkoInfoDtos;
     }
