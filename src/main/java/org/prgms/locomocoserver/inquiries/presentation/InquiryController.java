@@ -16,11 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.inquiries.application.InquiryService;
 import org.prgms.locomocoserver.inquiries.domain.Inquiry;
+import org.prgms.locomocoserver.inquiries.dto.request.InquiryCreateRequestDto;
 import org.prgms.locomocoserver.inquiries.dto.response.InquiryResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +47,7 @@ public class InquiryController {
     @GetMapping("/inquiries")
     public ResponseEntity<Results<InquiryResponseDto>> findAll(
         @RequestParam(required = false) Long mogakkoId,
-        @RequestParam(required = false) Long userId) {
+        @RequestParam(required = false) Long userId) { // TODO: 실 구현 필요
         ArrayList<InquiryResponseDto> responseDtos = new ArrayList<>();
 
         IntStream.range(0, 10).forEach(i -> responseDtos.add(new InquiryResponseDto((long)i + 1, "어딘가", "닉넴" + i, LocalDateTime.now().truncatedTo(
@@ -54,4 +57,9 @@ public class InquiryController {
 
         return ResponseEntity.status(HttpStatus.OK).body(new Results<>(responseDtos));
     }
+
+    /*@PutMapping("/inquries")
+    public ResponseEntity<Void> create(@RequestBody InquiryCreateRequestDto requestDto) { // TODO: 실 구현 필요
+
+    }*/
 }
