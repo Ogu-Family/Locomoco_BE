@@ -39,8 +39,12 @@ public class MogakkoController {
     private final MogakkoService mogakkoService;
 
     @GetMapping("/mogakko/map")
+    @Operation(summary = "모각코 리스트 반환", description = "홈 화면(리스트 화면)에서 필터링된 모각코 리스트를 반환합니다.")
+    @ApiResponses(
+        @ApiResponse(responseCode = "200", description = "모각코 생성 성공")
+    )
     public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
-        MogakkoFilterRequestDto requestDto) { // TODO: 실 구현 필요
+        @Parameter(description = "필터링 정보") MogakkoFilterRequestDto requestDto) { // TODO: 실 구현 필요
         ArrayList<MogakkoSimpleInfoResponseDto> responseDtos = new ArrayList<>();
 
         IntStream.range(0, 10).forEach(i -> {

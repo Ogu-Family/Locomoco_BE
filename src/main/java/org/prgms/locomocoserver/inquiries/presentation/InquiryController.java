@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class InquiryController {
     private final InquiryService inquiryService;
 
-    @Operation(summary = "문의 단건 조회", description = "문의 id로 문의 단건 조회를 합니다.")
+    @Operation(summary = "문의 전체 조회", description = "문의 id로 문의 단건 조회를 합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "문의 단일 조회 성공"),
     })
     @Parameters({
             @Parameter(name = "id", description = "문의 id")
     })
-    @GetMapping("/inquiries/{id}")
+    @GetMapping("/inquiries")
     public ResponseEntity<String> findById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body("문의 단건 조회");
     }
