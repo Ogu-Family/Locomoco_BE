@@ -16,11 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.inquiries.application.InquiryService;
 import org.prgms.locomocoserver.inquiries.dto.request.InquiryCreateRequestDto;
+import org.prgms.locomocoserver.inquiries.dto.request.InquiryDeleteRequestDto;
 import org.prgms.locomocoserver.inquiries.dto.request.InquiryUpdateRequestDto;
 import org.prgms.locomocoserver.inquiries.dto.response.InquiryResponseDto;
 import org.prgms.locomocoserver.inquiries.dto.response.InquiryUpdateResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -79,10 +81,22 @@ public class InquiryController {
     })
     @PatchMapping("/inquiries/{inquiryId}")
     public ResponseEntity<InquiryUpdateResponseDto> update(
-        @PathVariable(name = "inquiryId") Long id,
-        @RequestBody InquiryUpdateRequestDto requestDto) { // TODO: 실 구현 필요
+        @Parameter(description = "문의 id") @PathVariable(name = "inquiryId") Long id,
+        @Parameter(description = "업데이트 정보") @RequestBody InquiryUpdateRequestDto requestDto) { // TODO: 실 구현 필요
         InquiryUpdateResponseDto responseDto = new InquiryUpdateResponseDto(1L);
 
         return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(summary = "문의 삭제", description = "작성자 id, 문의 id에 따라 문의를 삭제합니다. 작성자 id는 검증용으로 이용합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "문의 삭제 성공"),
+    })
+    @DeleteMapping("/inquiries/{inquiryId}")
+    public ResponseEntity<Void> delete(
+        @Parameter(description = "문의 id") @PathVariable(name = "inquiryId") Long id,
+        @Parameter(description = "삭제 정보") @RequestBody InquiryDeleteRequestDto requestDto) { // TODO: 실 구현 필요
+
+        return ResponseEntity.noContent().build();
     }
 }
