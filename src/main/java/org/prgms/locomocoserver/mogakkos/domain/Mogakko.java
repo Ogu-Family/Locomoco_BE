@@ -59,9 +59,6 @@ public class Mogakko extends BaseEntity {
         + DEFAULT_MAX_PARTICIPANTS, nullable = false)
     private int maxParticipants;
 
-    @Column(name = "location") // TODO: 임시 컬럼. 추후 리스트 구현 시에 Location 테이블과 연동
-    private String location;
-
     @Column(name = "views")
     private long views;
 
@@ -83,7 +80,7 @@ public class Mogakko extends BaseEntity {
 
     public Mogakko(Long id, String title, String content, LocalDateTime startTime,
         LocalDateTime endTime, LocalDateTime deadline, int likeCount, int maxParticipants,
-        String location, long views, List<MogakkoTag> mogakkoTags, List<Participant> participants,
+        long views, List<MogakkoTag> mogakkoTags, List<Participant> participants,
         List<Inquiry> inquiries, User creator) {
         this.id = id;
         this.title = title;
@@ -93,7 +90,6 @@ public class Mogakko extends BaseEntity {
         this.deadline = deadline;
         this.likeCount = likeCount;
         this.maxParticipants = maxParticipants;
-        this.location = location; // TODO: 추후 삭제
         this.views = views;
         this.mogakkoTags = mogakkoTags;
         this.participants = participants;
@@ -122,13 +118,12 @@ public class Mogakko extends BaseEntity {
     }
 
     public void updateInfo(String title, String content, LocalDateTime startTime, LocalDateTime endTime,
-        LocalDateTime deadline, int maxParticipants, String location) {
+        LocalDateTime deadline, int maxParticipants) {
         this.title = title;
         this.content = content;
         this.startTime = startTime;
         this.endTime = endTime;
         this.deadline = deadline;
         this.maxParticipants = maxParticipants;
-        this.location = location;
     }
 }
