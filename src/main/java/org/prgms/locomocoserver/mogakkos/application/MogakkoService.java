@@ -10,7 +10,6 @@ import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoParticipantDto;
@@ -32,7 +31,7 @@ public class MogakkoService {
     private final UserRepository userRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
 
-    public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) {
+    public Long save(MogakkoCreateRequestDto requestDto) {
         Mogakko mogakko = createMogakkoBy(requestDto);
 
         User creator = userRepository.findById(requestDto.creatorId())
@@ -41,7 +40,7 @@ public class MogakkoService {
 
         Mogakko savedMogakko = mogakkoRepository.save(mogakko);
 
-        return new MogakkoCreateResponseDto(savedMogakko.getId()); // TODO: FE가 원하는 포맷이 있으면 그것으로 DTO 변환.
+        return savedMogakko.getId();
     }
 
     public MogakkoDetailResponseDto findDetail(Long id) {
@@ -133,10 +132,5 @@ public class MogakkoService {
             mogakko.addMogakkoTag(mogakkoTag);
         });
         return mogakko;
-    }
-
-    public Mogakko getById(Long id) {
-        return mogakkoRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new IllegalArgumentException("Mogakko Not Found mogakkoId: " + id));
     }
 }
