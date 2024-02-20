@@ -1,6 +1,8 @@
 package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
+import org.prgms.locomocoserver.chat.domain.ChatMessage;
+import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final MogakkoService mogakkoService;
     private final UserService userService;
 
@@ -24,7 +27,13 @@ public class ChatRoomService {
         Mogakko mogakko = mogakkoService.getByIdNotDeleted(messageDto.mogakkoId());
 
         ChatRoom chatRoom = chatRoomRepository.save(messageDto.toChatRoomEntity(mogakko, loginUser));
+        chatMessageRepository.save(messageDto.toChatMessageEntity());
         return new ChatRoomDto(chatRoom.getId(), chatRoom.getName());
+    }
+
+    public ChatMessageDto saveChatMessage(ChatMessageDto messageDto) {
+        ChatMessage chatMessage = chatMessageRepository.save(messageDto.toChatMessageEntity());
+        return new ChatMessageDto(chatMessage.getChatRoomId(), messageDto.mogakkoId(), chatMessage.getSenderId(), chatMessage.getContent());
     }
 
     public ChatRoom getById(Long id) {

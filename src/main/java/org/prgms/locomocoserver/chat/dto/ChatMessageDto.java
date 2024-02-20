@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.chat.dto;
 
+import org.prgms.locomocoserver.chat.domain.ChatMessage;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.user.domain.User;
@@ -17,6 +18,14 @@ public record ChatMessageDto(
                 .mogakko(mogakko)
                 .creator(creator)
                 .build();
+    }
+
+    public ChatMessage toChatMessageEntity() {
+        return ChatMessage.builder()
+             .chatRoomId(chatRoomId)
+             .senderId(senderId)
+             .content(message)
+             .build();
     }
 }
 
