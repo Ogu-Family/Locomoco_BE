@@ -21,7 +21,7 @@ public class ChatRoomService {
 
     public ChatRoomDto createChatRoom(ChatMessageDto messageDto) {
         User loginUser = userService.getById(messageDto.senderId());
-        Mogakko mogakko = mogakkoService.getById(messageDto.mogakkoId());
+        Mogakko mogakko = mogakkoService.getByIdNotDeleted(messageDto.mogakkoId());
 
         ChatRoom chatRoom = chatRoomRepository.save(messageDto.toChatRoomEntity(mogakko, loginUser));
         return new ChatRoomDto(chatRoom.getId(), chatRoom.getName());
