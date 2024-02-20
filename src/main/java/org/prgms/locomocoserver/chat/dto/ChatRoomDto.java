@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.chat.dto;
 
+import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.HashSet;
@@ -12,5 +13,9 @@ public record ChatRoomDto(
 ) {
     public ChatRoomDto(Long roomId, String name) {
         this(roomId, name, new HashSet<>());
+    }
+
+    public static ChatRoomDto create(ChatRoom chatRoom) {
+        return new ChatRoomDto(chatRoom.getId(), chatRoom.getName());
     }
 }
