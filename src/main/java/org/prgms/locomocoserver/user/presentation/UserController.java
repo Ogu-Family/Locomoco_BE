@@ -28,4 +28,10 @@ public class UserController {
     public ResponseEntity<Boolean> checkNicknameAvailability(@PathVariable String nickname) {
         return ResponseEntity.ok(userService.isNicknameUnique(nickname));
     }
+
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserInfoDto> getUserInfo(@PathVariable Long userId) {
+        UserInfoDto userInfoDto = userService.getUserInfo(userId);
+        return ResponseEntity.ok(userInfoDto);
+    }
 }

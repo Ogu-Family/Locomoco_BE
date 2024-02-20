@@ -51,6 +51,11 @@ public class UserService {
         return new UserInfoDto(user.getId(), user.getNickname(), user.getBirth(), user.getGender(), user.getTemperature(), user.getJob(), user.getEmail(), user.getProvider());
     }
 
+    public UserInfoDto getUserInfo(Long userId) {
+        User user = getById(userId);
+        return UserInfoDto.of(user);
+    }
+
     public boolean isNicknameUnique(String nickname) {
         return !userRepository.findByNicknameAndDeletedAtIsNull(nickname).isPresent();
     }
