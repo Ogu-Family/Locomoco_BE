@@ -33,7 +33,7 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User creator;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<User> participants = new ArrayList<>();
 
     @Builder
