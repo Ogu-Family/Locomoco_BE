@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.user.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
 
@@ -24,4 +25,16 @@ public record UserInfoDto(
         @Schema(description = "로그인 방법", example = "KAKAO")
         String provider
 ) {
+        public static UserInfoDto of(User user) {
+                return new UserInfoDto(
+                        user.getId(),
+                        user.getNickname(),
+                        user.getBirth(),
+                        user.getGender(),
+                        user.getTemperature(),
+                        user.getJob(),
+                        user.getEmail(),
+                        user.getProvider()
+                );
+        }
 }
