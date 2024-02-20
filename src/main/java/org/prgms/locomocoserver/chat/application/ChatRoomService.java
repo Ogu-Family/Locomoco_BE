@@ -13,6 +13,9 @@ import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
@@ -34,6 +37,13 @@ public class ChatRoomService {
     public ChatMessageDto saveChatMessage(ChatMessageDto messageDto) {
         ChatMessage chatMessage = chatMessageRepository.save(messageDto.toChatMessageEntity());
         return new ChatMessageDto(chatMessage.getChatRoomId(), messageDto.mogakkoId(), chatMessage.getSenderId(), chatMessage.getContent());
+    }
+
+    public List<ChatRoomDto> getAllChatRoom(Long userId) {
+        List<ChatRoomDto> chatRoomDtos = chatRoomRepository.findAllByUserIdAndDeletedAtIsNull(userId)
+                .map(chatRoom -> ChatRoomDto.create(chatRoom))
+                .stream().toList();
+        return chatRoomDtos;
     }
 
     public ChatRoom getById(Long id) {
