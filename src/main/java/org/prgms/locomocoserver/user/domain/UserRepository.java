@@ -13,4 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByNicknameAndDeletedAtIsNull(String nickname);
     @Query("SELECT u FROM User u WHERE u.id IN (SELECT p.user.id FROM Participant p WHERE p.mogakko = :mogakko)")
     List<User> findAllParticipantsByMogakko(Mogakko mogakko);
+    @Query("SELECT DISTINCT p.mogakko FROM Participant p JOIN FETCH p.mogakko m WHERE p.user.id = :userId AND m.deadline > CURRENT_TIMESTAMP")
+    List<Mogakko> findOngoingMogakkosByUserId(Long userId);
 }
