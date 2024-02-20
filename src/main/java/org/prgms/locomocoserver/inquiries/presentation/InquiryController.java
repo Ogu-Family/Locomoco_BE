@@ -16,10 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.inquiries.application.InquiryService;
 import org.prgms.locomocoserver.inquiries.dto.request.InquiryCreateRequestDto;
+import org.prgms.locomocoserver.inquiries.dto.request.InquiryUpdateRequestDto;
 import org.prgms.locomocoserver.inquiries.dto.response.InquiryResponseDto;
+import org.prgms.locomocoserver.inquiries.dto.response.InquiryUpdateResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,12 +63,23 @@ public class InquiryController {
     }
 
     @Operation(summary = "문의 생성", description = "작성자 id, 모각코 id에 따라 문의를 생성합니다.")
-    @PutMapping("/inquries")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "문의 생성 성공"),
     })
+    @PutMapping("/inquries")
     public ResponseEntity<Void> create(
         @Parameter(description = "문의 생성을 위해 보내주는 정보") @RequestBody InquiryCreateRequestDto requestDto) { // TODO: 실 구현 필요
         return ResponseEntity.ok(null);
+    }
+
+    @Operation(summary = "문의 수정", description = "작성자 id, 문의 id에 따라 문의를 수정합니다. 작성자 id는 검증용으로 이용합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "문의 수정 성공"),
+    })
+    @PatchMapping("/inquiries")
+    public ResponseEntity<InquiryUpdateResponseDto> update(@RequestBody InquiryUpdateRequestDto requestDto) { // TODO: 실 구현 필요
+        InquiryUpdateResponseDto responseDto = new InquiryUpdateResponseDto(1L);
+
+        return ResponseEntity.ok(responseDto);
     }
 }
