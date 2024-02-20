@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
@@ -12,6 +13,8 @@ import org.prgms.locomocoserver.user.vo.EmailVo;
 import org.prgms.locomocoserver.user.vo.TemperatureVo;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -45,6 +48,9 @@ public class User extends BaseEntity {
 
     @Column(name = "provider", nullable = false)
     private String provider;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<ChatRoom> chatRoomList = new ArrayList<>();
 
     @Builder
     public User(String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider) {

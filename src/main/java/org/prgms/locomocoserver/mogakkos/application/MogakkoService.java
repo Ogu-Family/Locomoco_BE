@@ -134,4 +134,9 @@ public class MogakkoService {
         });
         return mogakko;
     }
+
+    public Mogakko getById(Long id) {
+        return mogakkoRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new IllegalArgumentException("Mogakko Not Found mogakkoId: " + id));
+    }
 }
