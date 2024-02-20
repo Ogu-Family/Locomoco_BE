@@ -5,6 +5,7 @@ import java.util.List;
 public record ReviewCreateRequestDto(
     Long reviewerId,
     Long revieweeId,
-    List<Long> reviewContentId
+    List<Long> reviewContentId,
+    String content
 ) {
 }
