@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "User Controller", description = "사용자 컨트롤러")
@@ -48,4 +49,12 @@ public class UserController {
         List<MogakkoInfoDto> mogakkoInfoDtos = userService.getOngoingMogakkos(userId);
         return ResponseEntity.ok(mogakkoInfoDtos);
     }
+
+    @Operation(summary = "종료된 모각코 목록 조회", description = "사용자가 참여했던 모각코 목록을 조회합니다.")
+    @GetMapping("/users/{userId}/mogakko/complete")
+    public ResponseEntity<List<MogakkoInfoDto>> getCompleteMogakkos(@PathVariable Long userId) {
+        List<MogakkoInfoDto> mogakkoInfoDtos = new ArrayList<>(); // TODO: complete mogakkos 조회
+        return ResponseEntity.ok(mogakkoInfoDtos);
+    }
+    
 }
