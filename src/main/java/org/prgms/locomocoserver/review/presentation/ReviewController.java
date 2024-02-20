@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.review.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.review.dto.request.ReviewCreateRequestDto;
@@ -13,8 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 public class ReviewController {
 
-    @PostMapping("/reviews/{mogakkoId}/{sendorId}")
-    public ResponseEntity<ReviewDto> createReview(@PathVariable Long mogakkoId, @PathVariable Long sendorId,
+    @Operation(summary = "리뷰 생성", description = "모각코 id, reviewer id 기반으로 리뷰를 생성합니다.")
+    @PostMapping("/reviews/{mogakkoId}/{reviewerId}")
+    public ResponseEntity<ReviewDto> createReview(@PathVariable Long mogakkoId, @PathVariable Long reviewerId,
                                                @RequestBody ReviewCreateRequestDto request) {
         // TODO: create review 로직 구현
 

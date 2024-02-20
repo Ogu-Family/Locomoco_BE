@@ -6,7 +6,7 @@ public record ReviewDto(
         Long reviewId,
         Long reviewerId,
         Long revieweeId,
-        List<String> reviewContent,
+        List<Long> reviewContentId,
         String content
 ) {
 }

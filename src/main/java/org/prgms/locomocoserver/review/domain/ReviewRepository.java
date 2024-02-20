@@ -1,7 +1,6 @@
 package org.prgms.locomocoserver.review.domain;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public interface ReviewRepository {
+public interface ReviewRepository extends JpaRepository<Review, Long> {
 }
