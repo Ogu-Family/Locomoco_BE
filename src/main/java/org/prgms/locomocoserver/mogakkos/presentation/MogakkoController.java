@@ -15,7 +15,6 @@ import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoFilterRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,7 +38,7 @@ public class MogakkoController {
 
     private final MogakkoService mogakkoService;
 
-    @GetMapping("/mogakko/map")
+    @PostMapping("/mogakko/map")
     @Operation(summary = "모각코 리스트 반환", description = "홈 화면(리스트 화면)에서 필터링된 모각코 리스트를 반환합니다.")
     @ApiResponses(
         @ApiResponse(responseCode = "200", description = "모각코 생성 성공")
@@ -47,25 +47,25 @@ public class MogakkoController {
         @Parameter(description = "필터링 정보") MogakkoFilterRequestDto requestDto) { // TODO: 실 구현 필요
         ArrayList<MogakkoSimpleInfoResponseDto> responseDtos = new ArrayList<>();
 
-        IntStream.range(0, 10).forEach(i -> {
-            responseDtos.add(new MogakkoSimpleInfoResponseDto("제모옥" + i, i * 10, i * 3, i % 8 + 2, 1, new LocationInfoDto("어딘가", (double)101 / (i + 1), (double)157 / (i + 1)), List.of(
-                (long) i, (long) i + 1, (long) i + 2)));
-        });
+        IntStream.range(0, 10).forEach(i -> responseDtos.add(
+            new MogakkoSimpleInfoResponseDto("제모옥" + i, i * 10, i * 3, i % 8 + 2, 1,
+                new LocationInfoDto("어딘가", (double) 101 / (i + 1), (double) 157 / (i + 1)), List.of(
+                (long) i, (long) i + 1, (long) i + 2))));
 
         Results<MogakkoSimpleInfoResponseDto> responseDto = new Results<>(responseDtos);
 
         return ResponseEntity.ok(responseDto);
     }
 
-    @PostMapping("/mogakko/map")
+    @PutMapping("/mogakko/map")
     @Operation(summary = "모각코 생성", description = "생성에 필요한 값을 받아 모각코를 생성합니다.")
     @ApiResponses(
         @ApiResponse(responseCode = "200", description = "모각코 생성 성공")
     )
-    public ResponseEntity<MogakkoCreateResponseDto> create(@RequestBody MogakkoCreateRequestDto requestDto) {
-        MogakkoCreateResponseDto responseDto = mogakkoService.save(requestDto);
+    public ResponseEntity<Void> create(@RequestBody MogakkoCreateRequestDto requestDto) {
+        mogakkoService.save(requestDto);
 
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(null);
     }
 
     @GetMapping("/mogakko/map/{id}")
@@ -94,6 +94,10 @@ public class MogakkoController {
     }
 
     @DeleteMapping("/mogakko/map/{id}")
+    @Operation(summary = "모각코 삭제", description = "모각코 id 값을 넘겨 해당 모각코를 삭제합니다. DB에는 존재하며 삭제된 상태로만 기록됩니다.")
+    @ApiResponses(
+        @ApiResponse(responseCode = "204", description = "모각코 삭제 성공")
+    )
     public ResponseEntity<Void> delete(
         @Parameter(description = "삭제할 모각코 id") @PathVariable Long id) {
         mogakkoService.delete(id);
