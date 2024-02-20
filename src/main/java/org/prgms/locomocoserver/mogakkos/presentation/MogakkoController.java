@@ -5,12 +5,19 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import org.prgms.locomocoserver.global.common.dto.Results;
+import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
+import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoFilterRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +37,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class MogakkoController {
 
     private final MogakkoService mogakkoService;
+
+    @GetMapping("/mogakko/map")
+    public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
+        MogakkoFilterRequestDto requestDto) { // TODO: 실 구현 필요
+        ArrayList<MogakkoSimpleInfoResponseDto> responseDtos = new ArrayList<>();
+
+        IntStream.range(0, 10).forEach(i -> {
+            responseDtos.add(new MogakkoSimpleInfoResponseDto("제모옥" + i, i * 10, i * 3, i % 8 + 2, 1, new LocationInfoDto("어딘가", (double)101 / (i + 1), (double)157 / (i + 1)), List.of(
+                (long) i, (long) i + 1, (long) i + 2)));
+        });
+
+        Results<MogakkoSimpleInfoResponseDto> responseDto = new Results<>(responseDtos);
+
+        return ResponseEntity.ok(responseDto);
+    }
 
     @PostMapping("/mogakko/map")
     @Operation(summary = "모각코 생성", description = "생성에 필요한 값을 받아 모각코를 생성합니다.")
