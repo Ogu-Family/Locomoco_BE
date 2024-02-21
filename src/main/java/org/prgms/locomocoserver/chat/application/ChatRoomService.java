@@ -35,14 +35,17 @@ public class ChatRoomService {
         Mogakko mogakko = mogakkoService.getByIdNotDeleted(messageRequestDto.mogakkoId());
 
         ChatRoom chatRoom = chatRoomRepository.save(messageRequestDto.toChatRoomEntity(mogakko, loginUser));
-        chatMessageRepository.save(messageRequestDto.toChatMessageEntity());
+        chatMessageRepository.save(messageRequestDto.toChatMessageEntity(loginUser, chatRoom));
         return new ChatRoomDto(chatRoom.getId(), chatRoom.getName());
     }
 
     @Transactional
     public ChatMessageDto saveChatMessage(ChatMessageRequestDto messageDto) {
-        ChatMessage chatMessage = chatMessageRepository.save(messageDto.toChatMessageEntity());
-        return new ChatMessageDto(chatMessage.getChatRoomId(), chatMessage.getSenderId(), chatMessage.getContent());
+        User sender = userService.getById(messageDto.senderId());
+        ChatRoom chatRoom = getById(messageDto.chatRoomId());
+
+        ChatMessage chatMessage = chatMessageRepository.save(messageDto.toChatMessageEntity(sender, chatRoom));
+        return ChatMessageDto.of(chatMessage);
     }
 
     @Transactional

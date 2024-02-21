@@ -23,12 +23,11 @@ public record ChatMessageRequestDto(
                 .build();
     }
 
-    public ChatMessage toChatMessageEntity() {
+    public ChatMessage toChatMessageEntity(User sender, ChatRoom chatRoom) {
         return ChatMessage.builder()
-                .chatRoomId(chatRoomId)
-                .senderId(senderId)
-                .content(message)
-                .build();
+                .sender(sender)
+                .chatRoom(chatRoom)
+                .content(message).build();
     }
 
 }
