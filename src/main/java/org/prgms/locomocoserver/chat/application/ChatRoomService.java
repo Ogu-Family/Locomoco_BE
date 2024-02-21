@@ -36,7 +36,7 @@ public class ChatRoomService {
 
         ChatRoom chatRoom = chatRoomRepository.save(messageRequestDto.toChatRoomEntity(mogakko, loginUser));
         chatMessageRepository.save(messageRequestDto.toChatMessageEntity(loginUser, chatRoom));
-        return new ChatRoomDto(chatRoom.getId(), chatRoom.getName());
+        return ChatRoomDto.of(chatRoom);
     }
 
     @Transactional
