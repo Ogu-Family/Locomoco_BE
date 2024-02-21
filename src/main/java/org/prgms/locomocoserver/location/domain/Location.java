@@ -34,16 +34,27 @@ public class Location {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "city")
+    private String city;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mogakko_id")
     private Mogakko mogakko;
 
     @Builder
-    public Location(double latitude, double longitude, String address, Mogakko mogakko) {
+    public Location(double latitude, double longitude, String address, String city, Mogakko mogakko) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
+        this.city = city;
         this.mogakko = mogakko;
+    }
+
+    public void updateInfo(double latitude, double longitude, String address, String city) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.address = address;
+        this.city = city;
     }
 
     public void updateMogakko(Mogakko mogakko) {
