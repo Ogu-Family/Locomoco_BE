@@ -34,7 +34,6 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "creator_id", referencedColumnName = "id", nullable = false)
     private User creator;
 
-    // TODO: org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: org.prgms.locomocoserver.chat.domain.ChatRoom.participants: could not initialize proxy - no Session
     @ManyToMany(fetch = FetchType.EAGER)
     @Builder.Default
     private List<User> participants = new ArrayList<>();

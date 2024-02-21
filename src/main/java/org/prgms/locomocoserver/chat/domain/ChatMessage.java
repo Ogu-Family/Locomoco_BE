@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.global.common.BaseEntity;
+import org.prgms.locomocoserver.user.domain.User;
 
 @Entity
 @Getter
@@ -17,19 +18,21 @@ public class ChatMessage extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @Column(name = "sender_id")
-    private Long senderId;
+    private User sender;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @Column(name = "chat_room_id")
-    private Long chatRoomId;
+    private ChatRoom chatRoom;
 
     @Column(name = "content")
     private String content;
 
     @Builder
-    public ChatMessage(Long senderId, Long chatRoomId, String content) {
-        this.senderId = senderId;
-        this.chatRoomId = chatRoomId;
+    public ChatMessage(User sender, ChatRoom chatRoom, String content) {
+        this.sender = sender;
+        this.chatRoom = chatRoom;
         this.content = content;
     }
 }
