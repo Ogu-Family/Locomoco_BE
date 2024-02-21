@@ -28,6 +28,7 @@ public class ChatRoomController {
         return ResponseEntity.ok(chatRoomDtos);
     }
 
+    @Operation(summary = "채팅방 메시지 내용 조회", description = "roomId 기반 채팅방 조회")
     @GetMapping("/chats/room/{roomId}/messages")
     public ResponseEntity<List<ChatMessageDto>> getAllChatMessages(@PathVariable Long roomId,
                                                                    @RequestParam(name = "cursor", required = false) String cursor,
