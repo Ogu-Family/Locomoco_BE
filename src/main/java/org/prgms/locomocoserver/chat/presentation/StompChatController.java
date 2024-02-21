@@ -7,6 +7,8 @@ import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
+import org.prgms.locomocoserver.user.application.UserService;
+import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,24 +19,14 @@ public class StompChatController {
 
     private final SimpMessagingTemplate template;
     private final ChatRoomService chatRoomService;
-    private final ChatRoomRepository chatRoomRepository;
+    private final UserService userService;
 
     @MessageMapping(value = "/chats/enter")
     public void enter(ChatMessageRequestDto requestDto) {
 
-        // TODO: 로직 변경
-        // 채팅방이 이미 존재하는지 확인
-        ChatRoom existingRoom = chatRoomRepository.findById(requestDto.chatRoomId()).orElse(null);
-
-        // 채팅방이 존재하지 않으면 새로운 채팅방을 생성
-        if (existingRoom == null) {
-            ChatRoomDto newRoom = chatRoomService.createChatRoom(requestDto);
-            requestDto = new ChatMessageRequestDto(newRoom.roomId(), requestDto.senderId(), requestDto.mogakkoId(), requestDto.senderId() + "님이 채팅방에 참여하였습니다.");
-        } else {
-            // 이미 존재하는 채팅방에 입장 메시지를 전송
-            chatRoomService.addParticipant(existingRoom, requestDto.senderId());
-            requestDto = new ChatMessageRequestDto(existingRoom.getId(), requestDto.senderId(), requestDto.mogakkoId(), requestDto.senderId() + "님이 채팅방에 참여하였습니다.");
-        }
+        ChatRoomDto chatRoomDto = chatRoomService.enterChatRoom(requestDto);
+        User sender = userService.getById(requestDto.senderId());
+        requestDto = new ChatMessageRequestDto(chatRoomDto.roomId(), requestDto.senderId(), requestDto.mogakkoId(), sender.getNickname() + "님이 채팅방에 참여하였습니다.");
 
         template.convertAndSend("/sub/chat/room/" + requestDto.chatRoomId(), requestDto);
     }

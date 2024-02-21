@@ -30,12 +30,11 @@ public class ChatRoomService {
     private final UserService userService;
 
     @Transactional
-    public ChatRoomDto createChatRoom(ChatMessageRequestDto messageRequestDto) {
-        User loginUser = userService.getById(messageRequestDto.senderId());
-        Mogakko mogakko = mogakkoService.getByIdNotDeleted(messageRequestDto.mogakkoId());
+    public ChatRoomDto enterChatRoom(ChatMessageRequestDto requestDto) {
+        ChatRoom chatRoom = chatRoomRepository.findById(requestDto.chatRoomId())
+                .orElse(createChatRoom(requestDto));
+        addParticipant(chatRoom, requestDto.senderId());
 
-        ChatRoom chatRoom = chatRoomRepository.save(messageRequestDto.toChatRoomEntity(mogakko, loginUser));
-        chatMessageRepository.save(messageRequestDto.toChatMessageEntity(loginUser, chatRoom));
         return ChatRoomDto.of(chatRoom);
     }
 
@@ -73,13 +72,22 @@ public class ChatRoomService {
             pageable = page.nextPageable();
         }
         List<ChatMessageDto> chatMessageDtos = chatMessageRepository.findAllByChatRoomId(roomId, pageable)
-              .map(chatMessage -> ChatMessageDto.of(chatMessage))
-              .stream().toList();
+                .map(chatMessage -> ChatMessageDto.of(chatMessage))
+                .stream().toList();
         return chatMessageDtos;
     }
 
     public ChatRoom getById(Long id) {
         return chatRoomRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("ChatRoom Not Found chatRoomId: " + id));
+    }
+
+    private ChatRoom createChatRoom(ChatMessageRequestDto messageRequestDto) {
+        User loginUser = userService.getById(messageRequestDto.senderId());
+        Mogakko mogakko = mogakkoService.getByIdNotDeleted(messageRequestDto.mogakkoId());
+
+        ChatRoom chatRoom = chatRoomRepository.save(messageRequestDto.toChatRoomEntity(mogakko, loginUser));
+        chatMessageRepository.save(messageRequestDto.toChatMessageEntity(loginUser, chatRoom));
+        return chatRoom;
     }
 }
