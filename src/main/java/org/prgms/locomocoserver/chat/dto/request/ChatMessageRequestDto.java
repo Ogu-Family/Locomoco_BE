@@ -5,6 +5,8 @@ import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.user.domain.User;
 
+import java.util.List;
+
 public record ChatMessageRequestDto(
         Long chatRoomId,
         Long mogakkoId,
@@ -17,6 +19,7 @@ public record ChatMessageRequestDto(
                 .name(mogakko.getTitle())
                 .mogakko(mogakko)
                 .creator(creator)
+                .participants(List.of(creator))
                 .build();
     }
 

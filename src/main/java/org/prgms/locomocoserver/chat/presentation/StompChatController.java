@@ -29,6 +29,7 @@ public class StompChatController {
             requestDto = new ChatMessageRequestDto(newRoom.roomId(), requestDto.senderId(), requestDto.mogakkoId(), requestDto.senderId() + "님이 채팅방에 참여하였습니다.");
         } else {
             // 이미 존재하는 채팅방에 입장 메시지를 전송
+            chatRoomService.addParticipant(existingRoom, requestDto.senderId());
             requestDto = new ChatMessageRequestDto(existingRoom.getId(), requestDto.senderId(), requestDto.mogakkoId(), requestDto.senderId() + "님이 채팅방에 참여하였습니다.");
         }
 

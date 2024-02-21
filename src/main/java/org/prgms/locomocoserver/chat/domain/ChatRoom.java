@@ -43,4 +43,8 @@ public class ChatRoom extends BaseEntity {
         this.creator = creator;
         this.participants = participants;
     }
+
+    public void addParticipant(User user) {
+        this.participants.add(user);
+    }
 }
