@@ -15,7 +15,7 @@ public record ChatRoomDto(
         this(roomId, name, new HashSet<>());
     }
 
-    public static ChatRoomDto create(ChatRoom chatRoom) {
+    public static ChatRoomDto of(ChatRoom chatRoom) {
         return new ChatRoomDto(chatRoom.getId(), chatRoom.getName());
     }
 }

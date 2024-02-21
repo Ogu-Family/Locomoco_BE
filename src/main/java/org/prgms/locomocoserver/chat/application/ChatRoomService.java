@@ -61,7 +61,7 @@ public class ChatRoomService {
             pageable = page.nextPageable();
         }
         List<ChatRoomDto> chatRoomDtos = chatRoomRepository.findByParticipantsId(userId, pageable)
-                .map(chatRoom -> ChatRoomDto.create(chatRoom))
+                .map(chatRoom -> ChatRoomDto.of(chatRoom))
                 .stream().toList();
         return chatRoomDtos;
     }
