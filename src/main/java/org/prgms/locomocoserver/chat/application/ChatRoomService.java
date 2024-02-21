@@ -7,6 +7,7 @@ import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
+import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -27,18 +28,18 @@ public class ChatRoomService {
     private final MogakkoService mogakkoService;
     private final UserService userService;
 
-    public ChatRoomDto createChatRoom(ChatMessageDto messageDto) {
-        User loginUser = userService.getById(messageDto.senderId());
-        Mogakko mogakko = mogakkoService.getByIdNotDeleted(messageDto.mogakkoId());
+    public ChatRoomDto createChatRoom(ChatMessageRequestDto messageRequestDto) {
+        User loginUser = userService.getById(messageRequestDto.senderId());
+        Mogakko mogakko = mogakkoService.getByIdNotDeleted(messageRequestDto.mogakkoId());
 
-        ChatRoom chatRoom = chatRoomRepository.save(messageDto.toChatRoomEntity(mogakko, loginUser));
-        chatMessageRepository.save(messageDto.toChatMessageEntity());
+        ChatRoom chatRoom = chatRoomRepository.save(messageRequestDto.toChatRoomEntity(mogakko, loginUser));
+        chatMessageRepository.save(messageRequestDto.toChatMessageEntity());
         return new ChatRoomDto(chatRoom.getId(), chatRoom.getName());
     }
 
-    public ChatMessageDto saveChatMessage(ChatMessageDto messageDto) {
+    public ChatMessageDto saveChatMessage(ChatMessageRequestDto messageDto) {
         ChatMessage chatMessage = chatMessageRepository.save(messageDto.toChatMessageEntity());
-        return new ChatMessageDto(chatMessage.getChatRoomId(), messageDto.mogakkoId(), chatMessage.getSenderId(), chatMessage.getContent());
+        return new ChatMessageDto(chatMessage.getChatRoomId(), chatMessage.getSenderId(), chatMessage.getContent());
     }
 
     public List<ChatRoomDto> getAllChatRoom(Long userId, String cursor, int pageSize) {
@@ -51,6 +52,18 @@ public class ChatRoomService {
                 .map(chatRoom -> ChatRoomDto.create(chatRoom))
                 .stream().toList();
         return chatRoomDtos;
+    }
+
+    public List<ChatMessageDto> getAllChatMessages(Long roomId, String cursor, int pageSize) {
+        Pageable pageable = PageRequest.of(0, pageSize);
+        if (cursor == null) {
+            Page<ChatMessage> page = chatMessageRepository.findByChatRoomIdAndDeletedAtIsNullOrderByCreatedAtDesc(roomId, pageable);
+            pageable = page.nextPageable();
+        }
+        List<ChatMessageDto> chatMessageDtos = chatMessageRepository.findByChatRoomIdAndDeletedAtIsNullOrderByCreatedAtDesc(roomId, pageable)
+              .map(chatMessage -> ChatMessageDto.of(chatMessage))
+              .stream().toList();
+        return chatMessageDtos;
     }
 
     public ChatRoom getById(Long id) {
