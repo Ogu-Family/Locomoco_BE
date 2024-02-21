@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class ChatRoomService {
     private final MogakkoService mogakkoService;
     private final UserService userService;
 
+    @Transactional
     public ChatRoomDto createChatRoom(ChatMessageRequestDto messageRequestDto) {
         User loginUser = userService.getById(messageRequestDto.senderId());
         Mogakko mogakko = mogakkoService.getByIdNotDeleted(messageRequestDto.mogakkoId());
@@ -37,18 +39,25 @@ public class ChatRoomService {
         return new ChatRoomDto(chatRoom.getId(), chatRoom.getName());
     }
 
+    @Transactional
     public ChatMessageDto saveChatMessage(ChatMessageRequestDto messageDto) {
         ChatMessage chatMessage = chatMessageRepository.save(messageDto.toChatMessageEntity());
         return new ChatMessageDto(chatMessage.getChatRoomId(), chatMessage.getSenderId(), chatMessage.getContent());
     }
 
+    @Transactional
+    public void addParticipant(ChatRoom existingRoom, Long participantId) {
+        User newUser = userService.getById(participantId);
+        existingRoom.addParticipant(newUser);
+    }
+
     public List<ChatRoomDto> getAllChatRoom(Long userId, String cursor, int pageSize) {
         Pageable pageable = PageRequest.of(0, pageSize);
         if (cursor == null) {
-            Page<ChatRoom> page = chatRoomRepository.findByCreatorIdAndDeletedAtIsNullOrderByUpdatedAtDesc(userId, pageable);
+            Page<ChatRoom> page = chatRoomRepository.findByParticipantsId(userId, pageable);
             pageable = page.nextPageable();
         }
-        List<ChatRoomDto> chatRoomDtos = chatRoomRepository.findByCreatorIdAndDeletedAtIsNullOrderByUpdatedAtDesc(userId, pageable)
+        List<ChatRoomDto> chatRoomDtos = chatRoomRepository.findByParticipantsId(userId, pageable)
                 .map(chatRoom -> ChatRoomDto.create(chatRoom))
                 .stream().toList();
         return chatRoomDtos;
