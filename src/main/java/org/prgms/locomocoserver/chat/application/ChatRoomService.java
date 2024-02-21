@@ -69,10 +69,10 @@ public class ChatRoomService {
     public List<ChatMessageDto> getAllChatMessages(Long roomId, String cursor, int pageSize) {
         Pageable pageable = PageRequest.of(0, pageSize);
         if (cursor == null) {
-            Page<ChatMessage> page = chatMessageRepository.findByChatRoomIdAndDeletedAtIsNullOrderByCreatedAtDesc(roomId, pageable);
+            Page<ChatMessage> page = chatMessageRepository.findAllByChatRoomId(roomId, pageable);
             pageable = page.nextPageable();
         }
-        List<ChatMessageDto> chatMessageDtos = chatMessageRepository.findByChatRoomIdAndDeletedAtIsNullOrderByCreatedAtDesc(roomId, pageable)
+        List<ChatMessageDto> chatMessageDtos = chatMessageRepository.findAllByChatRoomId(roomId, pageable)
               .map(chatMessage -> ChatMessageDto.of(chatMessage))
               .stream().toList();
         return chatMessageDtos;
