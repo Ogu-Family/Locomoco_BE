@@ -14,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "chat_rooms")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom extends BaseEntity {
@@ -33,11 +34,13 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "creator_id", referencedColumnName = "id", nullable = false)
     private User creator;
 
+    // TODO: org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: org.prgms.locomocoserver.chat.domain.ChatRoom.participants: could not initialize proxy - no Session
     @ManyToMany(fetch = FetchType.LAZY)
+    @Builder.Default
     private List<User> participants = new ArrayList<>();
 
-    @Builder
-    public ChatRoom(String name, Mogakko mogakko, User creator, List<User> participants) {
+    public ChatRoom(Long id, String name, Mogakko mogakko, User creator, List<User> participants) {
+        this.id = id;
         this.name = name;
         this.mogakko = mogakko;
         this.creator = creator;
