@@ -32,9 +32,10 @@ public record MogakkoCreateRequestDto(@Schema(description = "작성자 id", exam
 
     public Location toLocation() {
         return Location.builder()
-            .address(location().address())
-            .latitude(location().latitude())
+            .address(location.address())
+            .latitude(location.latitude())
             .longitude(location.longitude())
+            .city(location.city())
             .build();
     }
 }
