@@ -8,7 +8,7 @@ public record UserBriefInfoDto(@Schema(description = "유저 id", example = "1")
                                // TODO: 프로필 사진 처리
                                ) {
 
-    public static UserBriefInfoDto create(User user) {
+    public static UserBriefInfoDto of(User user) {
         return new UserBriefInfoDto(user.getId(), user.getNickname());
     }
 }

@@ -50,7 +50,7 @@ public class MogakkoService {
         List<User> participants = userRepository.findAllParticipantsByMogakko(foundMogakko);
         List<MogakkoTag> mogakkoTags = mogakkoTagRepository.findAllByMogakko(foundMogakko);
 
-        UserBriefInfoDto creatorInfoDto = UserBriefInfoDto.create(creator);
+        UserBriefInfoDto creatorInfoDto = UserBriefInfoDto.of(creator);
         List<MogakkoParticipantDto> mogakkoParticipantDtos = participants.stream().map(MogakkoParticipantDto::create)
             .toList();
         List<Long> tagIds = mogakkoTags.stream().map(mogakkoTag -> mogakkoTag.getTag().getId())

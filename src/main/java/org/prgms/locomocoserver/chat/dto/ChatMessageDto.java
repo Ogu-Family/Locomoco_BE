@@ -1,22 +1,18 @@
 package org.prgms.locomocoserver.chat.dto;
 
-import org.prgms.locomocoserver.chat.domain.ChatRoom;
-import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
-import org.prgms.locomocoserver.user.domain.User;
+import org.prgms.locomocoserver.chat.domain.ChatMessage;
+
+import java.time.LocalDateTime;
 
 public record ChatMessageDto(
+        Long chatMessageId,
         Long chatRoomId,
-        Long mogakkoId,
         Long senderId,
-        String message
+        String message,
+        LocalDateTime createdAt
 ) {
-
-    public ChatRoom toChatRoomEntity(Mogakko mogakko, User creator) {
-        return ChatRoom.builder()
-                .name(mogakko.getTitle())
-                .mogakko(mogakko)
-                .creator(creator)
-                .build();
+    public static ChatMessageDto of(ChatMessage chatMessage) {
+        return new ChatMessageDto(chatMessage.getId(), chatMessage.getChatRoom().getId(), chatMessage.getSender().getId(), chatMessage.getContent(), chatMessage.getCreatedAt());
     }
 }
 
