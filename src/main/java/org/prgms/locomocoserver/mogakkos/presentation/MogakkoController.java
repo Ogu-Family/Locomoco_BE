@@ -13,7 +13,6 @@ import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
-import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoFilterRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
@@ -24,10 +23,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Mogakko controller", description = "모각코 컨트롤러")
@@ -38,13 +37,13 @@ public class MogakkoController {
 
     private final MogakkoService mogakkoService;
 
-    @PostMapping("/mogakko/map")
+    @GetMapping("/mogakko/map")
     @Operation(summary = "모각코 리스트 반환", description = "홈 화면(리스트 화면)에서 필터링된 모각코 리스트를 반환합니다.")
     @ApiResponses(
         @ApiResponse(responseCode = "200", description = "모각코 목록 반환 성공")
     )
     public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
-        @Parameter(description = "필터링 정보") MogakkoFilterRequestDto requestDto) { // TODO: 실 구현 필요
+        @Parameter(description = "필터링 태그 id 목록") @RequestParam List<Long> tags) { // TODO: 실 구현 필요
         ArrayList<MogakkoSimpleInfoResponseDto> responseDtos = new ArrayList<>();
 
         IntStream.range(0, 10).forEach(i -> responseDtos.add(
