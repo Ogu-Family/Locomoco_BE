@@ -43,8 +43,16 @@ public class MogakkoController {
         @ApiResponse(responseCode = "200", description = "모각코 목록 반환 성공")
     )
     public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
-        @Parameter(description = "필터링 태그 id 목록") @RequestParam List<Long> tags) {
-        List<MogakkoSimpleInfoResponseDto> responseDtos = mogakkoService.findAllByTagIds(tags);
+        @Parameter(description = "필터링 커서") @RequestParam(required = false, defaultValue = "0") Long cursor,
+        @Parameter(description = "필터링 태그 id 목록") @RequestParam(required = false) List<Long> tags) {
+        List<MogakkoSimpleInfoResponseDto> responseDtos;
+
+        if (tags == null) {
+            responseDtos = mogakkoService.findAll(cursor);
+        }
+        else {
+            responseDtos = mogakkoService.findAllByTagIds(tags, cursor);
+        }
 
         Results<MogakkoSimpleInfoResponseDto> results = new Results<>(responseDtos);
 
