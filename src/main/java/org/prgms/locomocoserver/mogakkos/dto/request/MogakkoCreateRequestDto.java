@@ -3,19 +3,21 @@ package org.prgms.locomocoserver.mogakkos.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.prgms.locomocoserver.location.domain.Location;
+import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 
-public record MogakkoCreateRequestDto(@Schema(description = "작성자 id") Long creatorId,
-                                      @Schema(description = "모각코 글 제목") String title,
-                                      @Schema(description = "모각코 장소") String location,
+public record MogakkoCreateRequestDto(@Schema(description = "작성자 id", example = "1") Long creatorId,
+                                      @Schema(description = "모각코 글 제목", example = "모여서 각자 코딩") String title,
+                                      @Schema(description = "모각코 장소") LocationInfoDto location,
                                       @Schema(description = "모각코 시작 시간") LocalDateTime startTime,
                                       @Schema(description = "모각코 종료 시간") LocalDateTime endTime,
                                       @Schema(description = "모각코 모집 데드라인 시간") LocalDateTime deadline,
-                                      @Schema(description = "최대 참여자 수") Integer maxParticipants,
-                                      @Schema(description = "모각코 글 내용") String content,
-                                      @Schema(description = "선택된 태그 id 모음") List<Long> tags) {
+                                      @Schema(description = "최대 참여자 수", example = "4") Integer maxParticipants,
+                                      @Schema(description = "모각코 글 내용", example = "모각코 모여~") String content,
+                                      @Schema(description = "선택된 태그 id 모음", example = "[1, 2, 3]") List<Long> tags) {
 
-    public Mogakko toMogakkoWithoutTags() {
+    public Mogakko toDefaultMogakko() {
         return Mogakko.builder()
             .title(title)
             .content(content)
@@ -23,9 +25,17 @@ public record MogakkoCreateRequestDto(@Schema(description = "작성자 id") Long
             .endTime(endTime)
             .deadline(deadline)
             .likeCount(0)
-            .location(location)
             .views(0)
             .maxParticipants(maxParticipants != null ? maxParticipants : Mogakko.DEFAULT_MAX_PARTICIPANTS)
+            .build();
+    }
+
+    public Location toLocation() {
+        return Location.builder()
+            .address(location.address())
+            .latitude(location.latitude())
+            .longitude(location.longitude())
+            .city(location.city())
             .build();
     }
 }
