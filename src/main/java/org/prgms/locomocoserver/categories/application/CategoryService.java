@@ -28,7 +28,7 @@ public class CategoryService {
     private Results<CategoriesWithTagsDto> transformToResults(List<Category> categories) {
         List<CategoriesWithTagsDto> data = categories.stream().map(
             category -> new CategoriesWithTagsDto(category.getId(), category.getName(),
-                getTagsInfoDto(category))
+                category.getCategoryInputType(), getTagsInfoDto(category))
         ).toList();
 
         return new Results<>(data);
