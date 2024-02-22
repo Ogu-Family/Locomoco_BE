@@ -5,5 +5,5 @@ import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LocationRepository extends JpaRepository<Location, Long> {
-    Optional<Location> findByMogakko(Mogakko mogakko);
+    Optional<Location> findByMogakkoAndDeletedAtIsNull(Mogakko mogakko);
 }
