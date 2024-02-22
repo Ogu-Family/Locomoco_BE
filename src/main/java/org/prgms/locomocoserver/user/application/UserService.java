@@ -81,6 +81,18 @@ public class UserService {
         return mogakkoInfoDtos;
     }
 
+    public List<MogakkoInfoDto> getCompletedMogakkos(Long userId) {
+        List<MogakkoInfoDto> mogakkoInfoDtos = mogakkoRepository.findCompletedMogakkosByUserId(userId, LocalDateTime.now())
+                .stream().map(mogakko -> {
+                    LocationInfoDto locationInfoDto = LocationInfoDto.create(locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko).orElseThrow(() -> new IllegalArgumentException("Not Found Location")));
+                    List<Long> mogakkoTagIds = mogakkoTagRepository.findAllByMogakko(mogakko)
+                            .stream().map(mogakkoTag -> mogakkoTag.getId()).toList();  // TODO: List<Long> -> List<MogakkoTags> 변환되면 수정
+                    return MogakkoInfoDto.create(mogakko, locationInfoDto, mogakkoTagIds);
+                }).toList();
+
+        return mogakkoInfoDtos;
+    }
+
     public boolean isNicknameUnique(String nickname) {
         return !userRepository.findByNicknameAndDeletedAtIsNull(nickname).isPresent();
     }
