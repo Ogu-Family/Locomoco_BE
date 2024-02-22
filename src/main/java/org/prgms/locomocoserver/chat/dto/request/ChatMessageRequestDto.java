@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.chat.dto.request;
 
+import lombok.NonNull;
 import org.prgms.locomocoserver.chat.domain.ChatMessage;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
@@ -8,8 +9,11 @@ import org.prgms.locomocoserver.user.domain.User;
 import java.util.List;
 
 public record ChatMessageRequestDto(
+        @NonNull
         Long chatRoomId,
+        @NonNull
         Long mogakkoId,
+        @NonNull
         Long senderId,
         String message
 ) {
