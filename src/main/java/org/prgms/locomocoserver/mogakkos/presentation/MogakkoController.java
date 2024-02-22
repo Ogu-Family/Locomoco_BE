@@ -46,10 +46,14 @@ public class MogakkoController {
         @Parameter(description = "필터링 태그 id 목록") @RequestParam List<Long> tags) { // TODO: 실 구현 필요
         ArrayList<MogakkoSimpleInfoResponseDto> responseDtos = new ArrayList<>();
 
+        List<LocationInfoDto> dummyLocationInfoDtos = List.of(
+            new LocationInfoDto("서울 구로구 구로동 1124-49", 37.48499109823538, 126.90030884433865, "구로동"),
+            new LocationInfoDto("서울 구로구 디지털로32나길 17-28", 37.48483748703877, 126.89978894154596,
+                "구로동"));
+
         IntStream.range(0, 10).forEach(i -> responseDtos.add(
             new MogakkoSimpleInfoResponseDto("제모옥" + i, i * 10, i * 3, i % 8 + 2, 1,
-                new LocationInfoDto("어딘가", (double) 101 / (i + 1), (double) 157 / (i + 1), "개봉동"), List.of(
-                (long) i, (long) i + 1, (long) i + 2))));
+                dummyLocationInfoDtos.get(i % 2), List.of((long) i, (long) i + 1, (long) i + 2))));
 
         Results<MogakkoSimpleInfoResponseDto> responseDto = new Results<>(responseDtos);
 
