@@ -18,8 +18,12 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.prgms.locomocoserver.categories.domain.Category;
+import org.prgms.locomocoserver.categories.domain.CategoryInputType;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
+import org.prgms.locomocoserver.location.domain.Location;
+import org.prgms.locomocoserver.location.domain.LocationRepository;
+import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
@@ -59,15 +63,17 @@ class MogakkoServiceTest {
     private UserRepository userRepository;
     @Autowired
     private ParticipantRepository participantRepository;
+    @Autowired
+    private LocationRepository locationRepository;
     private User setUpUser1, setUpUser2;
     private Mogakko testMogakko;
 
     @BeforeAll
     void setUp() {
         Category langs = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 언어")
-            .build();
+            .categoryInputType(CategoryInputType.CHECKBOX).build();
         Category coding = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 유형")
-            .build();
+            .categoryInputType(CategoryInputType.COMBOBOX).build();
 
         categoryRepository.saveAll(List.of(langs, coding));
 
@@ -90,7 +96,7 @@ class MogakkoServiceTest {
             User.builder().nickname("참여자1").email("part@gmail.com").job(Job.DEVELOPER).birth(
                 LocalDate.EPOCH).gender(Gender.FEMALE).temperature(42.1).provider("kakao").build());
         testMogakko = Mogakko.builder().title("title").content("제곧내").views(20).likeCount(10)
-            .location("어딘가").startTime(LocalDateTime.now())
+            .startTime(LocalDateTime.now())
             .endTime(LocalDateTime.now().plusHours(2)).deadline(LocalDateTime.now().plusHours(1))
             .creator(setUpUser1).build();
 
@@ -100,6 +106,10 @@ class MogakkoServiceTest {
         participantRepository.save(
             Participant.builder().user(setUpUser2).mogakko(testMogakko).build());
 
+        Location testLocation = Location.builder().address("테스트 주소~").latitude(10.31232)
+            .longitude(105.4279823801).city("심곡본동").mogakko(testMogakko).build();
+        locationRepository.save(testLocation);
+
         tagIds.addAll(List.of(js.getId(), python.getId(), codingTest.getId(), backend.getId()));
     }
 
@@ -107,6 +117,7 @@ class MogakkoServiceTest {
     void tearDown() {
         participantRepository.deleteAll();
         mogakkoTagRepository.deleteAll();
+        locationRepository.deleteAll();
         mogakkoRepository.deleteAll();
         userRepository.deleteAll();
         tagRepository.deleteAll();
@@ -125,7 +136,7 @@ class MogakkoServiceTest {
         MogakkoCreateRequestDto mogakkoCreateRequestDto = new MogakkoCreateRequestDto(
             savedCreator.getId(),
             "제목",
-            "장소",
+            new LocationInfoDto("주소", 20.4892, 125.2387342, "개봉동"),
             startTime,
             startTime.plusHours(2),
             startTime.plusHours(1),
@@ -171,7 +182,7 @@ class MogakkoServiceTest {
     void success_update_mogakko_info_and_tags() {
         // given
         String updateTitle = "바뀐 제목";
-        String updateLocation = "바뀐 장소";
+        LocationInfoDto updateLocation = new LocationInfoDto("바뀐 주소", 25.12, 110.2489, "구로동");
         String updateContent = "바뀐 내용";
 
         MogakkoUpdateRequestDto requestDto = new MogakkoUpdateRequestDto(
@@ -194,11 +205,17 @@ class MogakkoServiceTest {
 
         assertThat(updatedMogakko.getTitle()).isEqualTo(updateTitle);
         assertThat(updatedMogakko.getContent()).isEqualTo(updateContent);
-        assertThat(updatedMogakko.getLocation()).isEqualTo(updateLocation);
         assertThat(updatedMogakko.getEndTime().truncatedTo(ChronoUnit.MILLIS))
             .isEqualTo(testMogakko.getStartTime().plusHours(5).truncatedTo(ChronoUnit.MILLIS));
-
         assertThat(updatedMogakkoTags).hasSize(1);
         assertThat(updatedMogakkoTags.get(0).getTag().getId()).isEqualTo(tagIds.get(2));
+
+        Optional<Location> locationOptional = locationRepository.findByMogakko(updatedMogakko);
+        assertThat(locationOptional.isPresent()).isTrue();
+        Location updatedLocation = locationOptional.get();
+        assertThat(updatedLocation.getAddress()).isEqualTo(updateLocation.address());
+        assertThat(updatedLocation.getCity()).isEqualTo(updateLocation.city());
+        assertThat(updatedLocation.getLatitude()).isEqualTo(updateLocation.latitude());
+        assertThat(updatedLocation.getLongitude()).isEqualTo(updateLocation.longitude());
     }
 }
