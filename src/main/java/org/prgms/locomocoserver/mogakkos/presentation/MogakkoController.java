@@ -43,21 +43,12 @@ public class MogakkoController {
         @ApiResponse(responseCode = "200", description = "모각코 목록 반환 성공")
     )
     public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
-        @Parameter(description = "필터링 태그 id 목록") @RequestParam List<Long> tags) { // TODO: 실 구현 필요
-        ArrayList<MogakkoSimpleInfoResponseDto> responseDtos = new ArrayList<>();
+        @Parameter(description = "필터링 태그 id 목록") @RequestParam List<Long> tags) {
+        List<MogakkoSimpleInfoResponseDto> responseDtos = mogakkoService.findAllByTagIds(tags);
 
-        List<LocationInfoDto> dummyLocationInfoDtos = List.of(
-            new LocationInfoDto("서울 구로구 구로동 1124-49", 37.48499109823538, 126.90030884433865, "구로동"),
-            new LocationInfoDto("서울 구로구 디지털로32나길 17-28", 37.48483748703877, 126.89978894154596,
-                "구로동"));
+        Results<MogakkoSimpleInfoResponseDto> results = new Results<>(responseDtos);
 
-        IntStream.range(0, 10).forEach(i -> responseDtos.add(
-            new MogakkoSimpleInfoResponseDto("제모옥" + i, i * 10, i * 3, i % 8 + 2, 1,
-                dummyLocationInfoDtos.get(i % 2), List.of((long) i, (long) i + 1, (long) i + 2))));
-
-        Results<MogakkoSimpleInfoResponseDto> responseDto = new Results<>(responseDtos);
-
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(results);
     }
 
     @PutMapping("/mogakko/map")
