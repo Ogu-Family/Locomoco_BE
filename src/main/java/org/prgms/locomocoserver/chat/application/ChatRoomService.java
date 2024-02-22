@@ -41,9 +41,10 @@ public class ChatRoomService {
     @Transactional
     public ChatMessageDto saveChatMessage(ChatMessageRequestDto messageDto) {
         User sender = userService.getById(messageDto.senderId());
-        ChatRoom chatRoom = chatRoomRepository.save(getById(messageDto.chatRoomId())); // updatedAt 갱신
+        ChatRoom chatRoom = getById(messageDto.chatRoomId()); // updatedAt 갱신
 
         ChatMessage chatMessage = chatMessageRepository.save(messageDto.toChatMessageEntity(sender, chatRoom));
+        chatRoom.updateUpdatedAt();
         return ChatMessageDto.of(chatMessage);
     }
 
