@@ -11,5 +11,7 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
     Optional<Mogakko> findByIdAndDeletedAtIsNull(Long id);
     @Query("SELECT m FROM Mogakko m JOIN m.participants p WHERE p.user.id = :userId AND m.deadline >= :now AND m.deletedAt IS NULL")
     List<Mogakko> findOngoingMogakkosByUserId(@Param("userId") Long userId, @Param("now") LocalDateTime now);
+    @Query("SELECT m FROM Mogakko m JOIN m.participants p WHERE p.user.id = :userId AND m.deadline < :now AND m.deletedAt IS NULL")
+    List<Mogakko> findCompletedMogakkosByUserId(@Param("userId") Long userId, @Param("now") LocalDateTime now);
 
 }
