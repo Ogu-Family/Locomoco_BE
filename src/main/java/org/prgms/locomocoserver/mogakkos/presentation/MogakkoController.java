@@ -50,7 +50,7 @@ public class MogakkoController {
             responseDtos = mogakkoService.findAllByCity(cursor, city);
         }
         else {
-            responseDtos = mogakkoService.findAllByTagIds(tags, cursor);
+            responseDtos = mogakkoService.findAllByFilter(tags, cursor, city);
         }
 
         Results<MogakkoSimpleInfoResponseDto> results = new Results<>(responseDtos);
