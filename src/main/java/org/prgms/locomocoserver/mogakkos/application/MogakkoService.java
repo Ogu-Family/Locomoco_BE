@@ -152,7 +152,7 @@ public class MogakkoService {
 
         tagMap.forEach((tag, status) -> {
             switch (status) {
-                case DELETE_TAG -> mogakkoTagRepository.deleteByTag(tag);
+                case DELETE_TAG -> mogakkoTagRepository.deleteByTagAndMogakko(tag, updateMogakko);
                 case INSERT_TAG -> mogakkoTagRepository.save(
                     MogakkoTag.builder().mogakko(updateMogakko).tag(tag).build());
             }
