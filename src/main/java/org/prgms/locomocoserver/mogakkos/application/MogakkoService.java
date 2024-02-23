@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.location.domain.Location;
 import org.prgms.locomocoserver.location.domain.LocationRepository;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
@@ -16,6 +17,7 @@ import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoParticipantDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MogakkoService {
 
     private final MogakkoRepository mogakkoRepository;
@@ -66,9 +69,33 @@ public class MogakkoService {
             .toList();
         List<Long> tagIds = mogakkoTags.stream().map(mogakkoTag -> mogakkoTag.getTag().getId())
             .toList();
-        MogakkoInfoDto mogakkoInfoDto = MogakkoInfoDto.create(foundMogakko, LocationInfoDto.create(foundLocation) , tagIds);
+        MogakkoInfoDto mogakkoInfoDto = MogakkoInfoDto.create(foundMogakko, LocationInfoDto.create(foundLocation), tagIds);
 
         return new MogakkoDetailResponseDto(creatorInfoDto, mogakkoParticipantDtos, mogakkoInfoDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MogakkoSimpleInfoResponseDto> findAll(Long cursor) {
+        List<Mogakko> mogakkos = mogakkoRepository.findAll(cursor);
+
+        return mogakkos.stream().map(mogakko -> {
+            Location location = locationRepository.findByMogakko(mogakko)
+                .orElseThrow(RuntimeException::new);// TODO: 장소 예외 반환
+
+            return MogakkoSimpleInfoResponseDto.create(mogakko, location);
+        }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<MogakkoSimpleInfoResponseDto> findAllByTagIds(List<Long> tagIds, Long cursor) {
+        List<Long> filteredMogakkoIds = mogakkoTagRepository.findAllIdsByTagIds(tagIds, tagIds.size(), cursor);
+        List<Mogakko> filteredMogakkos = mogakkoRepository.findAllById(filteredMogakkoIds);
+
+        return filteredMogakkos.stream().map(mogakko -> {
+            Location location = locationRepository.findByMogakko(mogakko)
+                .orElseThrow(RuntimeException::new);
+            return MogakkoSimpleInfoResponseDto.create(mogakko, location);
+        }).toList();
     }
 
     @Transactional
