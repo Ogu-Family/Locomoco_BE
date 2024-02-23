@@ -12,5 +12,5 @@ public interface MogakkoTagRepository extends JpaRepository<MogakkoTag, Long> {
     List<MogakkoTag> findAllByMogakko(Mogakko mogakko);
     @Query(value = "SELECT mt.mogakko_id FROM mogakko_tags mt WHERE (mt.mogakko_id > :cursor AND mt.tag_id IN :tagIds) GROUP BY mt.mogakko_id HAVING COUNT(mt.mogakko_id) = :tagSize LIMIT 20", nativeQuery = true)
     List<Long> findAllIdsByTagIds(Iterable<Long> tagIds, int tagSize, Long cursor);
-    void deleteByTag(Tag tag);
+    void deleteByTagAndMogakko(Tag tag, Mogakko mogakko);
 }
