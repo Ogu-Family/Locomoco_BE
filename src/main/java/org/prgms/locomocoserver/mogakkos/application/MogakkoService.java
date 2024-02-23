@@ -75,8 +75,8 @@ public class MogakkoService {
     }
 
     @Transactional(readOnly = true)
-    public List<MogakkoSimpleInfoResponseDto> findAll(Long cursor) {
-        List<Mogakko> mogakkos = mogakkoRepository.findAll(cursor);
+    public List<MogakkoSimpleInfoResponseDto> findAllByCity(Long cursor, String city) {
+        List<Mogakko> mogakkos = mogakkoRepository.findAll(cursor, city);
 
         return mogakkos.stream().map(mogakko -> {
             Location location = locationRepository.findByMogakko(mogakko)

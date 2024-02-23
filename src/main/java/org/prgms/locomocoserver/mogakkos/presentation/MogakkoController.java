@@ -5,12 +5,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.global.common.dto.Results;
-import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
@@ -44,11 +41,13 @@ public class MogakkoController {
     )
     public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
         @Parameter(description = "필터링 커서") @RequestParam(required = false, defaultValue = "0") Long cursor,
+        @Parameter(description = "동/읍/면") @RequestParam(required = false, defaultValue = "") String city,
         @Parameter(description = "필터링 태그 id 목록") @RequestParam(required = false) List<Long> tags) {
         List<MogakkoSimpleInfoResponseDto> responseDtos;
+        city = city.strip();
 
         if (tags == null) {
-            responseDtos = mogakkoService.findAll(cursor);
+            responseDtos = mogakkoService.findAllByCity(cursor, city);
         }
         else {
             responseDtos = mogakkoService.findAllByTagIds(tags, cursor);
