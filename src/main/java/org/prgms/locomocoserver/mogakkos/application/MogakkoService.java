@@ -75,8 +75,8 @@ public class MogakkoService {
     }
 
     @Transactional(readOnly = true)
-    public List<MogakkoSimpleInfoResponseDto> findAll(Long cursor) {
-        List<Mogakko> mogakkos = mogakkoRepository.findAll(cursor);
+    public List<MogakkoSimpleInfoResponseDto> findAllByCity(Long cursor, String city) {
+        List<Mogakko> mogakkos = mogakkoRepository.findAll(cursor, city);
 
         return mogakkos.stream().map(mogakko -> {
             Location location = locationRepository.findByMogakko(mogakko)
@@ -87,8 +87,8 @@ public class MogakkoService {
     }
 
     @Transactional(readOnly = true)
-    public List<MogakkoSimpleInfoResponseDto> findAllByTagIds(List<Long> tagIds, Long cursor) {
-        List<Long> filteredMogakkoIds = mogakkoTagRepository.findAllIdsByTagIds(tagIds, tagIds.size(), cursor);
+    public List<MogakkoSimpleInfoResponseDto> findAllByFilter(List<Long> tagIds, Long cursor, String city) {
+        List<Long> filteredMogakkoIds = mogakkoTagRepository.findAllIdsByfilter(tagIds, tagIds.size(), cursor, city);
         List<Mogakko> filteredMogakkos = mogakkoRepository.findAllById(filteredMogakkoIds);
 
         return filteredMogakkos.stream().map(mogakko -> {
