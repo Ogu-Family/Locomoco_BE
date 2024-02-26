@@ -46,6 +46,10 @@ public class Inquiry extends BaseEntity {
         this.mogakko = mogakko;
     }
 
+    public void updateInfo(String content) {
+        this.content = content;
+    }
+
     public void updateUser(User user) {
         this.user = user;
     }
