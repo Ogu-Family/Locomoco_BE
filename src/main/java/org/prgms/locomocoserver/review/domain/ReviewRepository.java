@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findAllByRevieweeAndDeletedAtIsNull(User user);
+    List<Review> findAllByReviewerAndDeletedAtIsNull(User user);
 }

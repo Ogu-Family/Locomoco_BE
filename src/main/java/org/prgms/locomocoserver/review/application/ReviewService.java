@@ -25,4 +25,12 @@ public class ReviewService {
         return reviewRepository.findAllByRevieweeAndDeletedAtIsNull(user).stream()
                 .map(review -> ReviewDto.of(review)).toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDto> getSentReviews(Long userId) {
+        User user = userService.getById(userId);
+
+        return reviewRepository.findAllByReviewerAndDeletedAtIsNull(user).stream()
+                .map(review -> ReviewDto.of(review)).toList();
+    }
 }

@@ -40,9 +40,16 @@ public class ReviewController {
     }
 
     @GetMapping("/users/{userId}/review-recieved")
-    @Operation(summary = "리뷰 조회", description = "모각코 id, reviewee id 기반으로 받은 리뷰를 조회 합니다.")
-    public ResponseEntity<List<ReviewDto>> getReviews(@PathVariable Long userId) {
+    @Operation(summary = "받은 리뷰 조회", description = "user id 기반으로 받은 리뷰를 조회 합니다.")
+    public ResponseEntity<List<ReviewDto>> getRecievedReviews(@PathVariable Long userId) {
         List<ReviewDto> reviewDtos = reviewService.getRecievedReviews(userId);
+        return ResponseEntity.ok(reviewDtos);
+    }
+
+    @GetMapping("/users/{userId}/review-sent")
+    @Operation(summary = "보낸 리뷰 조회", description = "모각코 id, reviewee id 기반으로 받은 리뷰를 조회 합니다.")
+    public ResponseEntity<List<ReviewDto>> getSentReviews(@PathVariable Long userId) {
+        List<ReviewDto> reviewDtos = reviewService.getSentReviews(userId);
         return ResponseEntity.ok(reviewDtos);
     }
 }
