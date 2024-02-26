@@ -71,7 +71,9 @@ public class InquiryController {
     })
     @PutMapping("/inquries")
     public ResponseEntity<Void> create(
-        @Parameter(description = "문의 생성을 위해 보내주는 정보") @RequestBody InquiryCreateRequestDto requestDto) { // TODO: 실 구현 필요
+        @Parameter(description = "문의 생성을 위해 보내주는 정보") @RequestBody InquiryCreateRequestDto requestDto) {
+        inquiryService.save(requestDto);
+
         return ResponseEntity.ok(null);
     }
 
