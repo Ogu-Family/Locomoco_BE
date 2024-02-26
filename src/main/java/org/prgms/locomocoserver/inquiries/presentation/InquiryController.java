@@ -84,8 +84,8 @@ public class InquiryController {
     @PatchMapping("/inquiries/{inquiryId}")
     public ResponseEntity<InquiryUpdateResponseDto> update(
         @Parameter(description = "문의 id") @PathVariable(name = "inquiryId") Long id,
-        @Parameter(description = "업데이트 정보") @RequestBody InquiryUpdateRequestDto requestDto) { // TODO: 실 구현 필요
-        InquiryUpdateResponseDto responseDto = new InquiryUpdateResponseDto(1L);
+        @Parameter(description = "업데이트 정보") @RequestBody InquiryUpdateRequestDto requestDto) {
+        InquiryUpdateResponseDto responseDto = inquiryService.update(id, requestDto);
 
         return ResponseEntity.ok(responseDto);
     }
