@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.review.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.prgms.locomocoserver.review.domain.Review;
 
 import java.util.List;
 
@@ -18,4 +19,7 @@ public record ReviewDto(
         @Schema(description = "리뷰 내용", example = "좋았습니다~")
         String content
 ) {
+        public static ReviewDto of(Review review) {
+            return new ReviewDto(review.getId(), review.getReviewer().getId(), review.getReviewee().getId(), review.getScore(), review.getReviewContentIds(), review.getContent());
+        }
 }
