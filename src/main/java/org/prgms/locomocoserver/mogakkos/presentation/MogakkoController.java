@@ -5,12 +5,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.global.common.dto.Results;
-import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
@@ -43,21 +40,22 @@ public class MogakkoController {
         @ApiResponse(responseCode = "200", description = "모각코 목록 반환 성공")
     )
     public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
-        @Parameter(description = "필터링 태그 id 목록") @RequestParam List<Long> tags) { // TODO: 실 구현 필요
-        ArrayList<MogakkoSimpleInfoResponseDto> responseDtos = new ArrayList<>();
+        @Parameter(description = "필터링 커서") @RequestParam(required = false, defaultValue = "0") Long cursor,
+        @Parameter(description = "동/읍/면") @RequestParam(required = false, defaultValue = "") String city,
+        @Parameter(description = "필터링 태그 id 목록") @RequestParam(required = false) List<Long> tags) {
+        List<MogakkoSimpleInfoResponseDto> responseDtos;
+        city = city.strip();
 
-        List<LocationInfoDto> dummyLocationInfoDtos = List.of(
-            new LocationInfoDto("서울 구로구 구로동 1124-49", 37.48499109823538, 126.90030884433865, "구로동"),
-            new LocationInfoDto("서울 구로구 디지털로32나길 17-28", 37.48483748703877, 126.89978894154596,
-                "구로동"));
+        if (tags == null) {
+            responseDtos = mogakkoService.findAllByCity(cursor, city);
+        }
+        else {
+            responseDtos = mogakkoService.findAllByFilter(tags, cursor, city);
+        }
 
-        IntStream.range(0, 10).forEach(i -> responseDtos.add(
-            new MogakkoSimpleInfoResponseDto("제모옥" + i, i * 10, i * 3, i % 8 + 2, 1,
-                dummyLocationInfoDtos.get(i % 2), List.of((long) i, (long) i + 1, (long) i + 2))));
+        Results<MogakkoSimpleInfoResponseDto> results = new Results<>(responseDtos);
 
-        Results<MogakkoSimpleInfoResponseDto> responseDto = new Results<>(responseDtos);
-
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(results);
     }
 
     @PutMapping("/mogakko/map")
