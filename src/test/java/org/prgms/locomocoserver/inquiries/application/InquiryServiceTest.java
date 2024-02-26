@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.inquiries.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,12 +17,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.prgms.locomocoserver.inquiries.domain.Inquiry;
 import org.prgms.locomocoserver.inquiries.domain.InquiryRepository;
 import org.prgms.locomocoserver.inquiries.dto.request.InquiryCreateRequestDto;
+import org.prgms.locomocoserver.inquiries.dto.request.InquiryUpdateRequestDto;
+import org.prgms.locomocoserver.inquiries.dto.response.InquiryUpdateResponseDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class InquiryServiceTest {
@@ -64,5 +68,35 @@ class InquiryServiceTest {
 
         // then
         verify(inquiryRepository).save(any(Inquiry.class));
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 문의를 수정할 수 있다")
+    void success_update_inquiry() {
+        // given
+        long inquiryId = 3L;
+        long userId = 1L;
+        String updateContent = "updateContent";
+        InquiryUpdateRequestDto requestDto = new InquiryUpdateRequestDto(userId, updateContent);
+
+        User user = User.builder().nickname("생성자").email("cho@gmail.com").job(Job.JOB_SEEKER)
+            .birth(LocalDate.EPOCH).gender(Gender.MALE).temperature(36.5).provider("github")
+            .build();
+        Inquiry preInquiry = Inquiry.builder().user(user).mogakko(null).content("content").build();
+        Inquiry updatedInquiry = Inquiry.builder().user(user).mogakko(null).content(updateContent).build();
+
+        ReflectionTestUtils.setField(user, "id", userId);
+        ReflectionTestUtils.setField(updatedInquiry, "id", inquiryId);
+
+        when(inquiryRepository.findByIdAndDeletedAtIsNull(inquiryId)).thenReturn(Optional.of(preInquiry));
+        when(inquiryRepository.save(preInquiry)).thenReturn(updatedInquiry);
+
+        // when
+        InquiryUpdateResponseDto responseDto = inquiryService.update(inquiryId, requestDto);
+
+        // then
+        assertThat(responseDto.id()).isEqualTo(inquiryId);
+
+        verify(inquiryRepository).save(preInquiry);
     }
 }
