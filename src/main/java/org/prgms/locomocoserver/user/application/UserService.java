@@ -70,7 +70,8 @@ public class UserService {
     }
 
     public List<MogakkoInfoDto> getOngoingMogakkos(Long userId) {
-        List<MogakkoInfoDto> mogakkoInfoDtos = mogakkoRepository.findOngoingMogakkosByUserId(userId, LocalDateTime.now())
+        User user = getById(userId);
+        List<MogakkoInfoDto> mogakkoInfoDtos = mogakkoRepository.findOngoingMogakkosByUser(user, LocalDateTime.now())
                 .stream().map(mogakko -> {
                     LocationInfoDto locationInfoDto = LocationInfoDto.create(locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko).orElseThrow(() -> new IllegalArgumentException("Not Found Location")));
                     List<Long> mogakkoTagIds = mogakkoTagRepository.findAllByMogakko(mogakko)
@@ -82,7 +83,8 @@ public class UserService {
     }
 
     public List<MogakkoInfoDto> getCompletedMogakkos(Long userId) {
-        List<MogakkoInfoDto> mogakkoInfoDtos = mogakkoRepository.findCompletedMogakkosByUserId(userId, LocalDateTime.now())
+        User user = getById(userId);
+        List<MogakkoInfoDto> mogakkoInfoDtos = mogakkoRepository.findCompletedMogakkosByUser(user, LocalDateTime.now())
                 .stream().map(mogakko -> {
                     LocationInfoDto locationInfoDto = LocationInfoDto.create(locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko).orElseThrow(() -> new IllegalArgumentException("Not Found Location")));
                     List<Long> mogakkoTagIds = mogakkoTagRepository.findAllByMogakko(mogakko)
