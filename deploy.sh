@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-REPOSITORY=/home/ubuntu/locomoco-server
+REPOSITORY=/home/ubuntu/locomoco
 cd $REPOSITORY
 
 APP_NAME=locomoco-server
