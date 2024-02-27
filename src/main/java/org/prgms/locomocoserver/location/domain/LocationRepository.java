@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LocationRepository extends JpaRepository<Location, Long> {
     Optional<Location> findByMogakkoAndDeletedAtIsNull(Mogakko mogakko);
+    Optional<Location> findByMogakko(Mogakko mogakko);
 }
