@@ -5,11 +5,11 @@ files:
   - source: /
     destination: /home/ubuntu/locomoco
 permissions:
-  - object: /home/ubuntu/locomoco/
+  - object: /home/ubuntu/locomoco
     owner: ubuntu
     group: ubuntu
+    mode: 777
 hooks:
   AfterInstall:
     - location: scripts/deploy.sh
       timeout: 60
-      runas: ubuntu
