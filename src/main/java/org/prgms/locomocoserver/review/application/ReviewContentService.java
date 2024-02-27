@@ -5,6 +5,7 @@ import org.prgms.locomocoserver.review.domain.data.ReviewContent;
 import org.prgms.locomocoserver.review.domain.data.ReviewContentRepository;
 import org.prgms.locomocoserver.review.dto.response.ReviewContentDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ public class ReviewContentService {
 
     private final ReviewContentRepository reviewContentRepository;
 
+    @Transactional(readOnly = true)
     public List<ReviewContentDto> getAllReviewContents() {
         List<ReviewContent> reviewContents = reviewContentRepository.findAllByDeletedAtIsNull();
         return reviewContents.stream()

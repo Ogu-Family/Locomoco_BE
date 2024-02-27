@@ -61,7 +61,7 @@ public class MogakkoService {
             .orElseGet(() -> User.builder().nickname("(알 수 없음)").build());
         List<User> participants = userRepository.findAllParticipantsByMogakko(foundMogakko);
         List<MogakkoTag> mogakkoTags = mogakkoTagRepository.findAllByMogakko(foundMogakko);
-        Location foundLocation = locationRepository.findByMogakko(foundMogakko)
+        Location foundLocation = locationRepository.findByMogakkoAndDeletedAtIsNull(foundMogakko)
             .orElseThrow(RuntimeException::new); // TODO: 장소 예외 반환
 
         UserBriefInfoDto creatorInfoDto = UserBriefInfoDto.of(creator);
@@ -175,7 +175,7 @@ public class MogakkoService {
     }
 
     private void updateMogakkoLocation(Mogakko mogakko, LocationInfoDto locationInfoDto) {
-        Location location = locationRepository.findByMogakko(mogakko)
+        Location location = locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
             .orElseThrow(RuntimeException::new); // TODO: 적절한 예외 반환 (유저 혹은 장소)
 
         location.updateInfo(locationInfoDto.latitude(),
