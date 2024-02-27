@@ -53,7 +53,7 @@ public class UserController {
     @Operation(summary = "종료된 모각코 목록 조회", description = "사용자가 참여했던 모각코 목록을 조회합니다.")
     @GetMapping("/users/{userId}/mogakko/complete")
     public ResponseEntity<List<MogakkoInfoDto>> getCompleteMogakkos(@PathVariable Long userId) {
-        List<MogakkoInfoDto> mogakkoInfoDtos = new ArrayList<>(); // TODO: complete mogakkos 조회
+        List<MogakkoInfoDto> mogakkoInfoDtos = userService.getCompletedMogakkos(userId);
         return ResponseEntity.ok(mogakkoInfoDtos);
     }
     

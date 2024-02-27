@@ -32,7 +32,7 @@ public class Review extends BaseEntity {
     @Column(name = "score", nullable = false)
     private int score;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "review_content_ids", joinColumns = @JoinColumn(name = "review_id"))
     @Column(name = "review_contents_id")
     private List<Long> reviewContentIds;

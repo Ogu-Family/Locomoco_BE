@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.review.application.ReviewContentService;
+import org.prgms.locomocoserver.review.application.ReviewService;
 import org.prgms.locomocoserver.review.domain.data.ReviewContentRepository;
 import org.prgms.locomocoserver.review.dto.request.ReviewCreateRequestDto;
 import org.prgms.locomocoserver.review.dto.response.ReviewContentDto;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewContentService reviewContentService;
+    private final ReviewService reviewService;
 
     @Operation(summary = "리뷰 내용 전체 데이터 반환", description = "긍정리뷰, 부정리뷰 모든 리스트를 조회 합니다.")
     @GetMapping("/reviews/contents")
@@ -35,5 +37,19 @@ public class ReviewController {
         // TODO: create review 로직 구현
 
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/users/{userId}/review-recieved")
+    @Operation(summary = "받은 리뷰 조회", description = "user id 기반으로 받은 리뷰를 조회 합니다.")
+    public ResponseEntity<List<ReviewDto>> getRecievedReviews(@PathVariable Long userId) {
+        List<ReviewDto> reviewDtos = reviewService.getRecievedReviews(userId);
+        return ResponseEntity.ok(reviewDtos);
+    }
+
+    @GetMapping("/users/{userId}/review-sent")
+    @Operation(summary = "보낸 리뷰 조회", description = "모각코 id, reviewee id 기반으로 받은 리뷰를 조회 합니다.")
+    public ResponseEntity<List<ReviewDto>> getSentReviews(@PathVariable Long userId) {
+        List<ReviewDto> reviewDtos = reviewService.getSentReviews(userId);
+        return ResponseEntity.ok(reviewDtos);
     }
 }
