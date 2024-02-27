@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-REPOSITORY=/home/ubuntu/locomoco
+REPOSITORY=/home/ubuntu/locomoco-server
 cd $REPOSITORY
 
-APP_NAME=locomoco
+APP_NAME=locomoco-server
 JAR_NAME=$(ls $REPOSITORY/build/libs/ | grep 'SNAPSHOT.jar' | tail -n 1)
 JAR_PATH=$REPOSITORY/build/libs/$JAR_NAME
 
