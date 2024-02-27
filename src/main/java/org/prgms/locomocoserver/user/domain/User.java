@@ -49,11 +49,14 @@ public class User extends BaseEntity {
     @Column(name = "provider", nullable = false)
     private String provider;
 
+    @Column(name = "profile_image")
+    private String profileImage;
+
     @ManyToMany(fetch = FetchType.LAZY)
     private List<ChatRoom> chatRoomList = new ArrayList<>();
 
     @Builder
-    public User(String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider) {
+    public User(String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider, String profileImage) {
         this.nickname = nickname;
         this.birth = birth;
         this.gender = gender;
@@ -61,6 +64,7 @@ public class User extends BaseEntity {
         this.job = job;
         this.email = new EmailVo(email).getEmail();
         this.provider = provider;
+        this.profileImage = profileImage;
     }
 
     public void setInitInfo(String nickname, LocalDate birth, Gender gender, Job job) {

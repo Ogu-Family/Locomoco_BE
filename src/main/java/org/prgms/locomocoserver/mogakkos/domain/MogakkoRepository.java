@@ -13,8 +13,8 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
         + "JOIN locations l ON (m.id > :cursor AND m.deleted_at IS NULL AND l.mogakko_id = m.id AND l.city LIKE :city%) "
         + "LIMIT 20", nativeQuery = true)
     List<Mogakko> findAll(Long cursor, String city);
-    @Query("SELECT m FROM Mogakko m JOIN m.participants p WHERE p.user.id = :userId AND m.deadline >= :now AND m.deletedAt IS NULL")
+    @Query("SELECT m FROM Mogakko m JOIN m.participants p WHERE p.user.id = :userId AND m.endTime >= :now AND m.deletedAt IS NULL")
     List<Mogakko> findOngoingMogakkosByUserId(@Param("userId") Long userId, @Param("now") LocalDateTime now);
-    @Query("SELECT m FROM Mogakko m JOIN m.participants p WHERE p.user.id = :userId AND m.deadline < :now AND m.deletedAt IS NULL")
+    @Query("SELECT m FROM Mogakko m JOIN m.participants p WHERE p.user.id = :userId AND m.endTime < :now AND m.deletedAt IS NULL")
     List<Mogakko> findCompletedMogakkosByUserId(@Param("userId") Long userId, @Param("now") LocalDateTime now);
 }
