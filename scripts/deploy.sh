@@ -18,5 +18,8 @@ else
   sleep 5
 fi
 
+echo "> $JAR_PATH 에 실행 권한 추가" >> /home/ubuntu/locomoco/deploy.log
+chmod +x $JAR_PATH
+
 echo "> Deploy - $JAR_PATH "
 sudo nohup java -jar $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
