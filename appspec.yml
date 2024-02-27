@@ -6,7 +6,7 @@ files:
     destination: /home/ubuntu/locomoco
     overwrite: yes
 permissions:
-  - object: /home/ubuntu/locomoco
+  - object: /
     pattern: "**"
     owner: ubuntu
     group: ubuntu
