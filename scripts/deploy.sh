@@ -22,4 +22,5 @@ echo "> $JAR_PATH 에 실행 권한 추가" >> /home/ubuntu/locomoco/deploy.log
 chmod +x $JAR_PATH
 
 echo "> Deploy - $JAR_PATH " >> /home/ubuntu/locomoco/deploy.log
-nohup java -jar $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
+cd ./build/libs
+nohup java -jar $JAR_NAME > /dev/null 2> /dev/null < /dev/null &
