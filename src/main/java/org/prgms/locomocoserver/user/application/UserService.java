@@ -55,6 +55,14 @@ public class UserService {
         return new UserInfoDto(user.getId(), user.getNickname(), user.getBirth(), user.getGender(), user.getTemperature(), user.getJob(), user.getEmail(), user.getProvider());
     }
 
+    @Transactional
+    public UserInfoDto deleteUser(Long userId) {
+        User user = getById(userId);
+        user.delete();
+
+        return UserInfoDto.of(user);
+    }
+
     public UserInfoDto getUserInfo(Long userId) {
         User user = getById(userId);
         return UserInfoDto.of(user);
