@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-source ~/.bashrc
-
 REPOSITORY=/home/ubuntu/locomoco
 cd $REPOSITORY
 
