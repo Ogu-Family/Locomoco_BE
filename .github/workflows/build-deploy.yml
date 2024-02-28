@@ -18,6 +18,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Set execute permission for deploy.sh
+        run: chmod +x scripts/deploy.sh
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -46,10 +49,6 @@ jobs:
     runs-on: [self-hosted, linux, x64, ec2]
 
     steps:
-      - name: Permission for deploy.sh
-        run: chmod 777 ./scripts/deploy.sh
-        shell: bash
-    
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
