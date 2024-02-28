@@ -3,6 +3,7 @@ name: Run Ubuntu Script
 on:
   push:
     branches: [ "master" ]
+  workflow_dispatch:
 
 env:
   PROJECT_NAME: locomoco
@@ -11,7 +12,7 @@ env:
   DEPLOYMENT_GROUP_NAME: locomoco-group
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -43,12 +44,6 @@ jobs:
       - name: Build with Gradle Wrapper
         run: ./gradlew build
 
-  deploy:
-    needs: build
-
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
