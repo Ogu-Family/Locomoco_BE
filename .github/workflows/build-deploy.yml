@@ -27,11 +27,8 @@ jobs:
       - name: Create application.yml
         run: printf "%s" "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
 
-      - name: Read pwd
-        run: pwd
-
-      - name: Read resources
-        run: cat ./src/main/java/org/prgms/locomocoserver/LocomocoServerApplication.java
+      - name: Create test application.yml
+        run: printf "%s" "${{ secrets.TEST_APPLICATION_YML }}" > ./src/test/resources/application.yml
 
       - name: Permission for gradlew
         run: chmod +x ./gradlew
