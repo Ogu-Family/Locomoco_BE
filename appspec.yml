@@ -9,6 +9,7 @@ permissions:
   - object: /
     owner: root
     group: root
+    mode: 777
 hooks:
   ApplicationStart:
     - location: scripts/deploy.sh
