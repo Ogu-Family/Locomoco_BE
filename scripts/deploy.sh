@@ -9,18 +9,14 @@ JAR_PATH=$REPOSITORY/build/libs/$JAR_NAME
 
 CURRENT_PID=$(pgrep -f $APP_NAME)
 
-if [ -z $CURRENT_PID ]
+if [ -z "$CURRENT_PID" ]
 then
   echo "> 종료할 애플리케이션이 없습니다."
 else
   echo "> kill -9 $CURRENT_PID"
-  kill -15 $CURRENT_PID
+  kill -15 "$CURRENT_PID"
   sleep 5
 fi
 
-echo "> $JAR_PATH 에 실행 권한 추가" >> /home/ubuntu/locomoco/deploy.log
-chmod +x $JAR_PATH
-
-echo "> Deploy - $JAR_PATH " >> /home/ubuntu/locomoco/deploy.log
-cd ./build/libs
-nohup java -jar $JAR_NAME > /dev/null 2> /dev/null < /dev/null &
+echo "> $JAR_PATH 배포"
+nohup java -jar "$JAR_PATH" > jarExecute.log 2>&1 < /dev/null &
