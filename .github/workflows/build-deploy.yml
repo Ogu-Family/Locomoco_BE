@@ -57,7 +57,7 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Make Zip File
-        run: zip -r ./$GITHUB_SHA.zip .
+        run: zip -r $GITHUB_SHA.zip . -i .
         shell: bash
 
       - name: Upload to S3
