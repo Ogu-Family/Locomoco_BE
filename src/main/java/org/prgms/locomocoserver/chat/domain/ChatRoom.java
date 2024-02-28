@@ -14,7 +14,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
 @Table(name = "chat_rooms")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom extends BaseEntity {
@@ -34,16 +33,15 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "creator_id", referencedColumnName = "id", nullable = false)
     private User creator;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<User> participants = new ArrayList<>();
 
-    public ChatRoom(Long id, String name, Mogakko mogakko, User creator, List<User> participants) {
+    @Builder
+    public ChatRoom(Long id, String name, Mogakko mogakko, User creator) {
         this.id = id;
         this.name = name;
         this.mogakko = mogakko;
         this.creator = creator;
-        this.participants = participants;
     }
 
     public void addParticipant(User user) {
