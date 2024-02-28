@@ -19,7 +19,6 @@ public record ChatMessageRequestDto(
                 .name(mogakko.getTitle())
                 .mogakko(mogakko)
                 .creator(creator)
-                .participants(List.of(creator))
                 .build();
     }
 
