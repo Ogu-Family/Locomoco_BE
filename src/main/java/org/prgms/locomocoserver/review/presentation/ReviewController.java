@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.review.application.ReviewContentService;
 import org.prgms.locomocoserver.review.application.ReviewService;
-import org.prgms.locomocoserver.review.domain.data.ReviewContentRepository;
 import org.prgms.locomocoserver.review.dto.request.ReviewCreateRequestDto;
 import org.prgms.locomocoserver.review.dto.response.ReviewContentDto;
 import org.prgms.locomocoserver.review.dto.response.ReviewDto;
@@ -34,9 +33,9 @@ public class ReviewController {
     @PostMapping("/reviews/{mogakkoId}/{reviewerId}")
     public ResponseEntity<ReviewDto> createReview(@PathVariable Long mogakkoId, @PathVariable Long reviewerId,
                                                @RequestBody ReviewCreateRequestDto request) {
-        // TODO: create review 로직 구현
+        ReviewDto reviewDto = reviewService.create(mogakkoId, reviewerId, request);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(reviewDto);
     }
 
     @GetMapping("/users/{userId}/review-recieved")
