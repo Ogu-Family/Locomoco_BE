@@ -27,6 +27,9 @@ jobs:
       - name: Create application.yml
         run: printf "%s" "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
 
+      - name: Create directory test resources
+        run: mkdir ./src/test/resources
+
       - name: Create test application.yml
         run: printf "%s" "${{ secrets.TEST_APPLICATION_YML }}" > ./src/test/resources/application.yml
 
