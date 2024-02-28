@@ -7,8 +7,8 @@ files:
     overwrite: yes
 permissions:
   - object: /
-    owner: root
-    group: root
+    owner: ubuntu
+    group: ubuntu
     mode: 777
 hooks:
   ApplicationStart:
