@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+whoami
+
 REPOSITORY=/home/ubuntu/locomoco
 cd $REPOSITORY
 
