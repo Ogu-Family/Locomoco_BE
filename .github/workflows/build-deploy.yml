@@ -46,6 +46,10 @@ jobs:
     runs-on: [self-hosted, linux, x64, ec2]
 
     steps:
+      - name: Permission for deploy.sh
+        run: chmod 777 ./scripts/deploy.sh
+        shell: bash
+    
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
