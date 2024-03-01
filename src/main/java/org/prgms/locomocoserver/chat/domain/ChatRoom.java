@@ -14,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "chat_rooms")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom extends BaseEntity {
@@ -41,12 +42,12 @@ public class ChatRoom extends BaseEntity {
     @Builder.Default
     private List<User> participants = new ArrayList<>();
 
-    @Builder
-    public ChatRoom(Long id, String name, Mogakko mogakko, User creator) {
+    public ChatRoom(Long id, String name, Mogakko mogakko, User creator, List<User> participants) {
         this.id = id;
         this.name = name;
         this.mogakko = mogakko;
         this.creator = creator;
+        this.participants = participants;
     }
 
     public void addParticipant(User user) {
