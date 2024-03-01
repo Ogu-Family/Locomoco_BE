@@ -10,10 +10,11 @@ import java.util.Set;
 public record ChatRoomDto(
         Long roomId,
         String name,
+        int participantCnt,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
     public static ChatRoomDto of(ChatRoom chatRoom) {
-        return new ChatRoomDto(chatRoom.getId(), chatRoom.getName(), chatRoom.getCreatedAt(), chatRoom.getUpdatedAt());
+        return new ChatRoomDto(chatRoom.getId(), chatRoom.getName(), chatRoom.getParticipants().size(), chatRoom.getCreatedAt(), chatRoom.getUpdatedAt());
     }
 }
