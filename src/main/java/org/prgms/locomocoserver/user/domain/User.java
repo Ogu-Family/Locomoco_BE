@@ -58,7 +58,7 @@ public class User extends BaseEntity {
     private List<ChatRoom> chatRoomList = new ArrayList<>();
 
 
-    public User(Long id, String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider, List<ChatRoom> chatRoomList) {
+    public User(Long id, String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider, String profileImage, List<ChatRoom> chatRoomList) {
         this.id = id;
         this.nickname = nickname;
         this.birth = birth;
@@ -67,6 +67,7 @@ public class User extends BaseEntity {
         this.job = job;
         this.email = email;
         this.provider = provider;
+        this.profileImage = profileImage;
         this.chatRoomList = chatRoomList;
     }
 
