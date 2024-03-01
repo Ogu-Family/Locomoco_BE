@@ -26,7 +26,7 @@ public class ChatRoom extends BaseEntity {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mogakko_id", nullable = false)
+    @JoinColumn(name = "mogakko_id", nullable = false, unique = true)
     private Mogakko mogakko;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,6 +34,11 @@ public class ChatRoom extends BaseEntity {
     private User creator;
 
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "chat_rooms_participants",
+            joinColumns = @JoinColumn(name = "chat_room_id"),
+            inverseJoinColumns = @JoinColumn(name = "participants_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"chat_room_id", "participants_id"}))
+    @Builder.Default
     private List<User> participants = new ArrayList<>();
 
     @Builder
@@ -46,5 +51,6 @@ public class ChatRoom extends BaseEntity {
 
     public void addParticipant(User user) {
         this.participants.add(user);
+        user.getChatRoomList().add(this);
     }
 }

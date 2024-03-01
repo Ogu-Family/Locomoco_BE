@@ -30,6 +30,13 @@ public class UserController {
         return ResponseEntity.ok(userInfoDto);
     }
 
+    @Operation(summary = "회원 탈퇴", description = "사용자 id로 탈퇴를 진행합니다")
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<UserInfoDto> deleteUser(@PathVariable Long userId) {
+        UserInfoDto userInfoDto = userService.deleteUser(userId);
+        return ResponseEntity.ok(userInfoDto);
+    }
+
     @Operation(summary = "회원가입 닉네임 중복확인", description = "닉네임 unique 여부를 확인합니다.")
     @GetMapping("/users/nickname/{nickname}/check")
     public ResponseEntity<Boolean> checkNicknameAvailability(@PathVariable String nickname) {

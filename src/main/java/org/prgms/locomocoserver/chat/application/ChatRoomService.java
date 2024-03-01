@@ -31,8 +31,8 @@ public class ChatRoomService {
 
     @Transactional
     public ChatRoomDto enterChatRoom(ChatMessageRequestDto requestDto) {
-        ChatRoom chatRoom = chatRoomRepository.findById(requestDto.chatRoomId())
-                .orElse(createChatRoom(requestDto));
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(requestDto.chatRoomId())
+                .orElseGet(() -> createChatRoom(requestDto));
         addParticipant(chatRoom, requestDto.senderId());
 
         return ChatRoomDto.of(chatRoom);
@@ -41,16 +41,11 @@ public class ChatRoomService {
     @Transactional
     public ChatMessageDto saveChatMessage(ChatMessageRequestDto messageDto) {
         User sender = userService.getById(messageDto.senderId());
-        ChatRoom chatRoom = chatRoomRepository.save(getById(messageDto.chatRoomId())); // updatedAt 갱신
+        ChatRoom chatRoom = getById(messageDto.chatRoomId()); // updatedAt 갱신
 
         ChatMessage chatMessage = chatMessageRepository.save(messageDto.toChatMessageEntity(sender, chatRoom));
+        chatRoom.updateUpdatedAt();
         return ChatMessageDto.of(chatMessage);
-    }
-
-    @Transactional
-    public void addParticipant(ChatRoom existingRoom, Long participantId) {
-        User newUser = userService.getById(participantId);
-        existingRoom.addParticipant(newUser);
     }
 
     public List<ChatRoomDto> getAllChatRoom(Long userId, String cursor, int pageSize) {
@@ -80,6 +75,11 @@ public class ChatRoomService {
     public ChatRoom getById(Long id) {
         return chatRoomRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("ChatRoom Not Found chatRoomId: " + id));
+    }
+
+    private void addParticipant(ChatRoom existingRoom, Long participantId) {
+        User newUser = userService.getById(participantId);
+        existingRoom.addParticipant(newUser);
     }
 
     private ChatRoom createChatRoom(ChatMessageRequestDto messageRequestDto) {
