@@ -34,7 +34,11 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "creator_id", referencedColumnName = "id", nullable = false)
     private User creator;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "chat_rooms_participants",
+            joinColumns = @JoinColumn(name = "chat_room_id"),
+            inverseJoinColumns = @JoinColumn(name = "participants_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"chat_room_id", "participants_id"}))
     @Builder.Default
     private List<User> participants = new ArrayList<>();
 
@@ -48,5 +52,6 @@ public class ChatRoom extends BaseEntity {
 
     public void addParticipant(User user) {
         this.participants.add(user);
+        user.getChatRoomList().add(this);
     }
 }
