@@ -48,12 +48,6 @@ public class ChatRoomService {
         return ChatMessageDto.of(chatMessage);
     }
 
-    @Transactional
-    public void addParticipant(ChatRoom existingRoom, Long participantId) {
-        User newUser = userService.getById(participantId);
-        existingRoom.addParticipant(newUser);
-    }
-
     public List<ChatRoomDto> getAllChatRoom(Long userId, String cursor, int pageSize) {
         Pageable pageable = PageRequest.of(0, pageSize);
         if (cursor == null) {
@@ -81,6 +75,11 @@ public class ChatRoomService {
     public ChatRoom getById(Long id) {
         return chatRoomRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("ChatRoom Not Found chatRoomId: " + id));
+    }
+
+    private void addParticipant(ChatRoom existingRoom, Long participantId) {
+        User newUser = userService.getById(participantId);
+        existingRoom.addParticipant(newUser);
     }
 
     private ChatRoom createChatRoom(ChatMessageRequestDto messageRequestDto) {
