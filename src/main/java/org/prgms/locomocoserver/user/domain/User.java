@@ -18,6 +18,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
@@ -50,17 +51,19 @@ public class User extends BaseEntity {
     private String provider;
 
     @ManyToMany(fetch = FetchType.LAZY)
+    @Builder.Default
     private List<ChatRoom> chatRoomList = new ArrayList<>();
 
-    @Builder
-    public User(String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider) {
+    public User(Long id, String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider, List<ChatRoom> chatRoomList) {
+        this.id = id;
         this.nickname = nickname;
         this.birth = birth;
         this.gender = gender;
-        this.temperature = new TemperatureVo(temperature).getTemperature();
+        this.temperature = temperature;
         this.job = job;
-        this.email = new EmailVo(email).getEmail();
+        this.email = email;
         this.provider = provider;
+        this.chatRoomList = chatRoomList;
     }
 
     public void setInitInfo(String nickname, LocalDate birth, Gender gender, Job job) {
