@@ -1,6 +1,9 @@
 package org.prgms.locomocoserver.review.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
+import org.prgms.locomocoserver.review.domain.Review;
+import org.prgms.locomocoserver.user.domain.User;
 
 import java.util.List;
 
@@ -16,4 +19,12 @@ public record ReviewCreateRequestDto(
         @Schema(description = "리뷰 내용", example = "와우")
         String content
 ) {
+        public static Review create(Mogakko mogakko, User reviewer, User reviewee, ReviewCreateRequestDto requestDto) {
+                return Review.builder()
+                        .reviewer(reviewer)
+                        .reviewee(reviewee)
+                        .content(requestDto.content())
+                        .score(requestDto.score())
+                        .reviewContentIds(requestDto.reviewContentId()).build();
+        }
 }

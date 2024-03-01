@@ -50,9 +50,13 @@ public class User extends BaseEntity {
     @Column(name = "provider", nullable = false)
     private String provider;
 
+    @Column(name = "profile_image")
+    private String profileImage;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @Builder.Default
     private List<ChatRoom> chatRoomList = new ArrayList<>();
+
 
     public User(Long id, String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider, List<ChatRoom> chatRoomList) {
         this.id = id;

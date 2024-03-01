@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.prgms.locomocoserver.categories.domain.Category;
+import org.prgms.locomocoserver.categories.domain.CategoryInputType;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
 import org.prgms.locomocoserver.categories.dto.response.CategoriesWithTagsDto;
@@ -29,8 +30,10 @@ class CategoryServiceTest {
 
     @BeforeEach
     void setUp() {
-        Category langs = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 언어").build();
-        Category coding = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 유형").build();
+        Category langs = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 언어")
+            .categoryInputType(CategoryInputType.CHECKBOX).build();
+        Category coding = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 유형")
+            .categoryInputType(CategoryInputType.COMBOBOX).build();
 
         categoryRepository.saveAll(List.of(langs, coding));
 

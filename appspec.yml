@@ -1,0 +1,18 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /home/ubuntu/locomoco
+    overwrite: yes
+permissions:
+  - object: /
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+    mode: 777
+hooks:
+  ApplicationStart:
+    - location: /scripts/deploy.sh
+      timeout: 120
+      runas: ubuntu
