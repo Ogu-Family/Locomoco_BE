@@ -31,8 +31,8 @@ public class ChatRoomService {
 
     @Transactional
     public ChatRoomDto enterChatRoom(ChatMessageRequestDto requestDto) {
-        ChatRoom chatRoom = chatRoomRepository.findById(requestDto.chatRoomId())
-                .orElse(createChatRoom(requestDto));
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(requestDto.chatRoomId())
+                .orElseGet(() -> createChatRoom(requestDto));
         addParticipant(chatRoom, requestDto.senderId());
 
         return ChatRoomDto.of(chatRoom);
