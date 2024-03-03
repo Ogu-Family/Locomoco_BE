@@ -30,7 +30,7 @@ public class ChatRoomService {
     private final UserService userService;
 
     @Transactional
-    public ChatRoomDto enterChatRoom(ChatMessageRequestDto requestDto) {
+    public ChatRoomDto enterChatRoom(Long roomId, ChatMessageRequestDto requestDto) {
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(requestDto.chatRoomId())
                 .orElseGet(() -> createChatRoom(requestDto));
         addParticipant(chatRoom, requestDto.senderId());
