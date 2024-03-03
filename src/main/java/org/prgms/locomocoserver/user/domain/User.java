@@ -57,8 +57,7 @@ public class User extends BaseEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     @Builder.Default
     private List<ChatRoom> chatRoomList = new ArrayList<>();
-
-
+    
     public User(Long id, String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider, Image profileImage, List<ChatRoom> chatRoomList) {
         this.id = id;
         this.nickname = nickname;
