@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.UUID;
 
-
 @Service
 @RequiredArgsConstructor
 public class ImageService {
@@ -77,8 +76,9 @@ public class ImageService {
         String randomFilename = UUID.randomUUID().toString(); // 확장자를 포함하지 않은 임시 파일 이름
         File file = File.createTempFile(randomFilename, extension);
 
-        // MultipartFile의 데이터를 생성한 임시 파일에 복사
+
         try (FileOutputStream fos = new FileOutputStream(file)) {
+
             fos.write(multipartFile.getBytes());
         }
 
@@ -86,10 +86,10 @@ public class ImageService {
         return file;
     }
 
-    public void remove(Image image) {
-        if (!amazonS3.doesObjectExist(bucket, image.getKey())) {
-            throw new AmazonS3Exception("Object " + image.getKey() + " does not exist!");
+        public void remove (Image image){
+            if (!amazonS3.doesObjectExist(bucket, image.getKey())) {
+                throw new AmazonS3Exception("Object " + image.getKey() + " does not exist!");
+            }
+            amazonS3.deleteObject(bucket, image.getKey());
         }
-        amazonS3.deleteObject(bucket, image.getKey());
     }
-}
