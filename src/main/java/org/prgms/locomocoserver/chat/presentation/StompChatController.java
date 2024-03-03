@@ -14,6 +14,7 @@ import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -32,7 +33,7 @@ public class StompChatController {
 
     @MessageMapping(value = "/chats/enter")
     @SendTo("/sub/chat/room/{chatRoomId}")
-    public ChatMessageRequestDto enter(ChatMessageRequestDto requestDto) {
+    public ChatMessageRequestDto enter(@Payload ChatMessageRequestDto requestDto) {
 
         ChatRoomDto chatRoomDto = chatRoomService.enterChatRoom(requestDto.chatRoomId(), requestDto);
         User sender = userService.getById(requestDto.senderId());
@@ -43,7 +44,7 @@ public class StompChatController {
 
     @MessageMapping(value = "/chats/message")
     @SendTo("/sub/chat/room/{chatRoomId}")
-    public ChatMessageDto message(ChatMessageRequestDto requestDto) {
+    public ChatMessageDto message(@Payload ChatMessageRequestDto requestDto) {
         log.info("Request Message : " + requestDto.senderId() + " " + requestDto.message());
         ChatMessageDto message = chatRoomService.saveChatMessage(requestDto);
         log.info("After Message : " + message.chatRoomId() + " " + message.message() + " " + message.senderNickName());
