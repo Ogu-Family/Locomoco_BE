@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.chat.presentation;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
@@ -15,6 +16,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -29,28 +31,24 @@ public class StompChatController {
     private final UserService userService;
 
     @MessageMapping(value = "/chats/enter")
-    public void enter(ChatMessageRequestDto requestDto) {
+    @SendTo("/sub/chat/room/{chatRoomId}")
+    public ChatMessageRequestDto enter(ChatMessageRequestDto requestDto) {
 
         ChatRoomDto chatRoomDto = chatRoomService.enterChatRoom(requestDto.chatRoomId(), requestDto);
         User sender = userService.getById(requestDto.senderId());
         requestDto = new ChatMessageRequestDto(chatRoomDto.roomId(), requestDto.senderId(), requestDto.mogakkoId(), sender.getNickname() + "님이 채팅방에 참여하였습니다.");
 
-        template.convertAndSend("/sub/chat/room/" + requestDto.chatRoomId(), requestDto);
+        return requestDto;
     }
 
     @MessageMapping(value = "/chats/message")
-    public void message(ChatMessageRequestDto requestDto) {
+    @SendTo("/sub/chat/room/{chatRoomId}")
+    public ChatMessageDto message(ChatMessageRequestDto requestDto) {
         log.info("Request Message : " + requestDto.senderId() + " " + requestDto.message());
         ChatMessageDto message = chatRoomService.saveChatMessage(requestDto);
         log.info("After Message : " + message.chatRoomId() + " " + message.message() + " " + message.senderNickName());
-        template.convertAndSend("/sub/chat/room/" + message.chatRoomId(), message);
+
+        return message;
     }
 
-    @MessageMapping("/{roomId}") //여기로 전송되면 메서드 호출 -> WebSocketConfig prefixes 에서 적용한건 앞에 생략
-    @SendTo("/room/{roomId}")   //구독하고 있는 장소로 메시지 전송 (목적지)  -> WebSocketConfig Broker 에서 적용한건 앞에 붙어줘야됨
-    public ChatMessageDto chat(@DestinationVariable Long roomId, ChatMessageRequestDto message) {
-        ChatRoomDto chatRoomDto = chatRoomService.enterChatRoom(roomId, message);
-
-        return new ChatMessageDto(1l, message.chatRoomId(), message.senderId(), "nickname", null, message.message(), LocalDateTime.now());
-    }
 }
