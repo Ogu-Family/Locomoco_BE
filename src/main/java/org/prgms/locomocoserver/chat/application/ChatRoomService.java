@@ -48,6 +48,7 @@ public class ChatRoomService {
         return ChatMessageDto.of(chatMessage);
     }
 
+    @Transactional(readOnly = true)
     public List<ChatRoomDto> getAllChatRoom(Long userId, String cursor, int pageSize) {
         Pageable pageable = PageRequest.of(0, pageSize);
         if (cursor == null) {
@@ -60,6 +61,7 @@ public class ChatRoomService {
         return chatRoomDtos;
     }
 
+    @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, String cursor, int pageSize) {
         Pageable pageable = PageRequest.of(0, pageSize);
         if (cursor == null) {
@@ -72,6 +74,7 @@ public class ChatRoomService {
         return chatMessageDtos;
     }
 
+    @Transactional(readOnly = true)
     public ChatRoom getById(Long id) {
         return chatRoomRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("ChatRoom Not Found chatRoomId: " + id));
