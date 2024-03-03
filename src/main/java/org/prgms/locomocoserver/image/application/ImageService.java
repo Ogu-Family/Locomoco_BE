@@ -15,8 +15,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +24,9 @@ public class ImageService {
 
     private final ImageRepository imageRepository;
     private final AmazonS3 amazonS3;
-
+    private final String dirName = "upload/";
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-    private final String dirName = "upload/";
 
     public Image upload(MultipartFile multipartFile) throws IOException {
         File file = convertMultipartFileToFile(multipartFile);
@@ -79,7 +78,7 @@ public class ImageService {
         File file = File.createTempFile(randomFilename, extension);
 
         // MultipartFile의 데이터를 생성한 임시 파일에 복사
-        try (FileOutputStream fos = new FileOutputStream(file)){
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(multipartFile.getBytes());
         }
 
@@ -89,7 +88,7 @@ public class ImageService {
 
     public void remove(Image image) {
         if (!amazonS3.doesObjectExist(bucket, image.getKey())) {
-            throw new AmazonS3Exception("Object " +image.getKey()+ " does not exist!");
+            throw new AmazonS3Exception("Object " + image.getKey() + " does not exist!");
         }
         amazonS3.deleteObject(bucket, image.getKey());
     }
