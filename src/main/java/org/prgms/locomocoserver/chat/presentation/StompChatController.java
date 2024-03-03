@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.chat.presentation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
 import org.prgms.locomocoserver.chat.domain.ChatMessage;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class StompChatController {
@@ -38,7 +40,9 @@ public class StompChatController {
 
     @MessageMapping(value = "/chats/message")
     public void message(ChatMessageRequestDto requestDto) {
+        log.info("Request Message : " + requestDto.senderId() + " " + requestDto.message());
         ChatMessageDto message = chatRoomService.saveChatMessage(requestDto);
+        log.info("After Message : " + message.chatRoomId() + " " + message.message() + " " + message.senderNickName());
         template.convertAndSend("/sub/chat/room/" + message.chatRoomId(), message);
     }
 
