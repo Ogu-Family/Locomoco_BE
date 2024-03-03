@@ -38,7 +38,7 @@ public class StompChatController {
         User sender = userService.getById(requestDto.senderId());
         requestDto = new ChatMessageRequestDto(chatRoomDto.roomId(), requestDto.senderId(), requestDto.mogakkoId(), sender.getNickname() + "님이 채팅방에 참여하였습니다.");
 
-        template.convertAndSend("/sub/chat/message" + requestDto.chatRoomId(), requestDto);
+        template.convertAndSend("/sub/chat/room" + requestDto.chatRoomId(), requestDto);
     }
 
     @MessageMapping(value = "/chats/message")
@@ -47,7 +47,7 @@ public class StompChatController {
         ChatMessageDto message = chatRoomService.saveChatMessage(requestDto);
         log.info("After Message : " + message.chatRoomId() + " " + message.message() + " " + message.senderNickName());
 
-        template.convertAndSend("/sub/chat/message" + message.chatRoomId(), message);
+        template.convertAndSend("/sub/chat/room" + message.chatRoomId(), message);
     }
 
 }
