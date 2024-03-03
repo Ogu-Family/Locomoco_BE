@@ -46,11 +46,11 @@ public class InquiryService {
     }
 
     @Transactional
-    public void delete(Long id, InquiryDeleteRequestDto requestDto) {
+    public void delete(Long id, Long userId) {
         Inquiry inquiry = inquiryRepository.findByIdAndDeletedAtIsNull(id)
             .orElseThrow(RuntimeException::new); // TODO: 문의 예외 반환
 
-        validateUser(requestDto.userId(), inquiry);
+        validateUser(userId, inquiry);
 
         inquiry.delete();
     }

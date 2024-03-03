@@ -90,14 +90,15 @@ public class InquiryController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @Operation(summary = "문의 삭제", description = "작성자 id, 문의 id에 따라 문의를 삭제합니다. 작성자 id는 검증용으로 이용합니다.")
+    @Operation(summary = "문의 삭제", description = "유저 id, 문의 id에 따라 문의를 삭제합니다. 유저 id는 문의 작성자인지 검증하기 위해 이용합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "문의 삭제 성공"),
     })
     @DeleteMapping("/inquiries/{inquiryId}")
     public ResponseEntity<Void> delete(
-        @Parameter(description = "문의 id") @PathVariable(name = "inquiryId") Long id,
-        @Parameter(description = "삭제 정보") @RequestBody InquiryDeleteRequestDto requestDto) { // TODO: 실 구현 필요
+        @Parameter(description = "문의 id") @PathVariable Long inquiryId,
+        @Parameter(description = "유저 id") @RequestParam Long userId) {
+        inquiryService.delete(inquiryId, userId);
 
         return ResponseEntity.noContent().build();
     }
