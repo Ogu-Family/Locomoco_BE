@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.user.domain.User;
 
@@ -21,7 +22,7 @@ import org.prgms.locomocoserver.user.domain.User;
 @Getter
 @Table(name = "inquiries")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Inquiry {
+public class Inquiry extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +44,10 @@ public class Inquiry {
         this.content = content;
         this.user = user;
         this.mogakko = mogakko;
+    }
+
+    public void updateInfo(String content) {
+        this.content = content;
     }
 
     public void updateUser(User user) {

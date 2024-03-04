@@ -35,14 +35,20 @@ public class Category {
     @Column(name = "type", nullable = false)
     private CategoryType categoryType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "input_type", nullable = false)
+    private CategoryInputType categoryInputType;
+
     @OneToMany(mappedBy = "category")
     @Builder.Default
     private List<Tag> tags = new ArrayList<>();
 
-    public Category(Long id, String name, CategoryType categoryType, List<Tag> tags) {
+    public Category(Long id, String name, CategoryType categoryType,
+        CategoryInputType categoryInputType, List<Tag> tags) {
         this.id = id;
         this.name = name;
         this.categoryType = categoryType;
+        this.categoryInputType = categoryInputType;
         this.tags = tags;
     }
 
