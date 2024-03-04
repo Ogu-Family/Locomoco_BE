@@ -82,7 +82,7 @@ public class MogakkoService {
     public List<MogakkoSimpleInfoResponseDto> findAllByFilter(List<Long> tagIds, Long cursor,
         String searchVal, SearchType searchType) {
         SearchPolicy searchPolicy = searchType.getSearchPolicy(
-            new SearchRepositoryDto(mogakkoRepository, locationRepository, mogakkoTagRepository));
+            new SearchRepositoryDto(mogakkoRepository, mogakkoTagRepository));
         List<Mogakko> searchedMogakkos;
 
         if (tagIds == null || tagIds.isEmpty()) {
