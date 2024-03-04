@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
+import org.prgms.locomocoserver.mogakkos.application.SearchType;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
@@ -41,17 +42,13 @@ public class MogakkoController {
     )
     public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
         @Parameter(description = "필터링 커서") @RequestParam(required = false, defaultValue = "0") Long cursor,
-        @Parameter(description = "동/읍/면") @RequestParam(required = false, defaultValue = "") String city,
+        @Parameter(description = "검색 값") @RequestParam(name = "search", required = false, defaultValue = "") String searchVal,
+        @Parameter(description = "검색 타입") @RequestParam SearchType searchType,
         @Parameter(description = "필터링 태그 id 목록") @RequestParam(required = false) List<Long> tags) {
-        List<MogakkoSimpleInfoResponseDto> responseDtos;
-        city = city.strip();
+        searchVal = searchVal.strip();
 
-        if (tags == null) {
-            responseDtos = mogakkoService.findAllByCity(cursor, city);
-        }
-        else {
-            responseDtos = mogakkoService.findAllByFilter(tags, cursor, city);
-        }
+        List<MogakkoSimpleInfoResponseDto> responseDtos = mogakkoService.findAllByFilter(tags,
+            cursor, searchVal, searchType);
 
         Results<MogakkoSimpleInfoResponseDto> results = new Results<>(responseDtos);
 

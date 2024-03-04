@@ -8,10 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.location.domain.Location;
 import org.prgms.locomocoserver.location.domain.LocationRepository;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
+import org.prgms.locomocoserver.mogakkos.application.searchpolicy.SearchPolicy;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
+import org.prgms.locomocoserver.mogakkos.dto.SearchRepositoryDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
@@ -65,33 +67,31 @@ public class MogakkoService {
             .orElseThrow(RuntimeException::new); // TODO: 장소 예외 반환
 
         UserBriefInfoDto creatorInfoDto = UserBriefInfoDto.of(creator);
-        List<MogakkoParticipantDto> mogakkoParticipantDtos = participants.stream().map(MogakkoParticipantDto::create)
+        List<MogakkoParticipantDto> mogakkoParticipantDtos = participants.stream()
+            .map(MogakkoParticipantDto::create)
             .toList();
         List<Long> tagIds = mogakkoTags.stream().map(mogakkoTag -> mogakkoTag.getTag().getId())
             .toList();
-        MogakkoInfoDto mogakkoInfoDto = MogakkoInfoDto.create(foundMogakko, LocationInfoDto.create(foundLocation), tagIds);
+        MogakkoInfoDto mogakkoInfoDto = MogakkoInfoDto.create(foundMogakko,
+            LocationInfoDto.create(foundLocation), tagIds);
 
         return new MogakkoDetailResponseDto(creatorInfoDto, mogakkoParticipantDtos, mogakkoInfoDto);
     }
 
     @Transactional(readOnly = true)
-    public List<MogakkoSimpleInfoResponseDto> findAllByCity(Long cursor, String city) {
-        List<Mogakko> mogakkos = mogakkoRepository.findAll(cursor, city);
+    public List<MogakkoSimpleInfoResponseDto> findAllByFilter(List<Long> tagIds, Long cursor,
+        String searchVal, SearchType searchType) {
+        SearchPolicy searchPolicy = searchType.getSearchPolicy(
+            new SearchRepositoryDto(mogakkoRepository, mogakkoTagRepository));
+        List<Mogakko> searchedMogakkos;
 
-        return mogakkos.stream().map(mogakko -> {
-            Location location = locationRepository.findByMogakko(mogakko)
-                .orElseThrow(RuntimeException::new);// TODO: 장소 예외 반환
+        if (tagIds == null || tagIds.isEmpty()) {
+            searchedMogakkos = searchPolicy.search(cursor, searchVal);
+        } else {
+            searchedMogakkos = searchPolicy.search(cursor, searchVal, tagIds);
+        }
 
-            return MogakkoSimpleInfoResponseDto.create(mogakko, location);
-        }).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<MogakkoSimpleInfoResponseDto> findAllByFilter(List<Long> tagIds, Long cursor, String city) {
-        List<Long> filteredMogakkoIds = mogakkoTagRepository.findAllIdsByfilter(tagIds, tagIds.size(), cursor, city);
-        List<Mogakko> filteredMogakkos = mogakkoRepository.findAllById(filteredMogakkoIds);
-
-        return filteredMogakkos.stream().map(mogakko -> {
+        return searchedMogakkos.stream().map(mogakko -> {
             Location location = locationRepository.findByMogakko(mogakko)
                 .orElseThrow(RuntimeException::new);
             return MogakkoSimpleInfoResponseDto.create(mogakko, location);
@@ -144,8 +144,7 @@ public class MogakkoService {
         updateTags.forEach(tag -> {
             if (tagMap.get(tag) == null) {
                 tagMap.put(tag, INSERT_TAG);
-            }
-            else {
+            } else {
                 tagMap.put(tag, MAINTAIN_TAG);
             }
         });
@@ -161,7 +160,6 @@ public class MogakkoService {
 
     private Mogakko createMogakkoBy(MogakkoCreateRequestDto requestDto) {
         Mogakko mogakko = requestDto.toDefaultMogakko();
-
 
         List<Long> tagIds = requestDto.tags();
         List<Tag> tags = tagRepository.findAllById(tagIds);
