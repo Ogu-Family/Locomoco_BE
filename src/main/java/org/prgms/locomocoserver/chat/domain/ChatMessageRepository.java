@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
     @Query(value = "SELECT * FROM chat_messages WHERE chat_rooms_id = :roomId AND id > :cursor ORDER BY id DESC ",
             countQuery = "SELECT COUNT(*) FROM chat_messages WHERE chat_rooms_id = :roomId AND id > :cursor",

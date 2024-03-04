@@ -15,7 +15,6 @@ import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +55,7 @@ public class ChatRoomService {
 
     @Transactional(readOnly = true)
     public List<ChatRoomDto> getAllChatRoom(Long userId, Long cursor, int pageSize) {
-        if(cursor == null) cursor = 0L;
+        if (cursor == null) cursor = 0L;
         Pageable pageable = PageRequest.of(0, pageSize);
         Page<ChatRoom> page = chatRoomRepository.findByParticipantsId(userId, cursor, pageable);
 
@@ -88,7 +87,7 @@ public class ChatRoomService {
 
     private boolean isParticipantExist(ChatRoom chatRoom, Long userId) {
         return chatRoom.getParticipants().stream()
-              .anyMatch(participant -> participant.getId().equals(userId));
+                .anyMatch(participant -> participant.getId().equals(userId));
     }
 
     private ChatMessage getLastMessage(Long roomId) {
