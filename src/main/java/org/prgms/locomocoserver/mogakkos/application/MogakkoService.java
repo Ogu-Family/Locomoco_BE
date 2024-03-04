@@ -85,7 +85,7 @@ public class MogakkoService {
             new SearchRepositoryDto(mogakkoRepository, locationRepository, mogakkoTagRepository));
         List<Mogakko> searchedMogakkos;
 
-        if (tagIds.isEmpty()) {
+        if (tagIds == null || tagIds.isEmpty()) {
             searchedMogakkos = searchPolicy.search(cursor, searchVal);
         } else {
             searchedMogakkos = searchPolicy.search(cursor, searchVal, tagIds);
