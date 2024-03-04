@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.user.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.prgms.locomocoserver.image.dto.ImageDto;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
@@ -22,6 +23,8 @@ public record UserInfoDto(
         Job job,
         @Schema(description = "사용자 email", example = "example@gmail.com")
         String email,
+        @Schema(description = "사용자 프로필 사진", example = "https://example.com/image.png")
+        ImageDto profileImage,
         @Schema(description = "로그인 방법", example = "KAKAO")
         String provider
 ) {
@@ -34,6 +37,7 @@ public record UserInfoDto(
                         user.getTemperature(),
                         user.getJob(),
                         user.getEmail(),
+                        ImageDto.of(user.getProfileImage()),
                         user.getProvider()
                 );
         }
