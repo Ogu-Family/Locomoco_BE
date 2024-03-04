@@ -15,9 +15,11 @@ import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,8 +57,8 @@ public class ChatRoomService {
 
     @Transactional(readOnly = true)
     public List<ChatRoomDto> getAllChatRoom(Long userId, Long cursor, int pageSize) {
-        if (cursor == null) cursor = 0L;
-        Pageable pageable = PageRequest.of(0, pageSize);
+        if (cursor == null) cursor = Long.MAX_VALUE;
+        Pageable pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "id"));
         Page<ChatRoom> page = chatRoomRepository.findByParticipantsId(userId, cursor, pageable);
 
         List<ChatRoomDto> chatRoomDtos = page.map(chatRoom -> ChatRoomDto.of(chatRoom, ChatMessageDto.of(getLastMessage(chatRoom.getId())))).stream().toList();
@@ -66,8 +68,8 @@ public class ChatRoomService {
 
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, Long cursor, int pageSize) {
-        if (cursor == null) cursor = 0L;
-        Pageable pageable = PageRequest.of(0, pageSize);
+        if (cursor == null) cursor = Long.MAX_VALUE;
+        Pageable pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "id"));
         Page<ChatMessage> page = chatMessageRepository.findAllByChatRoomIdAndIdGreaterThan(roomId, cursor, pageable);
 
         List<ChatMessageDto> chatMessageDtos = page.getContent().stream()

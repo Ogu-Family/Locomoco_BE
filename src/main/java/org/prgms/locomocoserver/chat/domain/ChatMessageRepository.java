@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
-    @Query(value = "SELECT * FROM chat_messages WHERE chat_rooms_id = :roomId AND id > :cursor ORDER BY id DESC ",
+    @Query(value = "SELECT * FROM chat_messages WHERE chat_rooms_id = :roomId AND id < :cursor ORDER BY id DESC ",
             countQuery = "SELECT COUNT(*) FROM chat_messages WHERE chat_rooms_id = :roomId AND id > :cursor",
             nativeQuery = true)
     Page<ChatMessage> findAllByChatRoomIdAndIdGreaterThan(@Param("roomId") Long chatRoomId,
