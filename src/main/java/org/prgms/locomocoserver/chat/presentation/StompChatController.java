@@ -34,7 +34,7 @@ public class StompChatController {
     @MessageMapping(value = "/chats/enter")
     public void enter(ChatMessageRequestDto requestDto) {
 
-        ChatRoomDto chatRoomDto = chatRoomService.enterChatRoom(requestDto.chatRoomId(), requestDto);
+        ChatRoomDto chatRoomDto = chatRoomService.enterChatRoom(requestDto);
         User sender = userService.getById(requestDto.senderId());
         requestDto = new ChatMessageRequestDto(chatRoomDto.roomId(), requestDto.senderId(), requestDto.mogakkoId(), sender.getNickname() + "님이 채팅방에 참여하였습니다.");
 
