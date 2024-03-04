@@ -7,8 +7,7 @@ import org.prgms.locomocoserver.mogakkos.application.searchpolicy.TotalSearchPol
 import org.prgms.locomocoserver.mogakkos.dto.SearchRepositoryDto;
 
 public enum SearchType {
-    TOTAL(dto -> new TotalSearchPolicy(dto.mogakkoRepository(), dto.locationRepository(),
-        dto.mogakkoTagRepository())),
+    TOTAL(dto -> new TotalSearchPolicy(dto.mogakkoRepository())),
     LOCATION(dto -> new LocationSearchPolicy(dto.mogakkoRepository(),
         dto.mogakkoTagRepository()));
 
