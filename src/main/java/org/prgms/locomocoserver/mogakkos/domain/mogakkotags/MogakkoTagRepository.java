@@ -18,6 +18,6 @@ public interface MogakkoTagRepository extends JpaRepository<MogakkoTag, Long> {
         + "GROUP BY mt.mogakko_id HAVING COUNT(mt.mogakko_id) = :tagSize "
         + "ORDER BY mt.mogakko_id "
         + "LIMIT 20", nativeQuery = true)
-    List<Long> findAllIdsByfilter(Iterable<Long> tagIds, int tagSize, Long cursor, String city);
+    List<Long> findAllIdsByCity(Iterable<Long> tagIds, int tagSize, Long cursor, String city);
     void deleteByTagAndMogakko(Tag tag, Mogakko mogakko);
 }
