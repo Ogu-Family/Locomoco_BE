@@ -12,9 +12,10 @@ public record ChatRoomDto(
         String name,
         int participantCnt,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        ChatMessageDto lastMessage
 ) {
-    public static ChatRoomDto of(ChatRoom chatRoom) {
-        return new ChatRoomDto(chatRoom.getId(), chatRoom.getName(), chatRoom.getParticipants().size(), chatRoom.getCreatedAt(), chatRoom.getUpdatedAt());
+    public static ChatRoomDto of(ChatRoom chatRoom, ChatMessageDto lastMessage) {
+        return new ChatRoomDto(chatRoom.getId(), chatRoom.getName(), chatRoom.getParticipants().size(), chatRoom.getCreatedAt(), chatRoom.getUpdatedAt(), lastMessage);
     }
 }

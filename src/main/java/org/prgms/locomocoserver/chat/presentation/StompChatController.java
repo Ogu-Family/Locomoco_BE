@@ -1,26 +1,16 @@
 package org.prgms.locomocoserver.chat.presentation;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
-import org.prgms.locomocoserver.chat.domain.ChatMessage;
-import org.prgms.locomocoserver.chat.domain.ChatRoom;
-import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -34,7 +24,7 @@ public class StompChatController {
     @MessageMapping(value = "/chats/enter")
     public void enter(ChatMessageRequestDto requestDto) {
 
-        ChatRoomDto chatRoomDto = chatRoomService.enterChatRoom(requestDto.chatRoomId(), requestDto);
+        ChatRoomDto chatRoomDto = chatRoomService.enterChatRoom(requestDto);
         User sender = userService.getById(requestDto.senderId());
         requestDto = new ChatMessageRequestDto(chatRoomDto.roomId(), requestDto.senderId(), requestDto.mogakkoId(), sender.getNickname() + "님이 채팅방에 참여하였습니다.");
 
