@@ -6,17 +6,12 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.inquiries.application.InquiryService;
 import org.prgms.locomocoserver.inquiries.dto.request.InquiryCreateRequestDto;
-import org.prgms.locomocoserver.inquiries.dto.request.InquiryDeleteRequestDto;
 import org.prgms.locomocoserver.inquiries.dto.request.InquiryUpdateRequestDto;
 import org.prgms.locomocoserver.inquiries.dto.response.InquiryResponseDto;
 import org.prgms.locomocoserver.inquiries.dto.response.InquiryUpdateResponseDto;
@@ -43,24 +38,21 @@ public class InquiryController {
 
     @Operation(summary = "문의 전체 조회", description = "모각코 id, 작성자 id에 해당하는 문의들을 전부 가져옵니다. 각 파라미터는 필수 인자가 아니며, 모든 파라미터를 넘겨주지 않으면 전체 문의가 조회됩니다.")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "문의 단일 조회 성공"),
+        @ApiResponse(responseCode = "200", description = "문의 전체 조회 성공"),
     })
     @Parameters({
+        @Parameter(name = "cursor", description = "인덱스 커서. 마지막으로 조회한 문의 id. default Value는 사실 9223372036854775807여야 합니다. 스웨거 UI 오류임."),
         @Parameter(name = "mogakkoId", description = "연관된 모각코 id"),
         @Parameter(name = "userId", description = "연관된 작성자 id")
     })
     @GetMapping("/inquiries")
     public ResponseEntity<Results<InquiryResponseDto>> findAll(
+        @RequestParam(defaultValue = "9223372036854775807") Long cursor,
         @RequestParam(required = false) Long mogakkoId,
-        @RequestParam(required = false) Long userId) { // TODO: 실 구현 필요
-        ArrayList<InquiryResponseDto> responseDtos = new ArrayList<>();
+        @RequestParam(required = false) Long userId) {
+        log.info("cursor: {}", cursor);
 
-        IntStream.range(0, 10).forEach(i -> responseDtos.add(
-            new InquiryResponseDto((long) i + 1, "어딘가", "닉넴" + i, LocalDateTime.now().truncatedTo(
-                ChronoUnit.NANOS), LocalDateTime.now().truncatedTo(ChronoUnit.NANOS), "내용",
-                List.of((long) i + 1, (long) i + 2))));
-
-        log.info("mogakkoId = {}, userId = {}", mogakkoId, userId);
+        List<InquiryResponseDto> responseDtos = inquiryService.findAll(cursor, mogakkoId, userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(new Results<>(responseDtos));
     }
