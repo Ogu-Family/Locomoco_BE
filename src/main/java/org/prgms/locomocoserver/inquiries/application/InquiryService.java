@@ -1,11 +1,12 @@
 package org.prgms.locomocoserver.inquiries.application;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.inquiries.domain.Inquiry;
 import org.prgms.locomocoserver.inquiries.domain.InquiryRepository;
 import org.prgms.locomocoserver.inquiries.dto.request.InquiryCreateRequestDto;
-import org.prgms.locomocoserver.inquiries.dto.request.InquiryDeleteRequestDto;
 import org.prgms.locomocoserver.inquiries.dto.request.InquiryUpdateRequestDto;
+import org.prgms.locomocoserver.inquiries.dto.response.InquiryResponseDto;
 import org.prgms.locomocoserver.inquiries.dto.response.InquiryUpdateResponseDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
@@ -43,6 +44,23 @@ public class InquiryService {
         Inquiry updatedInquiry = inquiryRepository.save(foundInquiry);
 
         return InquiryUpdateResponseDto.create(updatedInquiry);
+    }
+
+    public List<InquiryResponseDto> findAll(Long cursor, Long mogakkoId, Long userId) {
+        List<Inquiry> foundInquries;
+
+        if (mogakkoId == null && userId == null) { // querydsl 도입 시 동적 쿼리로 리팩터링
+            foundInquries = inquiryRepository.findAll(cursor);
+        } else if (mogakkoId == null) {
+            foundInquries = inquiryRepository.findAllByUser(cursor, userId);
+        } else if (userId == null) {
+            foundInquries = inquiryRepository.findAllByMogakko(cursor, mogakkoId);
+        } else {
+            foundInquries = inquiryRepository.findAllByMogakkoAndUser(cursor, mogakkoId, userId);
+        }
+
+        return foundInquries.stream().map(
+            inquiry -> InquiryResponseDto.create(inquiry, inquiry.getUser())).toList();
     }
 
     @Transactional
