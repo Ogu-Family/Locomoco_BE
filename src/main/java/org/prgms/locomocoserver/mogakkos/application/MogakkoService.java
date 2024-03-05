@@ -67,7 +67,7 @@ public class MogakkoService {
         Location foundLocation = locationRepository.findByMogakkoAndDeletedAtIsNull(foundMogakko)
             .orElseThrow(RuntimeException::new); // TODO: 장소 예외 반환
 
-        mogakkoRepository.increaseViews(foundMogakko); // TODO: 동시성 테스트 필요
+        mogakkoRepository.increaseViews(foundMogakko);
 
         UserBriefInfoDto creatorInfoDto = UserBriefInfoDto.of(creator);
         List<MogakkoParticipantDto> mogakkoParticipantDtos = participants.stream()
