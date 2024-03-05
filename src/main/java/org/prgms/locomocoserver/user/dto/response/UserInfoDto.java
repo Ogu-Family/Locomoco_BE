@@ -23,7 +23,7 @@ public record UserInfoDto(
         Job job,
         @Schema(description = "사용자 email", example = "example@gmail.com")
         String email,
-        @Schema(description = "사용자 프로필 사진", example = "https://example.com/image.png")
+        @Schema(description = "사용자 프로필 사진")
         ImageDto profileImage,
         @Schema(description = "로그인 방법", example = "KAKAO")
         String provider
