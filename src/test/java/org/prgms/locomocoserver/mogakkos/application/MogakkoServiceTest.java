@@ -228,6 +228,7 @@ class MogakkoServiceTest {
     @DisplayName("모각코 동시 조회 시 조회 수가 제대로 오르는지 확인한다.")
     void success_increasing_mogakko_views_at_the_same_time() throws InterruptedException {
         // given
+        long initialViews = mogakkoRepository.findById(testMogakko.getId()).get().getViews();
         int loop = 4;
         ThreadPoolExecutor executor = ExecutorServiceUtil.newThreadPoolExecutor();
         CountDownLatch countDownLatch = new CountDownLatch(loop);
@@ -242,6 +243,6 @@ class MogakkoServiceTest {
 
         // then
         Mogakko mogakko = mogakkoRepository.findById(testMogakko.getId()).get();
-        assertThat(mogakko.getViews()).isEqualTo(testMogakko.getViews() + loop);
+        assertThat(mogakko.getViews()).isEqualTo(initialViews + loop);
     }
 }
