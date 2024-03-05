@@ -3,6 +3,8 @@ package org.prgms.locomocoserver.mogakkos.application;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.location.domain.Location;
@@ -11,16 +13,14 @@ import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.searchpolicy.SearchPolicy;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
+import org.prgms.locomocoserver.mogakkos.domain.likes.Like;
+import org.prgms.locomocoserver.mogakkos.domain.likes.LikeRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
 import org.prgms.locomocoserver.mogakkos.dto.SearchRepositoryDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoParticipantDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.*;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -41,6 +41,7 @@ public class MogakkoService {
     private final UserService userService;
     private final LocationRepository locationRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
+    private final LikeRepository likeRepository;
 
     public Long save(MogakkoCreateRequestDto requestDto) {
         Mogakko mogakko = createMogakkoBy(requestDto);
@@ -120,6 +121,20 @@ public class MogakkoService {
         Mogakko foundMogakko = getByIdNotDeleted(id);
 
         foundMogakko.delete();
+    }
+
+    @Transactional
+    public MogakkoLikeDto like(Long mogakkoId, Long userId) {
+        Mogakko mogakko = getByIdNotDeleted(mogakkoId);
+        User user = userService.getById(userId);
+
+        Like like = likeRepository.findByMogakkoAndUser(mogakko, user)
+                .orElseGet(() -> likeRepository.save(Like.builder().mogakko(mogakko).user(user).isLike(false).build()));
+
+        like.updateLike();
+        mogakko.updateLikeCount(like.isLike());
+
+        return MogakkoLikeDto.create(like, mogakko.getLikeCount());
     }
 
     public Mogakko getByIdNotDeleted(Long id) {
