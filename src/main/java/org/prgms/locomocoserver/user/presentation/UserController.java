@@ -66,6 +66,13 @@ public class UserController {
         return ResponseEntity.ok(mogakkoInfoDtos);
     }
 
+    @Operation(summary = "찜한 모각코 목록 조회", description = "사용자가 좋아요를 누른 모각코 목록을 조회합니다.")
+    @GetMapping("/users/{userId}/mogakko/like")
+    public ResponseEntity<List<MogakkoInfoDto>> getLikedMogakkos(@PathVariable Long userId) {
+        List<MogakkoInfoDto> mogakkoInfoDtos = userService.getLikedMogakkos(userId);
+        return ResponseEntity.ok(mogakkoInfoDtos);
+    }
+
     @Operation(summary = "프로필 이미지 업로드", description = "사용자의 프로필 이미지를 업로드 합니다.")
     @PostMapping("/users/{userId}/profile-image")
     public ResponseEntity<UserInfoDto> uploadProfileImage(@PathVariable Long userId, @RequestPart("file") MultipartFile multipartFile) throws IOException {

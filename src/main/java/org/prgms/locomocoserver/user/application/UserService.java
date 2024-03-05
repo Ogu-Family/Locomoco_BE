@@ -9,6 +9,7 @@ import org.prgms.locomocoserver.location.domain.LocationRepository;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
+import org.prgms.locomocoserver.mogakkos.domain.likes.MogakkoLikeRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
@@ -39,6 +40,7 @@ public class UserService {
     private final MogakkoRepository mogakkoRepository;
     private final LocationRepository locationRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
+    private final MogakkoLikeRepository mogakkoLikeRepository;
     private final ImageService imageService;
 
     @Transactional
@@ -104,6 +106,21 @@ public class UserService {
                     List<Long> mogakkoTagIds = mogakkoTagRepository.findAllByMogakko(mogakko)
                             .stream().map(mogakkoTag -> mogakkoTag.getId()).toList();  // TODO: List<Long> -> List<MogakkoTags> 변환되면 수정
                     return MogakkoInfoDto.create(mogakko, locationInfoDto, mogakkoTagIds);
+                }).toList();
+
+        return mogakkoInfoDtos;
+    }
+
+    @Transactional(readOnly = true)
+    public List<MogakkoInfoDto> getLikedMogakkos(Long userId) {
+        User user = getById(userId);
+        List<MogakkoInfoDto> mogakkoInfoDtos = mogakkoLikeRepository.findByUserAndIsLikeTrue(user).stream()
+                .map(mogakkoLike -> {
+                     Mogakko mogakko = mogakkoLike.getMogakko();
+                     LocationInfoDto locationInfoDto = LocationInfoDto.create(locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko).orElseThrow(() -> new IllegalArgumentException("Not Found Location")));
+                     List<Long> mogakkoTagIds = mogakkoTagRepository.findAllByMogakko(mogakko)
+                            .stream().map(mogakkoTag -> mogakkoTag.getId()).toList();
+                     return MogakkoInfoDto.create(mogakko, locationInfoDto, mogakkoTagIds);
                 }).toList();
 
         return mogakkoInfoDtos;

@@ -18,14 +18,15 @@ public class MogakkoLike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mogakko_id")
     private Mogakko mogakko;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "is_like")
     private boolean isLike;
 
     @Builder
