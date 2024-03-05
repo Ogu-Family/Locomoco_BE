@@ -11,6 +11,7 @@ import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
@@ -24,6 +25,7 @@ public class StompChatController {
     private final ChatRoomService chatRoomService;
     private final ChatRoomRepository chatRoomRepository;
 
+    @Transactional
     @MessageMapping(value = "/chats/enter")
     public void enter(ChatMessageRequestDto requestDto) {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(requestDto.chatRoomId());
