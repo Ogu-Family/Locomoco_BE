@@ -3,13 +3,15 @@ package org.prgms.locomocoserver.inquiries.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.prgms.locomocoserver.image.dto.ImageDto;
 import org.prgms.locomocoserver.inquiries.domain.Inquiry;
 import org.prgms.locomocoserver.user.domain.User;
 
 public record InquiryResponseDto(@Schema(description = "문의 id") Long inquiryId,
                                  @Schema(description = "작성자 id") Long userId,
                                  @Schema(description = "모각코 id") Long mogakkoId,
-                                 @Schema(description = "프로필 사진 저장 위치") String profileImage,
+                                 @Schema(description = "프로필 사진 저장 위치") ImageDto profileImage,
                                  @Schema(description = "작성자 닉네임") String nickname,
                                  @Schema(description = "생성 시간") LocalDateTime createdAt,
                                  @Schema(description = "수정 시간") LocalDateTime updatedAt,
@@ -18,7 +20,7 @@ public record InquiryResponseDto(@Schema(description = "문의 id") Long inquiry
         return new InquiryResponseDto(inquiry.getId(),
             user.getId(),
             inquiry.getMogakko().getId(),
-            user.getProfileImage(), // TODO: 추후 S3 연동 후에 로직 변경이 있을 수 있음
+            ImageDto.of(user.getProfileImage()),
             user.getNickname(),
             inquiry.getCreatedAt(),
             inquiry.getUpdatedAt(),

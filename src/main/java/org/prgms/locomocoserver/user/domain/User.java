@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.global.common.BaseEntity;
+import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.prgms.locomocoserver.user.vo.EmailVo;
@@ -50,15 +51,14 @@ public class User extends BaseEntity {
     @Column(name = "provider", nullable = false)
     private String provider;
 
-    @Column(name = "profile_image")
-    private String profileImage;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Image profileImage;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @Builder.Default
     private List<ChatRoom> chatRoomList = new ArrayList<>();
 
-
-    public User(Long id, String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider, String profileImage, List<ChatRoom> chatRoomList) {
+    public User(Long id, String nickname, LocalDate birth, Gender gender, double temperature, Job job, String email, String provider, Image profileImage, List<ChatRoom> chatRoomList) {
         this.id = id;
         this.nickname = nickname;
         this.birth = birth;
@@ -76,5 +76,9 @@ public class User extends BaseEntity {
         this.birth = birth;
         this.gender = gender;
         this.job = job;
+    }
+
+    public void updateProfileImage(Image profileImage) {
+        this.profileImage = profileImage;
     }
 }

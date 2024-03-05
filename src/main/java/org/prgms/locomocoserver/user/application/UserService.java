@@ -2,6 +2,9 @@ package org.prgms.locomocoserver.user.application;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.prgms.locomocoserver.image.application.ImageService;
+import org.prgms.locomocoserver.image.domain.Image;
+import org.prgms.locomocoserver.image.dto.ImageDto;
 import org.prgms.locomocoserver.location.domain.LocationRepository;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
@@ -20,7 +23,9 @@ import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
 import org.prgms.locomocoserver.user.dto.response.UserLoginResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +39,7 @@ public class UserService {
     private final MogakkoRepository mogakkoRepository;
     private final LocationRepository locationRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
+    private final ImageService imageService;
 
     @Transactional
     public UserLoginResponse saveOrUpdate(OAuthUserInfoDto oAuthUserInfoDto, TokenResponseDto tokenResponseDto) {
@@ -50,7 +56,7 @@ public class UserService {
 
         // UserDto 생성
         UserInfoDto userDto = new UserInfoDto(user.getId(), user.getNickname(), user.getBirth(), user.getGender(), user.getTemperature(),
-                user.getJob(), user.getEmail(), user.getProvider());
+                user.getJob(), user.getEmail(), ImageDto.of(user.getProfileImage()), user.getProvider());
         return new UserLoginResponse(tokenResponseDto, userDto, isNewUser);
     }
 
@@ -61,7 +67,7 @@ public class UserService {
                 Gender.valueOf(requestDto.gender().toUpperCase()), Job.valueOf(requestDto.job().toUpperCase()));
         user = userRepository.save(user);
 
-        return new UserInfoDto(user.getId(), user.getNickname(), user.getBirth(), user.getGender(), user.getTemperature(), user.getJob(), user.getEmail(), user.getProvider());
+        return new UserInfoDto(user.getId(), user.getNickname(), user.getBirth(), user.getGender(), user.getTemperature(), user.getJob(), user.getEmail(), ImageDto.of(user.getProfileImage()), user.getProvider());
     }
 
     @Transactional
@@ -101,6 +107,16 @@ public class UserService {
                 }).toList();
 
         return mogakkoInfoDtos;
+    }
+
+    @Transactional
+    public UserInfoDto uploadProfileImage(Long userId, MultipartFile multipartFile) throws IOException {
+        User loginUser = getById(userId);
+        Image image = imageService.upload(multipartFile);
+
+        loginUser.updateProfileImage(image);
+
+        return UserInfoDto.of(loginUser);
     }
 
     public boolean isNicknameUnique(String nickname) {

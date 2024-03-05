@@ -10,7 +10,9 @@ import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +64,13 @@ public class UserController {
     public ResponseEntity<List<MogakkoInfoDto>> getCompleteMogakkos(@PathVariable Long userId) {
         List<MogakkoInfoDto> mogakkoInfoDtos = userService.getCompletedMogakkos(userId);
         return ResponseEntity.ok(mogakkoInfoDtos);
+    }
+
+    @Operation(summary = "프로필 이미지 업로드", description = "사용자의 프로필 이미지를 업로드 합니다.")
+    @PostMapping("/users/{userId}/profile-image")
+    public ResponseEntity<UserInfoDto> uploadProfileImage(@PathVariable Long userId, @RequestPart("file") MultipartFile multipartFile) throws IOException {
+        UserInfoDto userInfoDto = userService.uploadProfileImage(userId, multipartFile);
+        return ResponseEntity.ok(userInfoDto);
     }
     
 }
