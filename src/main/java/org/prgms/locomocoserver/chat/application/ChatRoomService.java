@@ -31,11 +31,18 @@ public class ChatRoomService {
     private final ChatMessageRepository chatMessageRepository;
     private final MogakkoService mogakkoService;
     private final UserService userService;
+    private final StompChatService stompChatService;
 
     @Transactional
     public ChatRoomDto enterChatRoom(ChatMessageRequestDto requestDto) {
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(requestDto.chatRoomId())
                 .orElseGet(() -> createChatRoom(requestDto));
+
+        if (!isParticipantExist(chatRoom, requestDto.senderId())) {
+            ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);
+            addParticipant(chatRoom, requestDto.senderId());
+            stompChatService.sendToSubscribers(chatMessageDto);
+        }
 
         return ChatRoomDto.of(chatRoom, ChatMessageDto.of(getLastMessage(chatRoom.getId())));
     }
@@ -53,7 +60,7 @@ public class ChatRoomService {
     @Transactional
     public ChatMessageDto saveEnterMessage(ChatMessageRequestDto requestDto) {
         User sender = userService.getById(requestDto.senderId());
-        ChatRoom chatRoom = getById(requestDto.chatRoomId()); // updatedAt 갱신
+        ChatRoom chatRoom = getById(requestDto.chatRoomId());
 
         ChatMessage chatMessage = chatMessageRepository.save(requestDto.toEnterMessageEntity(sender, chatRoom));
         chatRoom.updateUpdatedAt();
@@ -92,16 +99,14 @@ public class ChatRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("ChatRoom Not Found chatRoomId: " + id));
     }
 
-    @Transactional
-    public void addParticipant(ChatRoom existingRoom, Long participantId) {
-        User newUser = userService.getById(participantId);
-        existingRoom.addParticipant(newUser);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean isParticipantExist(ChatRoom chatRoom, Long userId) {
+    private boolean isParticipantExist(ChatRoom chatRoom, Long userId) {
         return chatRoom.getParticipants().stream()
                 .anyMatch(participant -> participant.getId().equals(userId));
+    }
+
+    private void addParticipant(ChatRoom existingRoom, Long participantId) {
+        User newUser = userService.getById(participantId);
+        existingRoom.addParticipant(newUser);
     }
 
     private ChatMessage getLastMessage(Long roomId) {
