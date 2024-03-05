@@ -19,11 +19,11 @@ public class Like {
     private Long id;
 
     @ManyToOne
-    @Column(name = "mogakko_id")
+    @JoinColumn(name = "mogakko_id")
     private Mogakko mogakko;
 
     @ManyToOne
-    @Column(name = "user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     private boolean isLike;
@@ -33,5 +33,10 @@ public class Like {
         this.mogakko = mogakko;
         this.user = user;
         this.isLike = isLike;
+    }
+
+    public void updateLike() {
+        if (isLike) isLike = false;
+        else isLike = true;
     }
 }
