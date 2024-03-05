@@ -6,6 +6,7 @@ import org.prgms.locomocoserver.mogakkos.application.MogakkoParticipationService
 import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.ParticipationCheckingDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +23,7 @@ public class MogakkoParticipationController {
 
     private final MogakkoParticipationService participationService;
 
-    @GetMapping("mogakko/map/{id}/participate")
+    @GetMapping("/mogakko/map/{id}/participate")
     public ResponseEntity<ParticipationCheckingDto> checkParticipating(
         @PathVariable Long id, @RequestParam Long userId) {
         ParticipationCheckingDto responseDto = participationService.check(id, userId);
@@ -30,11 +31,18 @@ public class MogakkoParticipationController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PostMapping("mogakko/map/{id}/participate")
+    @PostMapping("/mogakko/map/{id}/participate")
     public ResponseEntity<Void> participate(@PathVariable Long id,
         @RequestBody ParticipationRequestDto requestDto) {
         participationService.participate(id, requestDto);
 
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/mogakko/map/{id}/participate")
+    public ResponseEntity<Void> cancel(@PathVariable Long id, @RequestParam Long userId) {
+        participationService.cancel(id, userId);
+
+        return ResponseEntity.noContent().build();
     }
 }
