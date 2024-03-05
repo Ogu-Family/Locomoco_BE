@@ -2,12 +2,17 @@ package org.prgms.locomocoserver.mogakkos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ch.qos.logback.core.util.ExecutorServiceUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -217,5 +222,26 @@ class MogakkoServiceTest {
         assertThat(updatedLocation.getCity()).isEqualTo(updateLocation.city());
         assertThat(updatedLocation.getLatitude()).isEqualTo(updateLocation.latitude());
         assertThat(updatedLocation.getLongitude()).isEqualTo(updateLocation.longitude());
+    }
+
+    @Test
+    @DisplayName("모각코 동시 조회 시 조회 수가 제대로 오르는지 확인한다.")
+    void success_increasing_mogakko_views_at_the_same_time() throws InterruptedException {
+        // given
+        int loop = 4;
+        ThreadPoolExecutor executor = ExecutorServiceUtil.newThreadPoolExecutor();
+        CountDownLatch countDownLatch = new CountDownLatch(loop);
+
+        // when
+        IntStream.range(0, loop).forEach(i -> executor.execute(() -> {
+            mogakkoService.findDetail(testMogakko.getId());
+            countDownLatch.countDown();
+        }));
+
+        countDownLatch.await(2000, TimeUnit.MILLISECONDS);
+
+        // then
+        Mogakko mogakko = mogakkoRepository.findById(testMogakko.getId()).get();
+        assertThat(mogakko.getViews()).isEqualTo(testMogakko.getViews() + loop);
     }
 }
