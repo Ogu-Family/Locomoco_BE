@@ -22,4 +22,4 @@ echo "> 실행권한 부여"
 chmod +x $JAR_PATH
 
 echo "> $JAR_PATH 배포"
-nohup java -jar $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
+nohup java -jar $JAR_PATH > ./server.log 2> ./run-error.log < /dev/null &
