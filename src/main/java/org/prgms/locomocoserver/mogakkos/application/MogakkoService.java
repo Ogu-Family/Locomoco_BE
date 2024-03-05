@@ -57,6 +57,7 @@ public class MogakkoService {
         return savedMogakko.getId();
     }
 
+    @Transactional
     public MogakkoDetailResponseDto findDetail(Long id) {
         Mogakko foundMogakko = getByIdNotDeleted(id);
         User creator = userRepository.findByIdAndDeletedAtIsNull(foundMogakko.getCreator().getId())
@@ -65,6 +66,8 @@ public class MogakkoService {
         List<MogakkoTag> mogakkoTags = mogakkoTagRepository.findAllByMogakko(foundMogakko);
         Location foundLocation = locationRepository.findByMogakkoAndDeletedAtIsNull(foundMogakko)
             .orElseThrow(RuntimeException::new); // TODO: 장소 예외 반환
+
+        mogakkoRepository.increaseViews(foundMogakko);
 
         UserBriefInfoDto creatorInfoDto = UserBriefInfoDto.of(creator);
         List<MogakkoParticipantDto> mogakkoParticipantDtos = participants.stream()
