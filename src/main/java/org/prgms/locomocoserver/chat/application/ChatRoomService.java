@@ -98,6 +98,7 @@ public class ChatRoomService {
         existingRoom.addParticipant(newUser);
     }
 
+    @Transactional(readOnly = true)
     public boolean isParticipantExist(ChatRoom chatRoom, Long userId) {
         return chatRoom.getParticipants().stream()
                 .anyMatch(participant -> participant.getId().equals(userId));
