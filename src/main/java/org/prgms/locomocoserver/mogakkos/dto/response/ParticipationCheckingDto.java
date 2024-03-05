@@ -1,5 +1,7 @@
 package org.prgms.locomocoserver.mogakkos.dto.response;
 
-public record ParticipationCheckingDto(boolean isParticipated) {
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record ParticipationCheckingDto(@Schema(description = "참여 여부") boolean isParticipated) {
 
 }
