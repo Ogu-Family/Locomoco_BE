@@ -19,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,19 +37,25 @@ public class ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(requestDto.chatRoomId())
                 .orElseGet(() -> createChatRoom(requestDto));
 
-        if (!isParticipantExist(chatRoom, requestDto.senderId())) {
-            addParticipant(chatRoom, requestDto.senderId());
-        }
-
         return ChatRoomDto.of(chatRoom, ChatMessageDto.of(getLastMessage(chatRoom.getId())));
     }
 
     @Transactional
-    public ChatMessageDto saveChatMessage(ChatMessageRequestDto messageDto) {
-        User sender = userService.getById(messageDto.senderId());
-        ChatRoom chatRoom = getById(messageDto.chatRoomId()); // updatedAt 갱신
+    public ChatMessageDto saveChatMessage(ChatMessageRequestDto requestDto) {
+        User sender = userService.getById(requestDto.senderId());
+        ChatRoom chatRoom = getById(requestDto.chatRoomId()); // updatedAt 갱신
 
-        ChatMessage chatMessage = chatMessageRepository.save(messageDto.toChatMessageEntity(sender, chatRoom));
+        ChatMessage chatMessage = chatMessageRepository.save(requestDto.toChatMessageEntity(sender, chatRoom));
+        chatRoom.updateUpdatedAt();
+        return ChatMessageDto.of(chatMessage);
+    }
+
+    @Transactional
+    public ChatMessageDto saveEnterMessage(ChatMessageRequestDto requestDto) {
+        User sender = userService.getById(requestDto.senderId());
+        ChatRoom chatRoom = getById(requestDto.chatRoomId()); // updatedAt 갱신
+
+        ChatMessage chatMessage = chatMessageRepository.save(requestDto.toEnterMessageEntity(sender, chatRoom));
         chatRoom.updateUpdatedAt();
         return ChatMessageDto.of(chatMessage);
     }
@@ -87,18 +92,19 @@ public class ChatRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("ChatRoom Not Found chatRoomId: " + id));
     }
 
-    private boolean isParticipantExist(ChatRoom chatRoom, Long userId) {
+    @Transactional
+    public void addParticipant(ChatRoom existingRoom, Long participantId) {
+        User newUser = userService.getById(participantId);
+        existingRoom.addParticipant(newUser);
+    }
+
+    public boolean isParticipantExist(ChatRoom chatRoom, Long userId) {
         return chatRoom.getParticipants().stream()
                 .anyMatch(participant -> participant.getId().equals(userId));
     }
 
     private ChatMessage getLastMessage(Long roomId) {
         return chatMessageRepository.findLastMessageByRoomId(roomId);
-    }
-
-    private void addParticipant(ChatRoom existingRoom, Long participantId) {
-        User newUser = userService.getById(participantId);
-        existingRoom.addParticipant(newUser);
     }
 
     private ChatRoom createChatRoom(ChatMessageRequestDto messageRequestDto) {
