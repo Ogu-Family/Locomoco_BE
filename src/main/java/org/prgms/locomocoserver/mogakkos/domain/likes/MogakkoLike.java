@@ -10,9 +10,9 @@ import org.prgms.locomocoserver.user.domain.User;
 
 @Entity
 @Getter
-@Table(name = "likes")
+@Table(name = "mogakko_likes")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Like {
+public class MogakkoLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,7 @@ public class Like {
     private boolean isLike;
 
     @Builder
-    public Like(Mogakko mogakko, User user, boolean isLike) {
+    public MogakkoLike(Mogakko mogakko, User user, boolean isLike) {
         this.mogakko = mogakko;
         this.user = user;
         this.isLike = isLike;

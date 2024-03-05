@@ -3,7 +3,6 @@ package org.prgms.locomocoserver.mogakkos.application;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +12,8 @@ import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.searchpolicy.SearchPolicy;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
-import org.prgms.locomocoserver.mogakkos.domain.likes.Like;
-import org.prgms.locomocoserver.mogakkos.domain.likes.LikeRepository;
+import org.prgms.locomocoserver.mogakkos.domain.likes.MogakkoLike;
+import org.prgms.locomocoserver.mogakkos.domain.likes.MogakkoLikeRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
 import org.prgms.locomocoserver.mogakkos.dto.SearchRepositoryDto;
@@ -41,7 +40,7 @@ public class MogakkoService {
     private final UserService userService;
     private final LocationRepository locationRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
-    private final LikeRepository likeRepository;
+    private final MogakkoLikeRepository likeRepository;
 
     public Long save(MogakkoCreateRequestDto requestDto) {
         Mogakko mogakko = createMogakkoBy(requestDto);
@@ -128,8 +127,8 @@ public class MogakkoService {
         Mogakko mogakko = getByIdNotDeleted(mogakkoId);
         User user = userService.getById(userId);
 
-        Like like = likeRepository.findByMogakkoAndUser(mogakko, user)
-                .orElseGet(() -> likeRepository.save(Like.builder().mogakko(mogakko).user(user).isLike(false).build()));
+        MogakkoLike like = likeRepository.findByMogakkoAndUser(mogakko, user)
+                .orElseGet(() -> likeRepository.save(MogakkoLike.builder().mogakko(mogakko).user(user).isLike(false).build()));
 
         like.updateLike();
         mogakko.updateLikeCount(like.isLike());
