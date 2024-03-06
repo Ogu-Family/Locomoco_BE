@@ -70,7 +70,9 @@ public class MogakkoService {
         Location foundLocation = locationRepository.findByMogakkoAndDeletedAtIsNull(foundMogakko)
             .orElseThrow(RuntimeException::new); // TODO: 장소 예외 반환
 
+        log.info("views count before increaseViews() : {}", foundMogakko.getViews());
         increaseViews(foundMogakko);
+        log.info("views count after increaseViews() : {}", foundMogakko.getViews());
 
         return getMogakkoDetailResponseDto(creator, participants, mogakkoTags, foundMogakko,
             foundLocation);
