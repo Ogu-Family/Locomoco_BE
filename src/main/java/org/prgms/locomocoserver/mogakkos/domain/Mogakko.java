@@ -53,7 +53,7 @@ public class Mogakko extends BaseEntity {
     private LocalDateTime deadline;
 
     @Column(name = "like_count", nullable = false)
-    private int likeCount = 0;
+    private int likeCount;
 
     @Column(name = "max_participants", columnDefinition = "int default "
         + DEFAULT_MAX_PARTICIPANTS, nullable = false)
