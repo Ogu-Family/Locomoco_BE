@@ -131,7 +131,7 @@ public class MogakkoService {
     }
 
     private void increaseViews(Mogakko foundMogakko) {
-        foundMogakko.increaseViews();
+        // foundMogakko.increaseViews();
 
         TransactionStatus status = transactionManager.getTransaction(
             new DefaultTransactionDefinition());
