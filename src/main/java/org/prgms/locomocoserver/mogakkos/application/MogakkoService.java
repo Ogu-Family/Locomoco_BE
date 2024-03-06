@@ -63,16 +63,18 @@ public class MogakkoService {
 
     public MogakkoDetailResponseDto findDetail(Long id) {
         Mogakko foundMogakko = getByIdNotDeleted(id);
+
+        log.info("views count before increaseViews() : {}", foundMogakko.getViews());
+        increaseViews(foundMogakko);
+        foundMogakko = getByIdNotDeleted(id);
+        log.info("views count after increaseViews() : {}", foundMogakko.getViews());
+
         User creator = userRepository.findByIdAndDeletedAtIsNull(foundMogakko.getCreator().getId())
             .orElseGet(() -> User.builder().nickname("(알 수 없음)").build());
         List<User> participants = userRepository.findAllParticipantsByMogakko(foundMogakko);
         List<MogakkoTag> mogakkoTags = mogakkoTagRepository.findAllByMogakko(foundMogakko);
         Location foundLocation = locationRepository.findByMogakkoAndDeletedAtIsNull(foundMogakko)
             .orElseThrow(RuntimeException::new); // TODO: 장소 예외 반환
-
-        log.info("views count before increaseViews() : {}", foundMogakko.getViews());
-        increaseViews(foundMogakko);
-        log.info("views count after increaseViews() : {}", foundMogakko.getViews());
 
         return getMogakkoDetailResponseDto(creator, participants, mogakkoTags, foundMogakko,
             foundLocation);
