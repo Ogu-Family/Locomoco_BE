@@ -37,7 +37,6 @@ public class MogakkoLike {
     }
 
     public void updateLike() {
-        if (isLike) isLike = false;
-        else isLike = true;
+        isLike = !isLike;
     }
 }
