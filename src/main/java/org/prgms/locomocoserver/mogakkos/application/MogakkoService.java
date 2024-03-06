@@ -38,7 +38,8 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 @Slf4j
 public class MogakkoService {
 
-    private final PlatformTransactionManager transactionManager;
+    private final MogakkoFindDetailService mogakkoFindDetailService;
+    //private final PlatformTransactionManager transactionManager;
     private final MogakkoRepository mogakkoRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
@@ -65,7 +66,7 @@ public class MogakkoService {
         Mogakko foundMogakko = getByIdNotDeleted(id);
 
         log.info("views count before increaseViews() : {}", foundMogakko.getViews());
-        increaseViews(foundMogakko);
+        mogakkoFindDetailService.increaseViews(foundMogakko);
         foundMogakko = getByIdNotDeleted(id);
         log.info("views count after increaseViews() : {}", foundMogakko.getViews());
 
@@ -132,7 +133,7 @@ public class MogakkoService {
         }
     }
 
-    private void increaseViews(Mogakko foundMogakko) {
+    /*private void increaseViews(Mogakko foundMogakko) {
         // foundMogakko.increaseViews();
 
         TransactionStatus status = transactionManager.getTransaction(
@@ -149,7 +150,7 @@ public class MogakkoService {
             throw e;
         }
 
-    }
+    }*/
 
     private static MogakkoDetailResponseDto getMogakkoDetailResponseDto(User creator,
         List<User> participants, List<MogakkoTag> mogakkoTags, Mogakko foundMogakko,
