@@ -28,13 +28,17 @@ import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.dto.response.UserBriefInfoDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MogakkoService {
 
+    private final PlatformTransactionManager transactionManager;
     private final MogakkoRepository mogakkoRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
@@ -57,7 +61,6 @@ public class MogakkoService {
         return savedMogakko.getId();
     }
 
-    @Transactional(readOnly = true)
     public MogakkoDetailResponseDto findDetail(Long id) {
         Mogakko foundMogakko = getByIdNotDeleted(id);
         User creator = userRepository.findByIdAndDeletedAtIsNull(foundMogakko.getCreator().getId())
@@ -127,7 +130,21 @@ public class MogakkoService {
 
     private void increaseViews(Mogakko foundMogakko) {
         foundMogakko.increaseViews();
-        mogakkoRepository.increaseViews(foundMogakko);
+
+        TransactionStatus status = transactionManager.getTransaction(
+            new DefaultTransactionDefinition());
+
+        try {
+            mogakkoRepository.increaseViews(foundMogakko);
+            transactionManager.commit(status);
+        }
+        catch (Exception e){
+            transactionManager.rollback(status);
+
+            log.error("조회 수 처리 중 에러 발생");
+            throw e;
+        }
+
     }
 
     private static MogakkoDetailResponseDto getMogakkoDetailResponseDto(User creator,
