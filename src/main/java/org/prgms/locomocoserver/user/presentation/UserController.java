@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
@@ -68,8 +69,8 @@ public class UserController {
 
     @Operation(summary = "찜한 모각코 목록 조회", description = "사용자가 좋아요를 누른 모각코 목록을 조회합니다.")
     @GetMapping("/users/{userId}/mogakko/like")
-    public ResponseEntity<List<MogakkoInfoDto>> getLikedMogakkos(@PathVariable Long userId) {
-        List<MogakkoInfoDto> mogakkoInfoDtos = userService.getLikedMogakkos(userId);
+    public ResponseEntity<List<MogakkoSimpleInfoResponseDto>> getLikedMogakkos(@PathVariable Long userId) {
+        List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = userService.getLikedMogakkos(userId);
         return ResponseEntity.ok(mogakkoInfoDtos);
     }
 
