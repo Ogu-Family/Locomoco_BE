@@ -57,7 +57,7 @@ public class MogakkoService {
         return savedMogakko.getId();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public MogakkoDetailResponseDto findDetail(Long id) {
         Mogakko foundMogakko = getByIdNotDeleted(id);
         User creator = userRepository.findByIdAndDeletedAtIsNull(foundMogakko.getCreator().getId())
@@ -67,18 +67,10 @@ public class MogakkoService {
         Location foundLocation = locationRepository.findByMogakkoAndDeletedAtIsNull(foundMogakko)
             .orElseThrow(RuntimeException::new); // TODO: 장소 예외 반환
 
-        mogakkoRepository.increaseViews(foundMogakko);
+        increaseViews(foundMogakko);
 
-        UserBriefInfoDto creatorInfoDto = UserBriefInfoDto.of(creator);
-        List<MogakkoParticipantDto> mogakkoParticipantDtos = participants.stream()
-            .map(MogakkoParticipantDto::create)
-            .toList();
-        List<Long> tagIds = mogakkoTags.stream().map(mogakkoTag -> mogakkoTag.getTag().getId())
-            .toList();
-        MogakkoInfoDto mogakkoInfoDto = MogakkoInfoDto.create(foundMogakko,
-            LocationInfoDto.create(foundLocation), tagIds);
-
-        return new MogakkoDetailResponseDto(creatorInfoDto, mogakkoParticipantDtos, mogakkoInfoDto);
+        return getMogakkoDetailResponseDto(creator, participants, mogakkoTags, foundMogakko,
+            foundLocation);
     }
 
     @Transactional(readOnly = true)
@@ -131,6 +123,26 @@ public class MogakkoService {
         if (!foundMogakko.isSameCreatorId(requestDto.creatorId())) {
             throw new RuntimeException(); // TODO: 모각코 예외 반환
         }
+    }
+
+    private void increaseViews(Mogakko foundMogakko) {
+        foundMogakko.increaseViews();
+        mogakkoRepository.increaseViews(foundMogakko);
+    }
+
+    private static MogakkoDetailResponseDto getMogakkoDetailResponseDto(User creator,
+        List<User> participants, List<MogakkoTag> mogakkoTags, Mogakko foundMogakko,
+        Location foundLocation) {
+        UserBriefInfoDto creatorInfoDto = UserBriefInfoDto.of(creator);
+        List<MogakkoParticipantDto> mogakkoParticipantDtos = participants.stream()
+            .map(MogakkoParticipantDto::create)
+            .toList();
+        List<Long> tagIds = mogakkoTags.stream().map(mogakkoTag -> mogakkoTag.getTag().getId())
+            .toList();
+        MogakkoInfoDto mogakkoInfoDto = MogakkoInfoDto.create(foundMogakko,
+            LocationInfoDto.create(foundLocation), tagIds);
+
+        return new MogakkoDetailResponseDto(creatorInfoDto, mogakkoParticipantDtos, mogakkoInfoDto);
     }
 
     private void updateMogakkoTags(Mogakko updateMogakko, List<Long> updateTagIds) {
