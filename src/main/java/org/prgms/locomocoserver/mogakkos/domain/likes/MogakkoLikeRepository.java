@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface MogakkoLikeRepository extends JpaRepository<MogakkoLike, Long> {
     Optional<MogakkoLike> findByMogakkoAndUser(Mogakko mogakko, User user);
-    List<MogakkoLike> findByUserAndIsLikeTrue(User user);
+    List<MogakkoLike> findAllByUserAndIsLikeTrue(User user); // TODO: 페이징 처리
 }
