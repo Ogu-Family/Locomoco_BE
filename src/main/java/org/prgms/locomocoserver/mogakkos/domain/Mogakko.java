@@ -117,6 +117,10 @@ public class Mogakko extends BaseEntity {
         return this.creator.getId().equals(creatorId);
     }
 
+    public void increaseViews() {
+        this.views++;
+    }
+
     public void updateInfo(String title, String content, LocalDateTime startTime, LocalDateTime endTime,
         LocalDateTime deadline, int maxParticipants) {
         this.title = title;
