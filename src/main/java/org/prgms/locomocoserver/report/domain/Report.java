@@ -34,4 +34,8 @@ public class Report extends BaseEntity {
         this.reportedId = reportedId;
         this.content = content;
     }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

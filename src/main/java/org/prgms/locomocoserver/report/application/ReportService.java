@@ -5,9 +5,11 @@ import org.prgms.locomocoserver.report.domain.Report;
 import org.prgms.locomocoserver.report.domain.ReportRepository;
 import org.prgms.locomocoserver.report.dto.ReportDto;
 import org.prgms.locomocoserver.report.dto.request.ReportCreateRequest;
+import org.prgms.locomocoserver.report.dto.request.ReportUpdateRequest;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,5 +23,17 @@ public class ReportService {
         Report report = reportRepository.save(request.toEntity(reporter));
 
         return ReportDto.of(report);
+    }
+
+    @Transactional
+    public ReportDto update(Long id, ReportUpdateRequest request) {
+        Report report = getById(id);
+        report.updateContent(request.content());
+        return ReportDto.of(report);
+    }
+
+    public Report getById(Long id) {
+        return reportRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new IllegalArgumentException("Report Not Found [id]: " + id));
     }
 }
