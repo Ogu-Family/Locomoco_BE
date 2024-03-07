@@ -52,10 +52,19 @@ public class ReviewController {
         return ResponseEntity.ok(reviewDtos);
     }
 
-    @GetMapping("/reviews/{mogakkoId}")
-    @Operation(summary = "모각코 리뷰 조회", description = "모각코 안에서 생성된 리뷰를 모두 조회합니다.")
-    public ResponseEntity<List<ReviewDto>> getMogakkoReviews(@PathVariable Long mogakkoId) {
-        List<ReviewDto> reviewDtos = reviewService.getMogakkoReviews(mogakkoId);
+    @GetMapping("/reviews/mogakko/{mogakkoId}/recieved")
+    @Operation(summary = "모각코 내가 받은 리뷰 조회", description = "모각코 안에서 내 리뷰를 모두 조회합니다.")
+    public ResponseEntity<List<ReviewDto>> getMogakkoReviewsRecieved(@PathVariable Long mogakkoId,
+                                                             @RequestParam Long revieweeId) {
+        List<ReviewDto> reviewDtos = reviewService.getMogakkoReviewsRecieved(revieweeId, mogakkoId);
+        return ResponseEntity.ok(reviewDtos);
+    }
+
+    @GetMapping("/reviews/mogakko/{mogakkoId}/sent")
+    @Operation(summary = "모각코 내가 보낸 리뷰 조회", description = "모각코 안에서 내가 작성한 리뷰를 모두 조회합니다.")
+    public ResponseEntity<List<ReviewDto>> getMogakkoReviewsSent(@PathVariable Long mogakkoId,
+                                                             @RequestParam Long reviewerId) {
+        List<ReviewDto> reviewDtos = reviewService.getMogakkoReviewsSent(reviewerId, mogakkoId);
         return ResponseEntity.ok(reviewDtos);
     }
 }
