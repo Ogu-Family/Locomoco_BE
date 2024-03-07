@@ -19,9 +19,9 @@ public class BlacklistService {
     public Results<UserBriefInfoDto> findAll(Long cursor, Long userId) {
         List<Blacklist> blacklist = blacklistRepository.findAllByBlockUserId(cursor, userId);
 
-        List<UserBriefInfoDto> blackedUsers = blacklist.stream()
+        List<UserBriefInfoDto> blockedUsers = blacklist.stream()
             .map(black -> UserBriefInfoDto.of(black.getBlockedUser())).toList();
 
-        return new Results<>(blackedUsers);
+        return new Results<>(blockedUsers);
     }
 }
