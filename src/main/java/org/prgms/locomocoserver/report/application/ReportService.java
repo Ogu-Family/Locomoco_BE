@@ -35,8 +35,9 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReportDto> getAllReports() {
-        return reportRepository.findAllByDeletedAtIsNull().stream()
+    public List<ReportDto> getAllReports(Long cursor, int pageSize) {
+        if (cursor == null) cursor = 0L;
+        return reportRepository.findAllByDeletedAtIsNull(cursor, pageSize).stream()
               .map(report -> ReportDto.of(report))
               .toList();
     }

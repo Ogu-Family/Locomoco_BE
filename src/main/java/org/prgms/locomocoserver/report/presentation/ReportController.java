@@ -33,8 +33,9 @@ public class ReportController {
     }
 
     @GetMapping("/reports")
-    public ResponseEntity<List<ReportDto>> getAllReports() {
-        List<ReportDto> reportDtos = reportService.getAllReports();
+    public ResponseEntity<List<ReportDto>> getAllReports(@RequestParam(name = "cursor") Long cursor,
+                                                         @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
+        List<ReportDto> reportDtos = reportService.getAllReports(cursor, pageSize);
         return ResponseEntity.ok(reportDtos);
     }
 
