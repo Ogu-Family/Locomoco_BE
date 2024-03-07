@@ -42,6 +42,11 @@ public class ReportService {
               .toList();
     }
 
+    public void delete(Long id) {
+        Report report = getById(id);
+        reportRepository.delete(report);
+    }
+
     private Report getById(Long id) {
         return reportRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("Report Not Found [id]: " + id));

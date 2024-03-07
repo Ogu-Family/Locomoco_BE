@@ -6,6 +6,7 @@ import org.prgms.locomocoserver.report.application.ReportService;
 import org.prgms.locomocoserver.report.dto.ReportDto;
 import org.prgms.locomocoserver.report.dto.request.ReportCreateRequest;
 import org.prgms.locomocoserver.report.dto.request.ReportUpdateRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class ReportController {
     @PostMapping("/reports")
     public ResponseEntity<ReportDto> create(@Valid @RequestBody ReportCreateRequest request) {
         ReportDto reportDto = reportService.create(request);
-        return ResponseEntity.ok(reportDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reportDto);
     }
 
     @PatchMapping("/reports/{id}")
@@ -37,6 +38,12 @@ public class ReportController {
                                                          @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         List<ReportDto> reportDtos = reportService.getAllReports(cursor, pageSize);
         return ResponseEntity.ok(reportDtos);
+    }
+
+    @DeleteMapping("/reports/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        reportService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
