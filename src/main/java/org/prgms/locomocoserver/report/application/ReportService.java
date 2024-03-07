@@ -32,7 +32,7 @@ public class ReportService {
         return ReportDto.of(report);
     }
 
-    public Report getById(Long id) {
+    private Report getById(Long id) {
         return reportRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("Report Not Found [id]: " + id));
     }
