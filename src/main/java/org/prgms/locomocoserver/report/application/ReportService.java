@@ -11,6 +11,8 @@ import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ReportService {
@@ -30,6 +32,13 @@ public class ReportService {
         Report report = getById(id);
         report.updateContent(request.content());
         return ReportDto.of(report);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReportDto> getAllReports() {
+        return reportRepository.findAllByDeletedAtIsNull().stream()
+              .map(report -> ReportDto.of(report))
+              .toList();
     }
 
     private Report getById(Long id) {

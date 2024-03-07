@@ -9,6 +9,8 @@ import org.prgms.locomocoserver.report.dto.request.ReportUpdateRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -30,5 +32,10 @@ public class ReportController {
         return ResponseEntity.ok(reportDto);
     }
 
+    @GetMapping("/reports")
+    public ResponseEntity<List<ReportDto>> getAllReports() {
+        List<ReportDto> reportDtos = reportService.getAllReports();
+        return ResponseEntity.ok(reportDtos);
+    }
 
 }
