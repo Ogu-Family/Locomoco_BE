@@ -53,7 +53,12 @@ public class KakaoController {
         log.info("token: " + tokenResponseDto.accessToken());
 
         KakaoUserInfoResponseDto kakaoUserInfoResponseDto = loadUserInfo(tokenResponseDto.accessToken());
+
+        log.info("KakaoController.getKakaoLoginCallback after loadUserInfo : " + kakaoUserInfoResponseDto.getEmail());
+
         UserLoginResponse userLoginResponse = userService.saveOrUpdate(kakaoUserInfoResponseDto, tokenResponseDto);
+
+        log.info("KakaoController.getKakaoLoginCallback after saveOrUpdate : " + userLoginResponse.tokenResponseDto().accessToken());
 
         return ResponseEntity.ok(userLoginResponse);
     }
@@ -94,6 +99,8 @@ public class KakaoController {
         // Kakao API 엔드포인트 URL
         String apiUrl = "https://kapi.kakao.com/v2/user/me";
 
+        log.info("KakaoController.loadUserInfo start : " + accessToken);
+
         // HTTP 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
@@ -101,6 +108,8 @@ public class KakaoController {
         // REST 템플릿을 사용하여 GET 요청 전송
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+
+        log.info("KakaoController.loadUserInfo response : " + response.getBody());
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(response.getBody(), KakaoUserInfoResponseDto.class);
