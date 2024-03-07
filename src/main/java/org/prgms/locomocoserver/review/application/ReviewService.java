@@ -48,4 +48,13 @@ public class ReviewService {
         return reviewRepository.findAllByReviewerAndDeletedAtIsNull(user).stream()
                 .map(review -> ReviewDto.of(review)).toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDto> getMogakkoReviews(Long mogakkoId) {
+        Mogakko mogakko = mogakkoService.getByIdNotDeleted(mogakkoId);
+
+        List<ReviewDto> reviewDtos = reviewRepository.findAllByMogakkoIdAndDeletedAtIsNull(mogakkoId)
+                .stream().map(review -> ReviewDto.of(review)).toList();
+        return reviewDtos;
+    }
 }

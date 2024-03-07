@@ -51,4 +51,11 @@ public class ReviewController {
         List<ReviewDto> reviewDtos = reviewService.getSentReviews(userId);
         return ResponseEntity.ok(reviewDtos);
     }
+
+    @GetMapping("/reviews/{mogakkoId}")
+    @Operation(summary = "모각코 리뷰 조회", description = "모각코 안에서 생성된 리뷰를 모두 조회합니다.")
+    public ResponseEntity<List<ReviewDto>> getMogakkoReviews(@PathVariable Long mogakkoId) {
+        List<ReviewDto> reviewDtos = reviewService.getMogakkoReviews(mogakkoId);
+        return ResponseEntity.ok(reviewDtos);
+    }
 }
