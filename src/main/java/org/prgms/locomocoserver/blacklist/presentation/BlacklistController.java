@@ -6,11 +6,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.blacklist.application.BlacklistService;
+import org.prgms.locomocoserver.blacklist.dto.request.BlacklistRequestDto;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.user.dto.response.UserBriefInfoDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,5 +37,14 @@ public class BlacklistController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @Operation(summary = "블랙리스트 등록", description = "특정 유저가 다른 유저를 블랙리스트로 등록합니다.")
+    @ApiResponse(responseCode = "200", description = "블랙리스트 등록 성공")
+    @PostMapping("/users/{userId}/blacklist")
+    public ResponseEntity<Void> black(
+        @Parameter(description = "유저 id") @PathVariable Long userId,
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "블랙리스트로 등록할 유저 id를 넣어줍니다") @RequestBody BlacklistRequestDto requestDto) {
+        blacklistService.black(userId, requestDto);
 
+        return ResponseEntity.ok().build();
+    }
 }
