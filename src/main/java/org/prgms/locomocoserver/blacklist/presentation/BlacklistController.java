@@ -10,6 +10,7 @@ import org.prgms.locomocoserver.blacklist.dto.request.BlacklistRequestDto;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.user.dto.response.UserBriefInfoDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,5 +47,16 @@ public class BlacklistController {
         blacklistService.black(userId, requestDto);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "블랙리스트 삭제", description = "특정 유저가 블랙리스트로 등록했던 유저를 블랙리스트에서 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "블랙리스트 삭제 성공")
+    @DeleteMapping("/users/{userId}/blacklist")
+    public ResponseEntity<Void> black(
+        @Parameter(description = "유저 id") @PathVariable Long userId,
+        @Parameter(description = "블랙되어있는 유저 id") @RequestParam Long blockedId) {
+        blacklistService.delete(userId, blockedId);
+
+        return ResponseEntity.noContent().build();
     }
 }
