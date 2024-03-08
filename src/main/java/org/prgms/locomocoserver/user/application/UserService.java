@@ -5,13 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.image.application.ImageService;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.image.dto.ImageDto;
+import org.prgms.locomocoserver.location.domain.Location;
 import org.prgms.locomocoserver.location.domain.LocationRepository;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
-import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
+import org.prgms.locomocoserver.mogakkos.domain.likes.MogakkoLikeRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
@@ -27,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,7 @@ public class UserService {
     private final MogakkoRepository mogakkoRepository;
     private final LocationRepository locationRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
+    private final MogakkoLikeRepository mogakkoLikeRepository;
     private final ImageService imageService;
 
     @Transactional
@@ -104,6 +106,20 @@ public class UserService {
                     List<Long> mogakkoTagIds = mogakkoTagRepository.findAllByMogakko(mogakko)
                             .stream().map(mogakkoTag -> mogakkoTag.getId()).toList();  // TODO: List<Long> -> List<MogakkoTags> 변환되면 수정
                     return MogakkoInfoDto.create(mogakko, locationInfoDto, mogakkoTagIds);
+                }).toList();
+
+        return mogakkoInfoDtos;
+    }
+
+    @Transactional(readOnly = true)
+    public List<MogakkoSimpleInfoResponseDto> getLikedMogakkos(Long userId) {
+        User user = getById(userId);
+        List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = mogakkoLikeRepository.findAllByUserAndIsLikeTrue(user).stream()
+                .map(mogakkoLike -> {
+                     Mogakko mogakko = mogakkoLike.getMogakko();
+                     Location location = locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
+                             .orElseThrow(() -> new IllegalArgumentException("Not Found Location"));  // TODO : 장소 예외 반환
+                     return MogakkoSimpleInfoResponseDto.create(mogakko, location);
                 }).toList();
 
         return mogakkoInfoDtos;
