@@ -13,6 +13,7 @@ import org.prgms.locomocoserver.mogakkos.application.SearchType;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoLikeDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
 import org.springframework.http.HttpStatus;
@@ -101,5 +102,15 @@ public class MogakkoController {
         mogakkoService.delete(id);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    @PutMapping("/mogakko/{id}/like")
+    @Operation(summary = "모각코 좋아요", description = "기존 상태가 좋아요 였다면 좋아요 취소, 좋아요 취소였다면 좋아요 상태 변경")
+    public ResponseEntity<MogakkoLikeDto> like(
+            @Parameter(description = "좋아요 상태 변경할 모각코 id") @PathVariable Long id,
+            @Parameter(description = "좋아요 상태 변경을 요청한 사용자 id") @RequestParam Long userId) {
+        MogakkoLikeDto mogakkoLikeDto = mogakkoService.like(id, userId);
+
+        return ResponseEntity.ok(mogakkoLikeDto);
     }
 }

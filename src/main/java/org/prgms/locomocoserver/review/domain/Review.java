@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.global.common.BaseEntity;
+import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.review.domain.data.ReviewContent;
 import org.prgms.locomocoserver.user.domain.User;
 
@@ -29,6 +30,10 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "reviewee_id")
     private User reviewee;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mogakko_id")
+    private Mogakko mogakko;
+
     @Column(name = "score", nullable = false)
     private int score;
 
@@ -41,9 +46,10 @@ public class Review extends BaseEntity {
     private String content;
 
     @Builder
-    public Review(User reviewer, User reviewee, int score, List<Long> reviewContentIds, String content) {
+    public Review(User reviewer, User reviewee, Mogakko mogakko, int score, List<Long> reviewContentIds, String content) {
         this.reviewer = reviewer;
         this.reviewee = reviewee;
+        this.mogakko = mogakko;
         this.score = score;
         this.reviewContentIds = reviewContentIds;
         this.content = content;

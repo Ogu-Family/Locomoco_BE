@@ -130,4 +130,9 @@ public class Mogakko extends BaseEntity {
         this.deadline = deadline;
         this.maxParticipants = maxParticipants;
     }
+
+    public void updateLikeCount(boolean flag) {
+        if(flag) this.likeCount++;  // 변경 후 값 true -> +1
+        else this.likeCount--;  // 변경 후 값 false -> -1
+    }
 }
