@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static java.util.Arrays.stream;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -47,5 +49,27 @@ public class ReviewService {
 
         return reviewRepository.findAllByReviewerAndDeletedAtIsNull(user).stream()
                 .map(review -> ReviewDto.of(review)).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDto> getMogakkoReviewsRecieved(Long revieweeId, Long mogakkoId) {
+        User reviewee = userService.getById(revieweeId);
+        Mogakko mogakko = mogakkoService.getByIdNotDeleted(mogakkoId);
+
+        List<ReviewDto> reviewDtos = reviewRepository.findAllByRevieweeAndMogakkoAndDeletedAtIsNull(reviewee, mogakko).stream()
+                .map(review -> ReviewDto.of(review)).toList();
+
+        return reviewDtos;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDto> getMogakkoReviewsSent(Long reviewerId, Long mogakkoId) {
+        User reviewer = userService.getById(reviewerId);
+        Mogakko mogakko = mogakkoService.getByIdNotDeleted(mogakkoId);
+
+        List<ReviewDto> reviewDtos = reviewRepository.findAllByReviewerAndMogakkoAndDeletedAtIsNull(reviewer, mogakko).stream()
+                .map(review -> ReviewDto.of(review)).toList();
+
+        return reviewDtos;
     }
 }
