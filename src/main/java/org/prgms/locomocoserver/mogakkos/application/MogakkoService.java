@@ -117,20 +117,6 @@ public class MogakkoService {
         foundMogakko.delete();
     }
 
-    @Transactional
-    public MogakkoLikeDto like(Long mogakkoId, Long userId) {
-        Mogakko mogakko = getByIdNotDeleted(mogakkoId);
-        User user = userService.getById(userId);
-
-        MogakkoLike like = likeRepository.findByMogakkoAndUser(mogakko, user)
-                .orElseGet(() -> likeRepository.save(MogakkoLike.builder().mogakko(mogakko).user(user).isLike(false).build()));
-
-        like.updateLike();
-        mogakko.updateLikeCount(like.isLike());
-
-        return MogakkoLikeDto.create(like, mogakko.getLikeCount());
-    }
-
     public Mogakko getByIdNotDeleted(Long id) {
         return mogakkoRepository.findByIdAndDeletedAtIsNull(id)
             .orElseThrow(RuntimeException::new); // TODO: 모각코 에러 반환
@@ -220,11 +206,11 @@ public class MogakkoService {
 
     private void updateMogakkoLocation(Mogakko mogakko, LocationInfoDto locationInfoDto) {
         Location location = locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
-            .orElseThrow(RuntimeException::new); // TODO: 적절한 예외 반환 (유저 혹은 장소)
+                .orElseThrow(RuntimeException::new); // TODO: 적절한 예외 반환 (유저 혹은 장소)
 
         location.updateInfo(locationInfoDto.latitude(),
-            locationInfoDto.longitude(),
-            locationInfoDto.address(),
-            locationInfoDto.city());
+                locationInfoDto.longitude(),
+                locationInfoDto.address(),
+                locationInfoDto.city());
     }
 }
