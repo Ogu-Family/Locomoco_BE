@@ -26,17 +26,10 @@ public class MogakkoLike {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "is_like")
-    private boolean isLike;
-
     @Builder
-    public MogakkoLike(Mogakko mogakko, User user, boolean isLike) {
+    public MogakkoLike(Mogakko mogakko, User user) {
         this.mogakko = mogakko;
         this.user = user;
-        this.isLike = isLike;
     }
 
-    public void updateLike() {
-        isLike = !isLike;
-    }
 }
