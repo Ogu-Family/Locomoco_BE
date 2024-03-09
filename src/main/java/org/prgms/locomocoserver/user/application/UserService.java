@@ -114,7 +114,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<MogakkoSimpleInfoResponseDto> getLikedMogakkos(Long userId) {
         User user = getById(userId);
-        List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = mogakkoLikeRepository.findAllByUserAndIsLikeTrue(user).stream()
+        List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = mogakkoLikeRepository.findAllByUser(user).stream()
                 .map(mogakkoLike -> {
                      Mogakko mogakko = mogakkoLike.getMogakko();
                      Location location = locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
