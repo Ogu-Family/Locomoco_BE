@@ -115,13 +115,13 @@ public class MogakkoController {
     @DeleteMapping("/mogakko/{id}/like")
     @Operation(summary = "모각코 좋아요 취소", description = "좋아요 취소")
     @ApiResponses(
-            @ApiResponse(responseCode = "204", description = "좋아요 취소 성공")
+            @ApiResponse(responseCode = "200", description = "좋아요 취소 성공")
     )
     public ResponseEntity<MogakkoLikeDto> likeCancel(
             @Parameter(description = "좋아요 취소 할 모각코 id") @PathVariable Long id,
             @Parameter(description = "좋아요 취소 요청한 사용자 id") @RequestParam Long userId) {
-        mogakkoLikeService.likeCancel(id, userId);
+        MogakkoLikeDto mogakkoLikeDto = mogakkoLikeService.likeCancel(id, userId);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        return ResponseEntity.ok(mogakkoLikeDto);
     }
 }
