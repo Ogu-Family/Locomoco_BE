@@ -19,8 +19,10 @@ public class AuthenticationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+
         String accessToken = httpRequest.getHeader("accessToken");
         String providerValue = httpRequest.getHeader("provider");
+
         if (accessToken != null && providerValue != null) {
 
             Provider provider = Provider.valueOf(providerValue.toUpperCase());
