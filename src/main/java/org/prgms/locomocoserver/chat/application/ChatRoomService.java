@@ -12,10 +12,6 @@ import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,24 +66,22 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public List<ChatRoomDto> getAllChatRoom(Long userId, Long cursor, int pageSize) {
         if (cursor == null) cursor = Long.MAX_VALUE;
-        Pageable pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "id"));
-        Page<ChatRoom> page = chatRoomRepository.findByParticipantsId(userId, cursor, pageable);
+        List<ChatRoom> chatRooms = chatRoomRepository.findByParticipantsId(userId, cursor, pageSize);
 
-        List<ChatRoomDto> chatRoomDtos = page.map(chatRoom -> ChatRoomDto.of(chatRoom, ChatMessageDto.of(getLastMessage(chatRoom.getId())))).stream().toList();
-
+        List<ChatRoomDto> chatRoomDtos = chatRooms.stream()
+                .map(chatRoom -> ChatRoomDto.of(chatRoom, ChatMessageDto.of(getLastMessage(chatRoom.getId()))))
+                .toList();
         return chatRoomDtos;
     }
 
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, Long cursor, int pageSize) {
         if (cursor == null) cursor = Long.MAX_VALUE;
-        Pageable pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "id"));
-        Page<ChatMessage> page = chatMessageRepository.findAllByChatRoomIdAndIdGreaterThan(roomId, cursor, pageable);
+        List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomIdAndIdGreaterThan(roomId, cursor, pageSize);
 
-        List<ChatMessageDto> chatMessageDtos = page.getContent().stream()
+        List<ChatMessageDto> chatMessageDtos = chatMessages.stream()
                 .map(ChatMessageDto::of)
                 .collect(Collectors.toList());
-
         Collections.reverse(chatMessageDtos);
 
         return chatMessageDtos;
