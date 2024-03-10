@@ -29,7 +29,7 @@ public class AuthenticationFilter implements Filter {
             httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
             httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             httpResponse.setHeader("Access-Control-Allow-Headers", "Authorization, provider");
-            httpResponse.setHeader("Access-Control-Expose-Headers", "Authorization, provider");
+            httpResponse.setHeader("Access-Control-Expose-Headers", "Authorization, provider");  // 이건 있어야 하는지 확인
             httpResponse.setStatus(HttpServletResponse.SC_OK);
         } else if (accessToken != null && providerValue != null) {
 

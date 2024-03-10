@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<ChatRoom> findByIdAndDeletedAtIsNull(Long id);
 
-    @Query(value = "SELECT * FROM chat_rooms cr JOIN users_chat_room_list ucr ON cr.id = ucr.chat_room_list_id WHERE ucr.user_id = :userId AND cr.id > :cursorId ORDER BY cr.id DESC limit :pageSize",
+    @Query(value = "SELECT * FROM chat_rooms cr JOIN users_chat_room_list ucr ON cr.id = ucr.chat_room_list_id WHERE ucr.user_id = :userId AND cr.id < :cursorId ORDER BY cr.id DESC limit :pageSize",
             nativeQuery = true)
     List<ChatRoom> findByParticipantsId(Long userId, Long cursorId, int pageSize);
 }
