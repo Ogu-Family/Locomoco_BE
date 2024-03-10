@@ -23,8 +23,8 @@ public class CorsFilter implements Filter {
         response.setHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers",
-                "Origin, X-Requested-With, Content-Type, Accept, Authorization, provider");
-        response.setHeader("Access-Control-Expose-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, provider");
+                "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+        response.setHeader("Access-Control-Expose-Headers", "Authorization, provider");
 
 
         if("OPTIONS".equalsIgnoreCase(request.getMethod())) {
@@ -33,5 +33,4 @@ public class CorsFilter implements Filter {
             chain.doFilter(req, res);
         }
     }
-
 }
