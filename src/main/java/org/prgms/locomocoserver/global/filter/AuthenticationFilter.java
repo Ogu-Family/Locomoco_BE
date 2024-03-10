@@ -20,7 +20,7 @@ public class AuthenticationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        String accessToken = httpRequest.getHeader("accessToken");
+        String accessToken = httpRequest.getHeader("Authorization");
         String providerValue = httpRequest.getHeader("provider");
 
         if (accessToken != null && providerValue != null) {
