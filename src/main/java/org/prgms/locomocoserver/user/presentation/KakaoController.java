@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.dto.kakao.KakaoUserInfoResponseDto;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
@@ -19,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
+@Slf4j
 @Tag(name = "Kakao Login Controller", description = "카카오 로그인 컨트롤러")
 @RestController
 @RequiredArgsConstructor
@@ -44,9 +46,16 @@ public class KakaoController {
     @Parameter(name = "code", description = "로그인 정보 입력 시 카카오에서 반환되는 일회성 code")
     @GetMapping("/users/login/kakao/callback")
     public ResponseEntity<UserLoginResponse> getKakaoLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
+        log.info("KakaoController.getKakaoLoginCallback " + code);
+
         TokenResponseDto tokenResponseDto = getTokenDto(code);
         KakaoUserInfoResponseDto kakaoUserInfoResponseDto = loadUserInfo(tokenResponseDto.accessToken());
+
+        log.info("KakaoController.getKakaoLoginCallback after loadUserInfo : " + kakaoUserInfoResponseDto.getEmail());
+
         UserLoginResponse userLoginResponse = userService.saveOrUpdate(kakaoUserInfoResponseDto, tokenResponseDto);
+
+        log.info("KakaoController.getKakaoLoginCallback after saveOrUpdate : " + userLoginResponse.isNewUser());
 
         return ResponseEntity.ok(userLoginResponse);
     }
