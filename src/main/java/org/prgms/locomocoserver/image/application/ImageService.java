@@ -7,8 +7,6 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.image.domain.ImageRepository;
-import org.prgms.locomocoserver.image.exception.ImageErrorType;
-import org.prgms.locomocoserver.image.exception.ImageException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -89,10 +87,11 @@ public class ImageService {
         return file;
     }
 
-        public void remove (Image image){
-            if (!amazonS3.doesObjectExist(bucket, image.getKey())) {
-                throw new AmazonS3Exception("Object " + image.getKey() + " does not exist!");
-            }
-            amazonS3.deleteObject(bucket, image.getKey());
+    public void remove(Image image) {
+        if (!amazonS3.doesObjectExist(bucket, image.getKey())) {
+            throw new AmazonS3Exception("Object " + image.getKey() + " does not exist!");
         }
+        amazonS3.deleteObject(bucket, image.getKey());
+        imageRepository.delete(image);
     }
+}
