@@ -7,6 +7,8 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.image.domain.ImageRepository;
+import org.prgms.locomocoserver.image.exception.ImageErrorType;
+import org.prgms.locomocoserver.image.exception.ImageException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -78,8 +80,9 @@ public class ImageService {
 
 
         try (FileOutputStream fos = new FileOutputStream(file)) {
-
             fos.write(multipartFile.getBytes());
+        } catch (IOException e) {
+            throw new IOException("Failed to convert the file.", e);
         }
 
         // 임시 파일 반환

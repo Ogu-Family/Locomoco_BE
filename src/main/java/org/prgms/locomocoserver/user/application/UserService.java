@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.image.application.ImageService;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.image.dto.ImageDto;
+import org.prgms.locomocoserver.image.exception.ImageErrorType;
+import org.prgms.locomocoserver.image.exception.ImageException;
 import org.prgms.locomocoserver.location.domain.Location;
 import org.prgms.locomocoserver.location.domain.LocationRepository;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
@@ -23,6 +25,8 @@ import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
 import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
 import org.prgms.locomocoserver.user.dto.response.UserLoginResponse;
+import org.prgms.locomocoserver.user.exception.UserErrorType;
+import org.prgms.locomocoserver.user.exception.UserException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -126,13 +130,16 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfoDto uploadProfileImage(Long userId, MultipartFile multipartFile) throws IOException {
-        User loginUser = getById(userId);
-        Image image = imageService.upload(multipartFile);
-
-        loginUser.updateProfileImage(image);
-
-        return UserInfoDto.of(loginUser);
+    public UserInfoDto uploadProfileImage(Long userId, MultipartFile multipartFile) {
+        try {
+            User loginUser = getById(userId);
+            Image image = imageService.upload(multipartFile);
+            loginUser.updateProfileImage(image);
+            return UserInfoDto.of(loginUser);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new ImageException(ImageErrorType.FILE_WRITE_ERROR);
+        }
     }
 
     public boolean isNicknameUnique(String nickname) {
@@ -141,6 +148,6 @@ public class UserService {
 
     public User getById(Long userId) {
         return userRepository.findByIdAndDeletedAtIsNull(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND));
     }
 }
