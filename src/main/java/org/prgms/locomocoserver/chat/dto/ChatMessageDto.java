@@ -16,8 +16,12 @@ public record ChatMessageDto(
 ) {
     public static ChatMessageDto of(ChatMessage chatMessage) {
         User sender = chatMessage.getSender();
+        String profileImagePath = null;
+        if (sender.getProfileImage() != null) {
+            profileImagePath = sender.getProfileImage().getPath();
+        }
         return new ChatMessageDto(chatMessage.getId(), chatMessage.getChatRoom().getId(), sender.getId(),
-                sender.getNickname(), sender.getProfileImage().getPath(), chatMessage.getContent(), chatMessage.getCreatedAt());
+                sender.getNickname(), profileImagePath, chatMessage.getContent(), chatMessage.getCreatedAt());
     }
 }
 
