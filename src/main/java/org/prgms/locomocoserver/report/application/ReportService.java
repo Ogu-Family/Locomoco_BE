@@ -22,23 +22,26 @@ public class ReportService {
 
     public ReportDto create(ReportCreateRequest request) {
         User reporter = userService.getById(request.reporterId());
+        User reported = userService.getById(request.reportedId());
         Report report = reportRepository.save(request.toEntity(reporter));
 
-        return ReportDto.of(report);
+        return ReportDto.of(report, reported);
     }
 
     @Transactional
     public ReportDto update(Long id, ReportUpdateRequest request) {
         Report report = getById(id);
         report.updateContent(request.content());
-        return ReportDto.of(report);
+        User reported = userService.getById(report.getReportedId());
+
+        return ReportDto.of(report, reported);
     }
 
     @Transactional(readOnly = true)
     public List<ReportDto> getAllReports(Long cursor, int pageSize) {
         if (cursor == null) cursor = 0L;
         return reportRepository.findAllByDeletedAtIsNull(cursor, pageSize).stream()
-              .map(report -> ReportDto.of(report))
+              .map(report -> ReportDto.of(report, userService.getById(report.getReportedId())))
               .toList();
     }
 
