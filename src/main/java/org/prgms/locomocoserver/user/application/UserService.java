@@ -142,6 +142,17 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public UserInfoDto deleteProfileImage(Long userId) {
+        User user = getById(userId);
+        Image profileImage = user.getProfileImage();
+
+        if(profileImage != null) imageService.remove(profileImage);
+        else throw new ImageException(ImageErrorType.IMAGE_NOT_FOUND);
+
+        return UserInfoDto.of(user);
+    }
+
     public boolean isNicknameUnique(String nickname) {
         return !userRepository.findByNicknameAndDeletedAtIsNull(nickname).isPresent();
     }
