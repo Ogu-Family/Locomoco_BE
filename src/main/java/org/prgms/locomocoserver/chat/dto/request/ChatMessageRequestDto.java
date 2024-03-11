@@ -16,7 +16,7 @@ public record ChatMessageRequestDto(
         Long mogakkoId,
         @NonNull
         Long senderId,
-        String message
+        String message // TODO: 글자수 초과 시 예외 처리
 ) {
 
     public ChatRoom toChatRoomEntity(Mogakko mogakko, User creator) {
