@@ -16,9 +16,8 @@ public record ChatMessageDto(
 ) {
     public static ChatMessageDto of(ChatMessage chatMessage) {
         User sender = chatMessage.getSender();
-        // TODO : sender profile image 추가
         return new ChatMessageDto(chatMessage.getId(), chatMessage.getChatRoom().getId(), sender.getId(),
-                sender.getNickname(), null, chatMessage.getContent(), chatMessage.getCreatedAt());
+                sender.getNickname(), sender.getProfileImage().getPath(), chatMessage.getContent(), chatMessage.getCreatedAt());
     }
 }
 
