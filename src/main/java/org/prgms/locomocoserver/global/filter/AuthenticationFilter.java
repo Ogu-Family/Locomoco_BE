@@ -19,11 +19,19 @@ public class AuthenticationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String accessToken = httpRequest.getHeader("accessToken");
+        String accessToken = httpRequest.getHeader("Authorization");
         String providerValue = httpRequest.getHeader("provider");
 
-        if (accessToken != null && providerValue != null) {
+        if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+            // preflight 요청에 대한 허용 응답 설정
+            httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+            httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            httpResponse.setHeader("Access-Control-Allow-Headers", "Authorization, provider");
+            httpResponse.setHeader("Access-Control-Expose-Headers", "Authorization, provider");  // 이건 있어야 하는지 확인
+            httpResponse.setStatus(HttpServletResponse.SC_OK);
+        } else if (accessToken != null && providerValue != null) {
 
             Provider provider = Provider.valueOf(providerValue.toUpperCase());
 
@@ -42,12 +50,12 @@ public class AuthenticationFilter implements Filter {
             if (isValidToken) {  // 유효한 accessToken
                 chain.doFilter(request, response);
             } else {
-                HttpServletResponse httpResponse = (HttpServletResponse) response;
+                httpResponse = (HttpServletResponse) response;
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
 
         } else { // accessToken이 헤더에 없을 경우
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
+            httpResponse = (HttpServletResponse) response;
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
