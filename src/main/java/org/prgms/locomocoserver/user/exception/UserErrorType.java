@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum UserErrorType {
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자가 존재하지 않습니다.");
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자가 존재하지 않습니다."),
+    PROVIDER_TYPE_ERROR(HttpStatus.UNAUTHORIZED, "해당 provider가 존재하지 않습니다.")
+    ;
 
     private final HttpStatus status;
     private final String message;

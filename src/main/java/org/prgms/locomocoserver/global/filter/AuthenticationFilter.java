@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
 import org.prgms.locomocoserver.user.domain.enums.Provider;
+import org.prgms.locomocoserver.user.exception.UserErrorType;
+import org.prgms.locomocoserver.user.exception.UserException;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -44,7 +46,7 @@ public class AuthenticationFilter implements Filter {
                     isValidToken = authenticationService.authenticateGithubUser(accessToken);
                     break;
                 default:  // 잘못된 Provider
-                    throw new RuntimeException("해당 provider가 존재하지 않습니다.");
+                    throw new UserException(UserErrorType.PROVIDER_TYPE_ERROR);
             }
 
             if (isValidToken) {  // 유효한 accessToken
