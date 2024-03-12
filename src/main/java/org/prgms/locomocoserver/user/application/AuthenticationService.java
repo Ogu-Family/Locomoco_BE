@@ -13,7 +13,7 @@ public class AuthenticationService {
         String url = "https://kapi.kakao.com/v1/user/access_token_info";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
+        headers.set("Authorization", accessToken); // header로 넘어오는 accessToken은 Bearer 붙어있음
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
@@ -27,7 +27,7 @@ public class AuthenticationService {
         String url = "https://api.github.com/applications/Iv1.8a61f9b3a7aba766/token";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
+        headers.set("Authorization", accessToken);
         headers.set("Accept", "application/vnd.github+json");
         headers.set("X-GitHub-Api-Version", "2022-11-28");
 
