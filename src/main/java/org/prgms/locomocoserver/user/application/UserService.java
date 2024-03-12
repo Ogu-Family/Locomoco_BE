@@ -67,13 +67,16 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfoDto getInitInfo(Long userId, UserInitInfoRequestDto requestDto) {
+    public UserInfoDto getInitInfo(Long userId, UserInitInfoRequestDto requestDto, MultipartFile multipartFile) {
         User user = getById(userId);
+
         user.setInitInfo(requestDto.nickname(), requestDto.birth(),
                 Gender.valueOf(requestDto.gender().toUpperCase()), Job.valueOf(requestDto.job().toUpperCase()));
+        uploadProfileImage(userId, multipartFile);
+
         user = userRepository.save(user);
 
-        return new UserInfoDto(user.getId(), user.getNickname(), user.getBirth(), user.getGender(), user.getTemperature(), user.getJob(), user.getEmail(), ImageDto.of(user.getProfileImage()), user.getProvider());
+        return UserInfoDto.of(user);
     }
 
     @Transactional
