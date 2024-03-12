@@ -67,14 +67,12 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfoDto getInitInfo(Long userId, UserInitInfoRequestDto requestDto, MultipartFile multipartFile) {
+    public UserInfoDto updateInitInfo(Long userId, UserInitInfoRequestDto requestDto, MultipartFile multipartFile) {
         User user = getById(userId);
 
         user.setInitInfo(requestDto.nickname(), requestDto.birth(),
                 Gender.valueOf(requestDto.gender().toUpperCase()), Job.valueOf(requestDto.job().toUpperCase()));
-        uploadProfileImage(userId, multipartFile);
-
-        user = userRepository.save(user);
+        if (multipartFile != null) uploadProfileImage(userId, multipartFile);
 
         return UserInfoDto.of(user);
     }

@@ -8,13 +8,11 @@ import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseD
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "User Controller", description = "사용자 컨트롤러")
@@ -30,7 +28,7 @@ public class UserController {
     public ResponseEntity<UserInfoDto> getInitInfo(@PathVariable Long userId,
                                                    @RequestPart("requestDto") UserInitInfoRequestDto requestDto,
                                                    @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
-        UserInfoDto userInfoDto = userService.getInitInfo(userId, requestDto, multipartFile);
+        UserInfoDto userInfoDto = userService.updateInitInfo(userId, requestDto, multipartFile);
         return ResponseEntity.ok(userInfoDto);
     }
 
