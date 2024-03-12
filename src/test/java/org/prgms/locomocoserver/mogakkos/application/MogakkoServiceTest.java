@@ -26,6 +26,7 @@ import org.prgms.locomocoserver.categories.domain.Category;
 import org.prgms.locomocoserver.categories.domain.CategoryInputType;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
+import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.location.domain.Location;
 import org.prgms.locomocoserver.location.domain.LocationRepository;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
@@ -70,6 +71,8 @@ class MogakkoServiceTest {
     private ParticipantRepository participantRepository;
     @Autowired
     private LocationRepository locationRepository;
+    @Autowired
+    private ChatRoomRepository chatRoomRepository;
     private User setUpUser1, setUpUser2;
     private Mogakko testMogakko;
 
@@ -123,6 +126,7 @@ class MogakkoServiceTest {
         participantRepository.deleteAll();
         mogakkoTagRepository.deleteAll();
         locationRepository.deleteAll();
+        chatRoomRepository.deleteAll();
         mogakkoRepository.deleteAll();
         userRepository.deleteAll();
         tagRepository.deleteAll();
@@ -162,6 +166,7 @@ class MogakkoServiceTest {
         assertThat(createdMogakko.getMaxParticipants()).isEqualTo(Mogakko.DEFAULT_MAX_PARTICIPANTS);
         assertThat(createdMogakko.getViews()).isEqualTo(0);
         assertThat(createdMogakko.getCreator().getId()).isEqualTo(savedCreator.getId());
+        assertThat(createdMogakko.getChatRoom()).isNotNull();
 
         assertThat(mogakkoTagRepository.findAllByMogakko(createdMogakko)).hasSize(3);
     }

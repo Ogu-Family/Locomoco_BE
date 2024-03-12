@@ -13,7 +13,6 @@ import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
-import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,6 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final MogakkoService mogakkoService;
     private final UserService userService;
     private final StompChatService stompChatService;
 
