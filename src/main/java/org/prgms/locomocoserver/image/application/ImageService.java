@@ -78,18 +78,20 @@ public class ImageService {
 
 
         try (FileOutputStream fos = new FileOutputStream(file)) {
-
             fos.write(multipartFile.getBytes());
+        } catch (IOException e) {
+            throw new IOException("Failed to convert the file.", e);
         }
 
         // 임시 파일 반환
         return file;
     }
 
-        public void remove (Image image){
-            if (!amazonS3.doesObjectExist(bucket, image.getKey())) {
-                throw new AmazonS3Exception("Object " + image.getKey() + " does not exist!");
-            }
-            amazonS3.deleteObject(bucket, image.getKey());
+    public void remove(Image image) {
+        if (!amazonS3.doesObjectExist(bucket, image.getKey())) {
+            throw new AmazonS3Exception("Object " + image.getKey() + " does not exist!");
         }
+        amazonS3.deleteObject(bucket, image.getKey());
+        imageRepository.delete(image);
     }
+}
