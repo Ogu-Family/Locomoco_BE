@@ -28,8 +28,9 @@ public class UserController {
     @Operation(summary = "사용자 초기 회원가입", description = "사용자 id로 초기 정보를 입력합니다.")
     @PutMapping("/users/init/{userId}")
     public ResponseEntity<UserInfoDto> getInitInfo(@PathVariable Long userId,
-                                                   @RequestBody UserInitInfoRequestDto requestDto) {
-        UserInfoDto userInfoDto = userService.getInitInfo(userId, requestDto);
+                                                   @RequestPart("requestDto") UserInitInfoRequestDto requestDto,
+                                                   @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
+        UserInfoDto userInfoDto = userService.getInitInfo(userId, requestDto, multipartFile);
         return ResponseEntity.ok(userInfoDto);
     }
 
