@@ -28,7 +28,7 @@ public class ChatRoomService {
     private final StompChatService stompChatService;
 
     @Transactional
-    public ChatRoomDto enterChatRoom(ChatEnterRequestDto requestDto) {
+    public void enterChatRoom(ChatEnterRequestDto requestDto) {
         ChatRoom chatRoom = getById(requestDto.chatRoomId());
 
         if (!isParticipantExist(chatRoom, requestDto.participant())) {
@@ -36,8 +36,6 @@ public class ChatRoomService {
             chatRoom.addParticipant(requestDto.participant());
             stompChatService.sendToSubscribers(chatMessageDto);
         }
-
-        return ChatRoomDto.of(chatRoom, ChatMessageDto.of(getLastMessage(chatRoom.getId())));
     }
 
     @Transactional
