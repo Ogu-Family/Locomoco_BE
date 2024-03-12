@@ -21,11 +21,4 @@ public record ChatMessageRequestDto(
             .content(message).build();
     }
 
-    public ChatMessage toEnterMessageEntity(User sender, ChatRoom chatRoom) {
-        return ChatMessage.builder()
-                .sender(sender)
-                .chatRoom(chatRoom)
-                .content(sender.getNickname() + " 님이 채팅방에 입장하였습니다.").build();
-    }
-
 }
