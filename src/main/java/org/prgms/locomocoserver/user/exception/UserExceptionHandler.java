@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class UserExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(UserException.class)
     public ResponseEntity<Object> handleUserException(UserException ex) {
         return ResponseEntity.status(ex.getErrorType().getStatus()).body(ex.getErrorType().getMessage());
     }
