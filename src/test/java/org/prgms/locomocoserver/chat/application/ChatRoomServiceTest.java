@@ -71,6 +71,6 @@ class ChatRoomServiceTest {
 
         assertThat(chatRoom.getMogakko().getId()).isEqualTo(mogakkoId);
         assertThat(chatRoom.getCreator().getId()).isEqualTo(dummyUsers.get(0).getId());
-        assertThat(chatRoom.getParticipants()).hasSize(2);
+        assertThat(chatRoom.getParticipants()).hasSize(3);
     }
 }

@@ -47,6 +47,7 @@ public class MogakkoService {
     private final MogakkoTagRepository mogakkoTagRepository;
     private final ChatRoomService chatRoomService;
 
+    @Transactional
     public Long save(MogakkoCreateRequestDto requestDto) {
         Mogakko mogakko = createMogakkoBy(requestDto);
 

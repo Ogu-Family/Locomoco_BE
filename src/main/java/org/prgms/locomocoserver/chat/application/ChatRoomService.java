@@ -102,9 +102,11 @@ public class ChatRoomService {
         return chatMessageRepository.findLastMessageByRoomId(roomId);
     }
 
+    @Transactional
     public ChatRoom createChatRoom(ChatCreateRequestDto requestDto) {
-        ChatRoom chatRoom = chatRoomRepository.save(requestDto.toChatRoomEntity());
+        ChatRoom chatRoom = requestDto.toChatRoomEntity();
+        chatRoom.addParticipant(requestDto.creator());
 
-        return chatRoom;
+        return chatRoomRepository.save(chatRoom);
     }
 }
