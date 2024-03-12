@@ -86,7 +86,7 @@ public class Mogakko extends BaseEntity {
     public Mogakko(Long id, String title, String content, LocalDateTime startTime,
         LocalDateTime endTime, LocalDateTime deadline, int likeCount, int maxParticipants,
         long views, List<MogakkoTag> mogakkoTags, List<Participant> participants,
-        List<Inquiry> inquiries, User creator) {
+        List<Inquiry> inquiries, User creator, ChatRoom chatRoom) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -100,6 +100,7 @@ public class Mogakko extends BaseEntity {
         this.participants = participants;
         this.inquiries = inquiries;
         this.creator = creator;
+        this.chatRoom = chatRoom;
     }
 
     public void addMogakkoTag(MogakkoTag mogakkoTag) {
