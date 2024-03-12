@@ -25,6 +25,7 @@ public record ReviewCreateRequestDto(
                         .reviewee(reviewee)
                         .content(requestDto.content())
                         .score(requestDto.score())
+                        .mogakko(mogakko)
                         .reviewContentIds(requestDto.reviewContentId()).build();
         }
 }
