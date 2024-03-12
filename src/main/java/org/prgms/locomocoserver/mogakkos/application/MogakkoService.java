@@ -3,23 +3,26 @@ package org.prgms.locomocoserver.mogakkos.application;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.prgms.locomocoserver.chat.application.ChatRoomService;
+import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
 import org.prgms.locomocoserver.location.domain.Location;
 import org.prgms.locomocoserver.location.domain.LocationRepository;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.searchpolicy.SearchPolicy;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
-import org.prgms.locomocoserver.mogakkos.domain.likes.MogakkoLike;
-import org.prgms.locomocoserver.mogakkos.domain.likes.MogakkoLikeRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
 import org.prgms.locomocoserver.mogakkos.dto.SearchRepositoryDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.*;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoParticipantDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -27,10 +30,7 @@ import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.dto.response.UserBriefInfoDto;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +45,7 @@ public class MogakkoService {
     private final UserService userService;
     private final LocationRepository locationRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
-    private final MogakkoLikeRepository likeRepository;
+    private final ChatRoomService chatRoomService;
 
     public Long save(MogakkoCreateRequestDto requestDto) {
         Mogakko mogakko = createMogakkoBy(requestDto);
@@ -58,6 +58,8 @@ public class MogakkoService {
 
         Mogakko savedMogakko = mogakkoRepository.save(mogakko);
         locationRepository.save(location);
+
+        chatRoomService.createChatRoom(new ChatCreateRequestDto(savedMogakko, creator));
 
         return savedMogakko.getId();
     }

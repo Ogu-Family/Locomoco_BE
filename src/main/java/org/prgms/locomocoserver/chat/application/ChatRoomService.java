@@ -1,5 +1,8 @@
 package org.prgms.locomocoserver.chat.application;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.domain.ChatMessage;
 import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
@@ -7,17 +10,13 @@ import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
+import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
-import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +30,7 @@ public class ChatRoomService {
 
     @Transactional
     public ChatRoomDto enterChatRoom(ChatMessageRequestDto requestDto) {
-        ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(requestDto.chatRoomId())
-                .orElseGet(() -> createChatRoom(requestDto));
+        ChatRoom chatRoom = getById(requestDto.chatRoomId());
 
         if (!isParticipantExist(chatRoom, requestDto.senderId())) {
             ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);
@@ -107,12 +105,9 @@ public class ChatRoomService {
         return chatMessageRepository.findLastMessageByRoomId(roomId);
     }
 
-    private ChatRoom createChatRoom(ChatMessageRequestDto messageRequestDto) {
-        User loginUser = userService.getById(messageRequestDto.senderId());
-        Mogakko mogakko = mogakkoService.getByIdNotDeleted(messageRequestDto.mogakkoId());
+    public ChatRoom createChatRoom(ChatCreateRequestDto requestDto) {
+        ChatRoom chatRoom = chatRoomRepository.save(requestDto.toChatRoomEntity());
 
-        ChatRoom chatRoom = chatRoomRepository.save(messageRequestDto.toChatRoomEntity(mogakko, loginUser));
-        chatMessageRepository.save(messageRequestDto.toChatMessageEntity(loginUser, chatRoom));
         return chatRoom;
     }
 }
