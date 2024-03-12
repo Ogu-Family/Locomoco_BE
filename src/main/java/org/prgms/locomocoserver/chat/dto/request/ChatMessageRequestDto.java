@@ -2,7 +2,7 @@ package org.prgms.locomocoserver.chat.dto.request;
 
 import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.NotBlank;
-import org.hibernate.validator.constraints.Length;
+
 import org.prgms.locomocoserver.chat.domain.ChatMessage;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
@@ -17,7 +17,6 @@ public record ChatMessageRequestDto(
         @Nonnull
         Long senderId,
         @NotBlank
-        @Length(max = 255, message = "메시지의 길이는 255글자를 초과할 수 없습니다.")
         String message // TODO: 글자수 초과 시 예외 처리
 ) {
 
