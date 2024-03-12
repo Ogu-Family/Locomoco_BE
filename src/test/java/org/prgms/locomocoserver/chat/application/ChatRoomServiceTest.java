@@ -10,11 +10,13 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
 import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.location.domain.Location;
+import org.prgms.locomocoserver.location.domain.LocationRepository;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
@@ -27,6 +29,7 @@ import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 @SpringBootTest
@@ -46,9 +49,15 @@ class ChatRoomServiceTest {
     private MogakkoRepository mogakkoRepository;
     @Autowired
     private ChatParticipantRepository chatParticipantRepository;
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
+    @Autowired
+    private LocationRepository locationRepository;
 
     @AfterEach
     void tearDown() {
+        locationRepository.deleteAll();
+        chatMessageRepository.deleteAll();
         chatParticipantRepository.deleteAll();
         chatRoomRepository.deleteAll();
         mogakkoRepository.deleteAll();
@@ -79,7 +88,7 @@ class ChatRoomServiceTest {
         chatRoomService.enterChatRoom(new ChatEnterRequestDto(mogakko.getChatRoom().getId(), dummyUsers.get(2)));
 
         // then
-        tx.getTransaction(new DefaultTransactionDefinition());
+        TransactionStatus status = tx.getTransaction(new DefaultTransactionDefinition());
 
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(
             mogakko.getChatRoom().getId()).orElseThrow(RuntimeException::new);
@@ -87,5 +96,7 @@ class ChatRoomServiceTest {
         assertThat(chatRoom.getMogakko().getId()).isEqualTo(mogakkoId);
         assertThat(chatRoom.getCreator().getId()).isEqualTo(dummyUsers.get(0).getId());
         assertThat(chatRoom.getChatParticipants()).hasSize(3);
+
+        tx.rollback(status);
     }
 }

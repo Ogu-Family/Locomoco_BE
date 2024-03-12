@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
@@ -26,6 +27,13 @@ class ParticipantRepositoryTest {
     private MogakkoRepository mogakkoRepository;
     @Autowired
     private UserRepository userRepository;
+
+    @AfterEach
+    void tearDown() {
+        participantRepository.deleteAll();
+        mogakkoRepository.deleteAll();
+        userRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("모각코 id와 유저 id를 이용해 특정 유저가 특정 모각코에 참여 중인지 확인할 수 있다")
