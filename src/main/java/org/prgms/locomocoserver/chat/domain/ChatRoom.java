@@ -26,7 +26,7 @@ public class ChatRoom extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mogakko_id", nullable = false, unique = true)
     private Mogakko mogakko;
 
