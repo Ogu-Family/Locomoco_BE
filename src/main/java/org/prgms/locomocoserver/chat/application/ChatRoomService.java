@@ -11,6 +11,7 @@ import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
+import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -29,12 +30,12 @@ public class ChatRoomService {
     private final StompChatService stompChatService;
 
     @Transactional
-    public ChatRoomDto enterChatRoom(ChatMessageRequestDto requestDto) {
+    public ChatRoomDto enterChatRoom(ChatEnterRequestDto requestDto) {
         ChatRoom chatRoom = getById(requestDto.chatRoomId());
 
-        if (!isParticipantExist(chatRoom, requestDto.senderId())) {
+        if (!isParticipantExist(chatRoom, requestDto.participant())) {
             ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);
-            addParticipant(chatRoom, requestDto.senderId());
+            chatRoom.addParticipant(requestDto.participant());
             stompChatService.sendToSubscribers(chatMessageDto);
         }
 
@@ -52,11 +53,11 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public ChatMessageDto saveEnterMessage(ChatMessageRequestDto requestDto) {
-        User sender = userService.getById(requestDto.senderId());
+    public ChatMessageDto saveEnterMessage(ChatEnterRequestDto requestDto) {
         ChatRoom chatRoom = getById(requestDto.chatRoomId());
+        User participant = requestDto.participant();
 
-        ChatMessage chatMessage = chatMessageRepository.save(requestDto.toEnterMessageEntity(sender, chatRoom));
+        ChatMessage chatMessage = chatMessageRepository.save(toEnterMessage(chatRoom, participant));
         chatRoom.updateUpdatedAt();
         return ChatMessageDto.of(chatMessage);
     }
@@ -91,14 +92,14 @@ public class ChatRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("ChatRoom Not Found chatRoomId: " + id));
     }
 
-    private boolean isParticipantExist(ChatRoom chatRoom, Long userId) {
+    private boolean isParticipantExist(ChatRoom chatRoom, User user) {
         return chatRoom.getParticipants().stream()
-                .anyMatch(participant -> participant.getId().equals(userId));
+                .anyMatch(participant -> participant.getId().equals(user.getId()));
     }
 
-    private void addParticipant(ChatRoom existingRoom, Long participantId) {
-        User newUser = userService.getById(participantId);
-        existingRoom.addParticipant(newUser);
+    private ChatMessage toEnterMessage(ChatRoom chatRoom, User participant) {
+        return ChatMessage.builder().chatRoom(chatRoom).sender(
+            participant).content(participant.getNickname() + "님이 입장하셨습니다.").build();
     }
 
     private ChatMessage getLastMessage(Long roomId) {
