@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.domain.ChatMessage;
 import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
+import org.prgms.locomocoserver.chat.domain.ChatParticipant;
+import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatParticipantRepository chatParticipantRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UserService userService;
     private final StompChatService stompChatService;
@@ -33,7 +36,10 @@ public class ChatRoomService {
 
         if (!isParticipantExist(chatRoom, requestDto.participant())) {
             ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);
-            chatRoom.addParticipant(requestDto.participant());
+            ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.participant())
+                .chatRoom(chatRoom).build());
+
+            chatRoom.addChatParticipant(chatParticipant);
             stompChatService.sendToSubscribers(chatMessageDto);
         }
     }
@@ -89,8 +95,8 @@ public class ChatRoomService {
     }
 
     private boolean isParticipantExist(ChatRoom chatRoom, User user) {
-        return chatRoom.getParticipants().stream()
-                .anyMatch(participant -> participant.getId().equals(user.getId()));
+        return chatRoom.getChatParticipants().stream()
+                .anyMatch(chatParticipant -> chatParticipant.getUser().getId().equals(user.getId()));
     }
 
     private ChatMessage toEnterMessage(ChatRoom chatRoom, User participant) {
@@ -105,7 +111,10 @@ public class ChatRoomService {
     @Transactional
     public ChatRoom createChatRoom(ChatCreateRequestDto requestDto) {
         ChatRoom chatRoom = requestDto.toChatRoomEntity();
-        chatRoom.addParticipant(requestDto.creator());
+        ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.creator())
+            .chatRoom(chatRoom).build());
+
+        chatRoom.addChatParticipant(chatParticipant);
 
         return chatRoomRepository.save(chatRoom);
     }

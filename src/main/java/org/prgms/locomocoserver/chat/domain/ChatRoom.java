@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.chat.domain;
 
 import jakarta.persistence.*;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,24 +35,23 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "creator_id", referencedColumnName = "id", nullable = false)
     private User creator;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "chat_rooms_participants",
-            joinColumns = @JoinColumn(name = "chat_room_id"),
-            inverseJoinColumns = @JoinColumn(name = "participants_id"),
-            uniqueConstraints = @UniqueConstraint(columnNames = {"chat_room_id", "participants_id"}))
+    @OneToMany(mappedBy = "chatRoom")
     @Builder.Default
-    private List<User> participants = new ArrayList<>();
+    private List<ChatParticipant> chatParticipants = new ArrayList<>();
 
-    public ChatRoom(Long id, String name, Mogakko mogakko, User creator, List<User> participants) {
+    public ChatRoom(Long id, String name, Mogakko mogakko, User creator, List<ChatParticipant> chatParticipants) {
         this.id = id;
         this.name = name;
         this.mogakko = mogakko;
         this.creator = creator;
-        this.participants = participants;
+        this.chatParticipants = chatParticipants;
     }
 
-    public void addParticipant(User user) {
-        this.participants.add(user);
-        user.getChatRoomList().add(this);
+    public void addChatParticipant(ChatParticipant participant) {
+        if (Objects.nonNull(participant)) {
+            this.chatParticipants.remove(participant);
+        }
+
+        this.chatParticipants.add(participant);
     }
 }
