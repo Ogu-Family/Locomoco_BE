@@ -80,5 +80,12 @@ public class UserController {
         UserInfoDto userInfoDto = userService.uploadProfileImage(userId, multipartFile);
         return ResponseEntity.ok(userInfoDto);
     }
+
+    @Operation(summary = "프로필 이미지 삭제", description = "사용자의 프로필 이미지를 삭제 합니다.")
+    @DeleteMapping("/users/{userId}/profile-image")
+    public ResponseEntity<UserInfoDto> deleteProfileImage(@PathVariable Long userId) {
+        UserInfoDto userInfoDto = userService.deleteProfileImage(userId);
+        return ResponseEntity.ok(userInfoDto);
+    }
     
 }
