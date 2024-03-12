@@ -7,8 +7,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
@@ -16,6 +18,7 @@ import org.prgms.locomocoserver.location.domain.Location;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
+import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
@@ -39,6 +42,18 @@ class ChatRoomServiceTest {
     private MogakkoService mogakkoService;
     @Autowired
     private ChatRoomRepository chatRoomRepository;
+    @Autowired
+    private MogakkoRepository mogakkoRepository;
+    @Autowired
+    private ChatParticipantRepository chatParticipantRepository;
+
+    @AfterEach
+    void tearDown() {
+        chatParticipantRepository.deleteAll();
+        chatRoomRepository.deleteAll();
+        mogakkoRepository.deleteAll();
+        userRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("채팅방에 참여할 수 있다")
@@ -71,6 +86,6 @@ class ChatRoomServiceTest {
 
         assertThat(chatRoom.getMogakko().getId()).isEqualTo(mogakkoId);
         assertThat(chatRoom.getCreator().getId()).isEqualTo(dummyUsers.get(0).getId());
-        assertThat(chatRoom.getParticipants()).hasSize(3);
+        assertThat(chatRoom.getChatParticipants()).hasSize(3);
     }
 }
