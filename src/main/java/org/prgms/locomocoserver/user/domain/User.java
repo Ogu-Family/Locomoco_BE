@@ -10,6 +10,7 @@ import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
+import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
 import org.prgms.locomocoserver.user.vo.EmailVo;
 import org.prgms.locomocoserver.user.vo.TemperatureVo;
 
@@ -80,5 +81,12 @@ public class User extends BaseEntity {
 
     public void updateProfileImage(Image profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public void updateUserInfo(UserUpdateRequest request) {
+        if (request.nickname() != null) this.nickname = request.nickname();
+        if (request.birth()!= null) this.birth = request.birth();
+        if (request.gender()!= null) this.gender = request.gender();
+        if (request.job()!= null) this.job = request.job();
     }
 }

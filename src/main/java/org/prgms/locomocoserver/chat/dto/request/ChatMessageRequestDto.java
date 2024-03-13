@@ -1,21 +1,22 @@
 package org.prgms.locomocoserver.chat.dto.request;
 
-import lombok.NonNull;
+import jakarta.annotation.Nonnull;
+import jakarta.validation.constraints.NotBlank;
+
 import org.prgms.locomocoserver.chat.domain.ChatMessage;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.user.domain.User;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public record ChatMessageRequestDto(
-        @NonNull
+        @Nonnull
         Long chatRoomId,
-        @NonNull
+        @Nonnull
         Long mogakkoId,
-        @NonNull
+        @Nonnull
         Long senderId,
+        @NotBlank
         String message // TODO: 글자수 초과 시 예외 처리
 ) {
 

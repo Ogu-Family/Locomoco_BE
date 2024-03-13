@@ -22,6 +22,7 @@ import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.prgms.locomocoserver.user.dto.OAuthUserInfoDto;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
+import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
 import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
 import org.prgms.locomocoserver.user.dto.response.UserLoginResponse;
@@ -67,13 +68,24 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfoDto getInitInfo(Long userId, UserInitInfoRequestDto requestDto) {
+    public UserInfoDto insertInitInfo(Long userId, UserInitInfoRequestDto requestDto, MultipartFile multipartFile) {
         User user = getById(userId);
+
         user.setInitInfo(requestDto.nickname(), requestDto.birth(),
                 Gender.valueOf(requestDto.gender().toUpperCase()), Job.valueOf(requestDto.job().toUpperCase()));
-        user = userRepository.save(user);
+        if (multipartFile != null) uploadProfileImage(userId, multipartFile);
 
-        return new UserInfoDto(user.getId(), user.getNickname(), user.getBirth(), user.getGender(), user.getTemperature(), user.getJob(), user.getEmail(), ImageDto.of(user.getProfileImage()), user.getProvider());
+        return UserInfoDto.of(user);
+    }
+
+    @Transactional
+    public UserInfoDto updateUserInfo(Long userId, UserUpdateRequest request, MultipartFile multipartFile) {
+        User user = getById(userId);
+        user.updateUserInfo(request);
+
+        if(multipartFile != null) uploadProfileImage(userId, multipartFile);
+
+        return UserInfoDto.of(user);
     }
 
     @Transactional
@@ -133,8 +145,15 @@ public class UserService {
     public UserInfoDto uploadProfileImage(Long userId, MultipartFile multipartFile) {
         try {
             User loginUser = getById(userId);
+
+            Image pre = loginUser.getProfileImage();
+            if(pre != null) {
+                imageService.remove(pre);
+            }
+
             Image image = imageService.upload(multipartFile);
             loginUser.updateProfileImage(image);
+
             return UserInfoDto.of(loginUser);
         } catch (IOException e) {
             e.printStackTrace();
