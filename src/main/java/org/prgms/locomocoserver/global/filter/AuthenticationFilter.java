@@ -64,7 +64,7 @@ public class AuthenticationFilter implements Filter {
 
             chain.doFilter(request, response);
         } catch (ExpiredTokenException e) {
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            httpResponse.sendError(1401, e.getMessage());
         } catch (InvalidTokenException e) {
             httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
