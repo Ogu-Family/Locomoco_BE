@@ -18,18 +18,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.domain.enums.Job;
-import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
-import org.prgms.locomocoserver.user.vo.EmailVo;
-import org.prgms.locomocoserver.user.vo.TemperatureVo;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
