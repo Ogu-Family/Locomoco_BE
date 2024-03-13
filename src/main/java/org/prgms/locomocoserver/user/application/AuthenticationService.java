@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.user.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.global.exception.ExpiredTokenException;
 import org.prgms.locomocoserver.global.exception.InvalidTokenException;
 import org.springframework.http.*;
@@ -9,12 +10,14 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
 
     public boolean authenticateKakaoUser(String accessToken) {
         String url = "https://kapi.kakao.com/v1/user/access_token_info";
+        log.info("AuthenticationService - authenticateKakaoUser");
 
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -27,17 +30,20 @@ public class AuthenticationService {
 
             return response.getStatusCode() == HttpStatus.OK;
         } catch (HttpClientErrorException.Unauthorized e) {
+            log.info("AuthenticationService - Unauthorized Exception: " + e.getMessage());
             throw new ExpiredTokenException("Kakao access token expired");
         } catch (HttpClientErrorException.BadRequest e) {
+            log.info("AuthenticationService - BadRequest Exception: " + e.getMessage());
             throw new InvalidTokenException("Invalid Kakao access token");
         } catch (HttpServerErrorException e) {
+            log.info("AuthenticationService - Internal ServerError Exception: " + e.getMessage());
             throw new RuntimeException("Error occurred during Kakao authentication", e);
         }
     }
 
     public boolean authenticateGithubUser(String accessToken) {
         String url = "https://api.github.com/applications/Iv1.8a61f9b3a7aba766/token";
-
+        log.info("AuthenticationService - authenticateGithubUser");
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", accessToken);

@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
 import org.prgms.locomocoserver.user.domain.enums.Provider;
 import org.prgms.locomocoserver.user.exception.UserErrorType;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Slf4j
 @Order(2)
 @Component
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class AuthenticationFilter implements Filter {
         String providerValue = httpRequest.getHeader("provider");
 
         if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+            log.info("AuthenticationFilter.doFilter OPTION called");
             // preflight 요청에 대한 허용 응답 설정
             httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
             httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
@@ -48,9 +51,11 @@ public class AuthenticationFilter implements Filter {
         boolean isValidToken = false;
         switch (provider) {
             case KAKAO:
+                log.info("AuthenticationFilter.doFilter KAKAO authenticated called");
                 isValidToken = authenticationService.authenticateKakaoUser(accessToken);
                 break;
             case GITHUB:
+                log.info("AuthenticationFilter.doFilter GITHUB authenticated called");
                 isValidToken = authenticationService.authenticateGithubUser(accessToken);
                 break;
             default:  // 잘못된 Provider
@@ -58,6 +63,7 @@ public class AuthenticationFilter implements Filter {
         }
 
         if (!isValidToken) {
+            log.info("AuthenticationFilter.doFilter !isValidToken called");
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }

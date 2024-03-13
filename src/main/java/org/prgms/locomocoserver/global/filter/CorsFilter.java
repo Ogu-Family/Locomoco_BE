@@ -3,12 +3,14 @@ package org.prgms.locomocoserver.global.filter;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 import java.io.IOException;
 
+@Slf4j
 @Configuration
 @Order(1)
 public class CorsFilter implements Filter {
@@ -17,6 +19,8 @@ public class CorsFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
+
+        log.info("CorsFilter.doFilter called");
 
         response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -27,6 +31,7 @@ public class CorsFilter implements Filter {
         response.setHeader("Access-Control-Expose-Headers", "Authorization, provider");
 
         if("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            log.info("CorsFilter.doFilter OPTION called");
             response.setStatus(HttpServletResponse.SC_OK);
         } else {
             chain.doFilter(req, res);
