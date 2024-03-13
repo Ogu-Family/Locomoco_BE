@@ -12,16 +12,14 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Slf4j
-@Order(1)
 @Component
 public class CorsFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        log.info("CorsFilter.doFilter START");
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
-
-        log.info("CorsFilter.doFilter called");
 
         response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         response.setHeader("Access-Control-Allow-Credentials", "true");

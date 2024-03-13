@@ -21,15 +21,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Slf4j
-@Order(3)
 @Component
 public class ExceptionHandlerFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        log.info("ExceptionHandlerFilter START");
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
-        log.info("ExceptionHandlerFilter.doFilterInternal called");
         try{
             chain.doFilter(request, response);
         }catch (ExpiredTokenException e){
