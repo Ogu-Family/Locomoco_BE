@@ -115,7 +115,9 @@ public class ChatRoomService {
             .chatRoom(chatRoom).build());
 
         chatRoom.addChatParticipant(chatParticipant);
+        chatRoomRepository.save(chatRoom);
+        chatMessageRepository.save(toEnterMessage(chatRoom, requestDto.creator()));
 
-        return chatRoomRepository.save(chatRoom);
+        return chatRoom;
     }
 }
