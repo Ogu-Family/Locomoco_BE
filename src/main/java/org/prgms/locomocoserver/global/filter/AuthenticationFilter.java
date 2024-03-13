@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.prgms.locomocoserver.global.exception.ExpiredTokenException;
+import org.prgms.locomocoserver.global.exception.InvalidTokenException;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
 import org.prgms.locomocoserver.user.domain.enums.Provider;
 import org.prgms.locomocoserver.user.exception.UserErrorType;
@@ -70,8 +72,15 @@ public class AuthenticationFilter implements Filter {
                 return;
             }
 
+        } catch (ExpiredTokenException e) {
+            log.info("AuthenticationFilter.doFilter : " + e.getMessage());
+            throw new ExpiredTokenException(e.getMessage());
+        } catch (InvalidTokenException e) {
+            log.info("AuthenticationFilter.doFilter : "  + e.getMessage());
+            throw new InvalidTokenException(e.getMessage());
         } catch (Exception e) {
-            chain.doFilter(request, response);
+            log.info("AuthenticationFilter.doFilter : "  + e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
         }
 
         chain.doFilter(request, response);
