@@ -4,16 +4,16 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.prgms.locomocoserver.global.exception.ExpiredTokenException;
-import org.prgms.locomocoserver.global.exception.InvalidTokenException;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
 import org.prgms.locomocoserver.user.domain.enums.Provider;
 import org.prgms.locomocoserver.user.exception.UserErrorType;
 import org.prgms.locomocoserver.user.exception.UserException;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Order(2)
 @Component
 @RequiredArgsConstructor
 public class AuthenticationFilter implements Filter {
@@ -44,29 +44,24 @@ public class AuthenticationFilter implements Filter {
         }
 
         Provider provider = Provider.valueOf(providerValue.toUpperCase());
-        try {
-            boolean isValidToken = false;
-            switch (provider) {
-                case KAKAO:
-                    isValidToken = authenticationService.authenticateKakaoUser(accessToken);
-                    break;
-                case GITHUB:
-                    isValidToken = authenticationService.authenticateGithubUser(accessToken);
-                    break;
-                default:  // 잘못된 Provider
-                    throw new UserException(UserErrorType.PROVIDER_TYPE_ERROR);
-            }
 
-            if (!isValidToken) {
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-            }
-
-            chain.doFilter(request, response);
-        } catch (ExpiredTokenException e) {
-            httpResponse.sendError(1401, e.getMessage());
-        } catch (InvalidTokenException e) {
-            httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        boolean isValidToken = false;
+        switch (provider) {
+            case KAKAO:
+                isValidToken = authenticationService.authenticateKakaoUser(accessToken);
+                break;
+            case GITHUB:
+                isValidToken = authenticationService.authenticateGithubUser(accessToken);
+                break;
+            default:  // 잘못된 Provider
+                throw new UserException(UserErrorType.PROVIDER_TYPE_ERROR);
         }
+
+        if (!isValidToken) {
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        chain.doFilter(request, response);
     }
 }
