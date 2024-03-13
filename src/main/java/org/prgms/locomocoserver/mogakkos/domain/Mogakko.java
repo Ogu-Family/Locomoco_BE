@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.inquiries.domain.Inquiry;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
@@ -78,10 +80,13 @@ public class Mogakko extends BaseEntity {
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
+    @OneToOne(mappedBy = "mogakko")
+    private ChatRoom chatRoom;
+
     public Mogakko(Long id, String title, String content, LocalDateTime startTime,
         LocalDateTime endTime, LocalDateTime deadline, int likeCount, int maxParticipants,
         long views, List<MogakkoTag> mogakkoTags, List<Participant> participants,
-        List<Inquiry> inquiries, User creator) {
+        List<Inquiry> inquiries, User creator, ChatRoom chatRoom) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -95,6 +100,7 @@ public class Mogakko extends BaseEntity {
         this.participants = participants;
         this.inquiries = inquiries;
         this.creator = creator;
+        this.chatRoom = chatRoom;
     }
 
     public void addMogakkoTag(MogakkoTag mogakkoTag) {
@@ -111,6 +117,10 @@ public class Mogakko extends BaseEntity {
 
     public void updateCreator(User creator) {
         this.creator = creator;
+    }
+
+    public void updateChatRoom(ChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
     }
 
     public boolean isSameCreatorId(Long creatorId) {
