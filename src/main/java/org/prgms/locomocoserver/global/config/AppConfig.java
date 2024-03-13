@@ -22,7 +22,7 @@ public class AppConfig {
     @Bean
     public FilterRegistrationBean<AuthenticationFilter> accessTokenFilterRegistration(AuthenticationFilter filter) {
         FilterRegistrationBean<AuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setOrder(2);
+        registrationBean.setOrder(3);
         registrationBean.setFilter(filter);
         registrationBean.addUrlPatterns("/api/v1/chats/rooms/*"); // 필터를 적용할 URL 패턴 지정
         return registrationBean;
@@ -31,7 +31,7 @@ public class AppConfig {
     @Bean
     public FilterRegistrationBean<ExceptionHandlerFilter> ExceptionHandlerFilterRegistration(ExceptionHandlerFilter filter) {
         FilterRegistrationBean<ExceptionHandlerFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setOrder(3);
+        registrationBean.setOrder(2);
         registrationBean.setFilter(filter);
         return registrationBean;
     }
