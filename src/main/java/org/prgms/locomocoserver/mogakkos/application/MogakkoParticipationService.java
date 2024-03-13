@@ -3,6 +3,8 @@ package org.prgms.locomocoserver.mogakkos.application;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.prgms.locomocoserver.chat.application.ChatRoomService;
+import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
@@ -19,6 +21,7 @@ public class MogakkoParticipationService {
     private final ParticipantRepository participantRepository;
     private final MogakkoService mogakkoService;
     private final UserService userService;
+    private final ChatRoomService chatRoomService;
 
     public ParticipationCheckingDto check(Long mogakkoId, Long userId) {
         Optional<Participant> optionalParticipant = participantRepository.findByMogakkoIdAndUserId(
@@ -40,9 +43,11 @@ public class MogakkoParticipationService {
         Participant participant = Participant.builder().mogakko(mogakko).user(user).build();
         mogakko.addParticipant(participant);
         participantRepository.save(participant);
+
+        chatRoomService.enterChatRoom(new ChatEnterRequestDto(mogakko.getChatRoom().getId(), user));
     }
 
-    public void cancel(Long mogakkoId, Long userId) {
+    public void cancel(Long mogakkoId, Long userId) { // TODO: 참여 취소 시 채팅방 자동 나가기
         Mogakko mogakko = mogakkoService.getByIdNotDeleted(mogakkoId);
 
         validateIfEndTimeIsPast(mogakko);
