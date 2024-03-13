@@ -49,24 +49,29 @@ public class AuthenticationFilter implements Filter {
 
         Provider provider = Provider.valueOf(providerValue.toUpperCase());
 
-        boolean isValidToken = false;
-        switch (provider) {
-            case KAKAO:
-                log.info("AuthenticationFilter.doFilter KAKAO authenticated called");
-                isValidToken = authenticationService.authenticateKakaoUser(accessToken);
-                break;
-            case GITHUB:
-                log.info("AuthenticationFilter.doFilter GITHUB authenticated called");
-                isValidToken = authenticationService.authenticateGithubUser(accessToken);
-                break;
-            default:  // 잘못된 Provider
-                throw new UserException(UserErrorType.PROVIDER_TYPE_ERROR);
-        }
+        try {
+            boolean isValidToken = false;
+            switch (provider) {
+                case KAKAO:
+                    log.info("AuthenticationFilter.doFilter KAKAO authenticated called");
+                    isValidToken = authenticationService.authenticateKakaoUser(accessToken);
+                    break;
+                case GITHUB:
+                    log.info("AuthenticationFilter.doFilter GITHUB authenticated called");
+                    isValidToken = authenticationService.authenticateGithubUser(accessToken);
+                    break;
+                default:  // 잘못된 Provider
+                    throw new UserException(UserErrorType.PROVIDER_TYPE_ERROR);
+            }
 
-        if (!isValidToken) {
-            log.info("AuthenticationFilter.doFilter !isValidToken called");
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+            if (!isValidToken) {
+                log.info("AuthenticationFilter.doFilter !isValidToken called");
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+
+        } catch (Exception e) {
+            chain.doFilter(request, response);
         }
 
         chain.doFilter(request, response);
