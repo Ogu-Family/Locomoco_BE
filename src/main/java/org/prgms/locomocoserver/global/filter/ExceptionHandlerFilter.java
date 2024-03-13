@@ -3,6 +3,8 @@ package org.prgms.locomocoserver.global.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
@@ -13,6 +15,7 @@ import org.prgms.locomocoserver.global.exception.InvalidTokenException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -20,25 +23,23 @@ import java.io.IOException;
 @Slf4j
 @Order(3)
 @Component
-public class ExceptionHandlerFilter extends OncePerRequestFilter {
+public class ExceptionHandlerFilter extends GenericFilterBean {
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+
         log.info("ExceptionHandlerFilter.doFilterInternal called");
         try{
-            filterChain.doFilter(request, response);
+            chain.doFilter(request, response);
         }catch (ExpiredTokenException e){
             //토큰의 유효기간 만료
             log.info("ExceptionHandlerFilter - ExpiredTokenException: " + e.getMessage());
-            setErrorResponse(response, ErrorCode.ACCESSTOKEN_EXPIRED);
+            setErrorResponse(httpServletResponse, ErrorCode.ACCESSTOKEN_EXPIRED);
         }catch (InvalidTokenException | IllegalArgumentException e){
             //유효하지 않은 토큰
             log.info("ExceptionHandlerFilter - InvalidTokenException: " + e.getMessage());
-            setErrorResponse(response, ErrorCode.INVALID_TOKEN);
+            setErrorResponse(httpServletResponse, ErrorCode.INVALID_TOKEN);
         }
     }
     private void setErrorResponse(
