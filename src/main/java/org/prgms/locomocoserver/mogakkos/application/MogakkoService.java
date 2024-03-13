@@ -47,7 +47,7 @@ public class MogakkoService {
     private final MogakkoTagRepository mogakkoTagRepository;
     private final MogakkoLikeRepository likeRepository;
 
-    public Long save(MogakkoCreateRequestDto requestDto) {
+    public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) {
         Mogakko mogakko = createMogakkoBy(requestDto);
 
         Location location = requestDto.toLocation();
@@ -59,7 +59,7 @@ public class MogakkoService {
         Mogakko savedMogakko = mogakkoRepository.save(mogakko);
         locationRepository.save(location);
 
-        return savedMogakko.getId();
+        return new MogakkoCreateResponseDto(savedMogakko.getId());
     }
 
     public MogakkoDetailResponseDto findDetail(Long id) {
