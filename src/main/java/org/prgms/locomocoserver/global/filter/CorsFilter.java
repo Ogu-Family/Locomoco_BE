@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order;
 import java.io.IOException;
 
 @Configuration
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(1)
 public class CorsFilter implements Filter {
 
     @Override
