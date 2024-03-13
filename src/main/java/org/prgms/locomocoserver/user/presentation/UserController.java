@@ -7,14 +7,13 @@ import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
+import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
 import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "User Controller", description = "사용자 컨트롤러")
@@ -28,8 +27,9 @@ public class UserController {
     @Operation(summary = "사용자 초기 회원가입", description = "사용자 id로 초기 정보를 입력합니다.")
     @PutMapping("/users/init/{userId}")
     public ResponseEntity<UserInfoDto> getInitInfo(@PathVariable Long userId,
-                                                   @RequestBody UserInitInfoRequestDto requestDto) {
-        UserInfoDto userInfoDto = userService.getInitInfo(userId, requestDto);
+                                                   @RequestPart("requestDto") UserInitInfoRequestDto requestDto,
+                                                   @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
+        UserInfoDto userInfoDto = userService.insertInitInfo(userId, requestDto, multipartFile);
         return ResponseEntity.ok(userInfoDto);
     }
 
@@ -72,6 +72,15 @@ public class UserController {
     public ResponseEntity<List<MogakkoSimpleInfoResponseDto>> getLikedMogakkos(@PathVariable Long userId) {
         List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = userService.getLikedMogakkos(userId);
         return ResponseEntity.ok(mogakkoInfoDtos);
+    }
+
+    @Operation(summary = "사용자 정보 수정", description = "프로필 이미지, 닉네임, 성별, 생년월일, 직업을 수정할 수 있습니다.")
+    @PatchMapping("/users/{userId}")
+    public ResponseEntity<UserInfoDto> updateUserInfo(@PathVariable Long userId,
+                                                      @RequestPart("requestDto") UserUpdateRequest requestDto,
+                                                      @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
+        UserInfoDto userInfoDto = userService.updateUserInfo(userId, requestDto, multipartFile);
+        return ResponseEntity.ok(userInfoDto);
     }
 
     @Operation(summary = "프로필 이미지 업로드", description = "사용자의 프로필 이미지를 업로드 합니다.")

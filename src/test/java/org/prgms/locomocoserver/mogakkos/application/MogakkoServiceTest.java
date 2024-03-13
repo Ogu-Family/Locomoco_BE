@@ -40,6 +40,7 @@ import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
 import org.prgms.locomocoserver.tags.domain.Tag;
@@ -162,11 +163,11 @@ class MogakkoServiceTest {
             List.of(tagIds.get(0), tagIds.get(1), tagIds.get(2)));
 
         // when
-        Long savedMogakkoId = mogakkoService.save(mogakkoCreateRequestDto);
+        MogakkoCreateResponseDto responseDto = mogakkoService.save(mogakkoCreateRequestDto);
 
         // then
         Optional<Mogakko> mogakkoOptional = mogakkoRepository.findByIdAndDeletedAtIsNull(
-            savedMogakkoId);
+            responseDto.id());
         assertThat(mogakkoOptional.isPresent()).isTrue();
 
         Mogakko createdMogakko = mogakkoOptional.get();

@@ -18,11 +18,7 @@ import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository
 import org.prgms.locomocoserver.mogakkos.dto.SearchRepositoryDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoParticipantDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.*;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -48,7 +44,7 @@ public class MogakkoService {
     private final ChatRoomService chatRoomService;
 
     @Transactional
-    public Long save(MogakkoCreateRequestDto requestDto) {
+    public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) {
         Mogakko mogakko = createMogakkoBy(requestDto);
 
         Location location = requestDto.toLocation();
@@ -62,7 +58,7 @@ public class MogakkoService {
 
         chatRoomService.createChatRoom(new ChatCreateRequestDto(savedMogakko, creator));
 
-        return savedMogakko.getId();
+        return new MogakkoCreateResponseDto(savedMogakko.getId());
     }
 
     public MogakkoDetailResponseDto findDetail(Long id) {
