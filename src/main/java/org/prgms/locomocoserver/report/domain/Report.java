@@ -22,7 +22,7 @@ public class Report extends BaseEntity {
     @JoinColumn(name = "reporter_id")
     User reporter;
 
-    @Column(name = "reproted_id")
+    @Column(name = "reported_id")
     Long reportedId;
 
     @Column(name = "content")
