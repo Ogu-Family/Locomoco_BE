@@ -12,6 +12,7 @@ import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.application.SearchType;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoLikeDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
@@ -51,15 +52,15 @@ public class MogakkoController {
         return ResponseEntity.ok(results);
     }
 
-    @PutMapping("/mogakko/map")
+    @PostMapping("/mogakko/map")
     @Operation(summary = "모각코 생성", description = "생성에 필요한 값을 받아 모각코를 생성합니다.")
     @ApiResponses(
             @ApiResponse(responseCode = "200", description = "모각코 생성 성공")
     )
-    public ResponseEntity<Void> create(@RequestBody MogakkoCreateRequestDto requestDto) {
-        mogakkoService.save(requestDto);
+    public ResponseEntity<MogakkoCreateResponseDto> create(@RequestBody MogakkoCreateRequestDto requestDto) {
+        MogakkoCreateResponseDto responseDto = mogakkoService.save(requestDto);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/mogakko/map/{id}")
