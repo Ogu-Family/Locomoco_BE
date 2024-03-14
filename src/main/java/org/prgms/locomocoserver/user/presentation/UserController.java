@@ -79,7 +79,7 @@ public class UserController {
     }
 
     @Operation(summary = "사용자 정보 수정", description = "프로필 이미지, 닉네임, 성별, 생년월일, 직업을 수정할 수 있습니다.")
-    @PatchMapping("/users/{userId}")
+    @PatchMapping(value = "/users/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserInfoDto> updateUserInfo(@PathVariable Long userId,
                                                       @RequestPart("requestDto") UserUpdateRequest requestDto,
                                                       @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
