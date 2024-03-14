@@ -12,6 +12,7 @@ public record ChatMessageDto(
         String senderNickName,
         String senderProfileImage,
         String message,
+        boolean isNotice,
         LocalDateTime createdAt
 ) {
     public static ChatMessageDto of(ChatMessage chatMessage) {
@@ -21,7 +22,7 @@ public record ChatMessageDto(
             profileImagePath = sender.getProfileImage().getPath();
         }
         return new ChatMessageDto(chatMessage.getId(), chatMessage.getChatRoom().getId(), sender.getId(),
-                sender.getNickname(), profileImagePath, chatMessage.getContent(), chatMessage.getCreatedAt());
+                sender.getNickname(), profileImagePath, chatMessage.getContent(), chatMessage.isNotice(), chatMessage.getCreatedAt());
     }
 }
 

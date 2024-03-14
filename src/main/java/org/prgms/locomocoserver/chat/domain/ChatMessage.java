@@ -26,13 +26,17 @@ public class ChatMessage extends BaseEntity {
     @JoinColumn(name = "chat_rooms_id")
     private ChatRoom chatRoom;
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "isNotice", nullable = false)
+    private boolean isNotice;
+
     @Builder
-    public ChatMessage(User sender, ChatRoom chatRoom, String content) {
+    public ChatMessage(User sender, ChatRoom chatRoom, String content, boolean isNotice) {
         this.sender = sender;
         this.chatRoom = chatRoom;
         this.content = content;
+        this.isNotice = isNotice;
     }
 }

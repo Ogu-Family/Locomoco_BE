@@ -15,6 +15,8 @@ import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
+import org.prgms.locomocoserver.chat.exception.ChatErrorType;
+import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
@@ -47,9 +49,9 @@ public class ChatRoomService {
     @Transactional
     public ChatMessageDto saveChatMessage(ChatMessageRequestDto requestDto) {
         User sender = userService.getById(requestDto.senderId());
-        ChatRoom chatRoom = getById(requestDto.chatRoomId()); // updatedAt 갱신
+        ChatRoom chatRoom = getById(requestDto.chatRoomId());
 
-        ChatMessage chatMessage = chatMessageRepository.save(requestDto.toChatMessageEntity(sender, chatRoom));
+        ChatMessage chatMessage = chatMessageRepository.save(requestDto.toChatMessageEntity(sender, chatRoom, false));
         chatRoom.updateUpdatedAt();
         return ChatMessageDto.of(chatMessage);
     }
@@ -91,7 +93,7 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public ChatRoom getById(Long id) {
         return chatRoomRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new IllegalArgumentException("ChatRoom Not Found chatRoomId: " + id));
+                .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
     }
 
     private boolean isParticipantExist(ChatRoom chatRoom, User user) {
@@ -101,7 +103,7 @@ public class ChatRoomService {
 
     private ChatMessage toEnterMessage(ChatRoom chatRoom, User participant) {
         return ChatMessage.builder().chatRoom(chatRoom).sender(
-            participant).content(participant.getNickname() + "님이 입장하셨습니다.").build();
+            participant).content(participant.getNickname() + "님이 입장하셨습니다.").isNotice(true).build();
     }
 
     private ChatMessage getLastMessage(Long roomId) {
