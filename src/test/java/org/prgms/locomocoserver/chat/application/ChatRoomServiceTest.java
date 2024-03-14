@@ -21,6 +21,7 @@ import org.prgms.locomocoserver.location.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
+import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.user.domain.User;
@@ -54,9 +55,12 @@ class ChatRoomServiceTest {
     private ChatMessageRepository chatMessageRepository;
     @Autowired
     private LocationRepository locationRepository;
+    @Autowired
+    private ParticipantRepository participantRepository;
 
     @AfterEach
     void tearDown() {
+        participantRepository.deleteAll();
         locationRepository.deleteAll();
         chatMessageRepository.deleteAll();
         chatParticipantRepository.deleteAll();

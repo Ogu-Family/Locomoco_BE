@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
+import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
 import org.prgms.locomocoserver.location.domain.Location;
 import org.prgms.locomocoserver.location.domain.LocationRepository;
@@ -18,6 +19,7 @@ import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository
 import org.prgms.locomocoserver.mogakkos.dto.SearchRepositoryDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
+import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.*;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
@@ -42,6 +44,7 @@ public class MogakkoService {
     private final LocationRepository locationRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
     private final ChatRoomService chatRoomService;
+    private final MogakkoParticipationService mogakkoParticipationService;
 
     @Transactional
     public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) {
@@ -56,7 +59,11 @@ public class MogakkoService {
         Mogakko savedMogakko = mogakkoRepository.save(mogakko);
         locationRepository.save(location);
 
-        chatRoomService.createChatRoom(new ChatCreateRequestDto(savedMogakko, creator));
+        ChatRoom chatRoom = chatRoomService.createChatRoom(
+            new ChatCreateRequestDto(savedMogakko, creator));
+        savedMogakko.updateChatRoom(chatRoom);
+        mogakkoParticipationService.participate(savedMogakko.getId(), new ParticipationRequestDto(
+            requestDto.creatorId()));
 
         return new MogakkoCreateResponseDto(savedMogakko.getId());
     }

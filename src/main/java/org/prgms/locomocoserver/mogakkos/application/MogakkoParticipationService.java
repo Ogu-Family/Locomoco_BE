@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
+import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class MogakkoParticipationService {
 
     private final ParticipantRepository participantRepository;
-    private final MogakkoService mogakkoService;
+    private final MogakkoRepository mogakkoRepository;
     private final UserService userService;
     private final ChatRoomService chatRoomService;
 
@@ -35,7 +36,8 @@ public class MogakkoParticipationService {
     }
 
     public void participate(Long mogakkoId, ParticipationRequestDto requestDto) {
-        Mogakko mogakko = mogakkoService.getByIdNotDeleted(mogakkoId);
+        Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
+            .orElseThrow(RuntimeException::new); // TODO: 모각코 에러 반환
         User user = userService.getById(requestDto.userId());
 
         validateIfDeadlineIsPast(mogakko);
@@ -48,7 +50,8 @@ public class MogakkoParticipationService {
     }
 
     public void cancel(Long mogakkoId, Long userId) { // TODO: 참여 취소 시 채팅방 자동 나가기
-        Mogakko mogakko = mogakkoService.getByIdNotDeleted(mogakkoId);
+        Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
+            .orElseThrow(RuntimeException::new); // TODO: 모각코 에러 반환
 
         validateIfEndTimeIsPast(mogakko);
 
