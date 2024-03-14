@@ -122,4 +122,11 @@ public class ChatRoomService {
 
         return chatRoom;
     }
+
+    @Transactional(readOnly = true)
+    public Long getChatRoomIdByMogakkoId(Long mogakkoId) {
+        ChatRoom chatRoom = chatRoomRepository.findByMogakkoId(mogakkoId)
+                .orElseThrow(() -> new IllegalArgumentException("Mogakko has no ChatRoom"));
+        return chatRoom.getId();
+    }
 }
