@@ -3,12 +3,12 @@ package org.prgms.locomocoserver.user.presentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
 import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
+import org.prgms.locomocoserver.user.dto.response.UserMyPageDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,22 +48,25 @@ public class UserController {
 
     @Operation(summary = "마이페이지 정보", description = "사용자 마이페이지 정보를 반환합니다.")
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserInfoDto> getUserInfo(@PathVariable Long userId) {
-        UserInfoDto userInfoDto = userService.getUserInfo(userId);
-        return ResponseEntity.ok(userInfoDto);
+    public ResponseEntity<UserMyPageDto> getUserInfo(@PathVariable Long userId) {
+        UserMyPageDto myPageDto = userService.getUserInfo(userId);
+
+        return ResponseEntity.ok(myPageDto);
     }
 
     @Operation(summary = "진행중인 모각코 목록 조회", description = "사용자가 진행중인 모각코 목록을 조회합니다.")
     @GetMapping("/users/{userId}/mogakko/ongoing")
-    public ResponseEntity<List<MogakkoInfoDto>> getOngoingMogakkos(@PathVariable Long userId) {
-        List<MogakkoInfoDto> mogakkoInfoDtos = userService.getOngoingMogakkos(userId);
+    public ResponseEntity<List<MogakkoSimpleInfoResponseDto>> getOngoingMogakkos(@PathVariable Long userId) {
+        List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = userService.getOngoingMogakkos(userId);
+
         return ResponseEntity.ok(mogakkoInfoDtos);
     }
 
     @Operation(summary = "종료된 모각코 목록 조회", description = "사용자가 참여했던 모각코 목록을 조회합니다.")
     @GetMapping("/users/{userId}/mogakko/complete")
-    public ResponseEntity<List<MogakkoInfoDto>> getCompleteMogakkos(@PathVariable Long userId) {
-        List<MogakkoInfoDto> mogakkoInfoDtos = userService.getCompletedMogakkos(userId);
+    public ResponseEntity<List<MogakkoSimpleInfoResponseDto>> getCompleteMogakkos(@PathVariable Long userId) {
+        List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = userService.getCompletedMogakkos(userId);
+
         return ResponseEntity.ok(mogakkoInfoDtos);
     }
 
