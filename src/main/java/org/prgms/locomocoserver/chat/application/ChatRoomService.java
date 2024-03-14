@@ -49,7 +49,7 @@ public class ChatRoomService {
         User sender = userService.getById(requestDto.senderId());
         ChatRoom chatRoom = getById(requestDto.chatRoomId()); // updatedAt 갱신
 
-        ChatMessage chatMessage = chatMessageRepository.save(requestDto.toChatMessageEntity(sender, chatRoom));
+        ChatMessage chatMessage = chatMessageRepository.save(requestDto.toChatMessageEntity(sender, chatRoom, false));
         chatRoom.updateUpdatedAt();
         return ChatMessageDto.of(chatMessage);
     }
@@ -101,7 +101,7 @@ public class ChatRoomService {
 
     private ChatMessage toEnterMessage(ChatRoom chatRoom, User participant) {
         return ChatMessage.builder().chatRoom(chatRoom).sender(
-            participant).content(participant.getNickname() + "님이 입장하셨습니다.").build();
+            participant).content(participant.getNickname() + "님이 입장하셨습니다.").isNotice(true).build();
     }
 
     private ChatMessage getLastMessage(Long roomId) {
