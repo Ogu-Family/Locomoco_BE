@@ -14,6 +14,7 @@ import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.likes.MogakkoLikeRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
+import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.user.domain.User;
@@ -26,6 +27,7 @@ import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
 import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
 import org.prgms.locomocoserver.user.dto.response.UserLoginResponse;
+import org.prgms.locomocoserver.user.dto.response.UserMyPageDto;
 import org.prgms.locomocoserver.user.exception.UserErrorType;
 import org.prgms.locomocoserver.user.exception.UserException;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,7 @@ public class UserService {
     private final LocationRepository locationRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
     private final MogakkoLikeRepository mogakkoLikeRepository;
+    private final ParticipantRepository participantRepository;
     private final ImageService imageService;
 
     @Transactional
@@ -96,9 +99,14 @@ public class UserService {
         return UserInfoDto.of(user);
     }
 
-    public UserInfoDto getUserInfo(Long userId) {
+    public UserMyPageDto getUserInfo(Long userId) {
+        LocalDateTime now = LocalDateTime.now();
         User user = getById(userId);
-        return UserInfoDto.of(user);
+        long likeMogakkoCount = mogakkoLikeRepository.countByUser(user);
+        long ongoingCount = participantRepository.countOngoingByUser(user, now);
+        long completeCount = participantRepository.countCompleteByUser(user, now);
+
+        return UserMyPageDto.create(user, likeMogakkoCount, ongoingCount, completeCount);
     }
 
     public List<MogakkoInfoDto> getOngoingMogakkos(Long userId) {
