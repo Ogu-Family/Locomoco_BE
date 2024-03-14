@@ -9,6 +9,7 @@ import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
 import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
 import org.prgms.locomocoserver.user.dto.response.UserMyPageDto;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +26,7 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "사용자 초기 회원가입", description = "사용자 id로 초기 정보를 입력합니다.")
-    @PutMapping("/users/init/{userId}")
+    @PutMapping(value = "/users/init/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserInfoDto> getInitInfo(@PathVariable Long userId,
                                                    @RequestPart("requestDto") UserInitInfoRequestDto requestDto,
                                                    @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
