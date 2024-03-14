@@ -3,7 +3,6 @@ package org.prgms.locomocoserver.user.presentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
@@ -57,15 +56,17 @@ public class UserController {
 
     @Operation(summary = "진행중인 모각코 목록 조회", description = "사용자가 진행중인 모각코 목록을 조회합니다.")
     @GetMapping("/users/{userId}/mogakko/ongoing")
-    public ResponseEntity<List<MogakkoInfoDto>> getOngoingMogakkos(@PathVariable Long userId) {
-        List<MogakkoInfoDto> mogakkoInfoDtos = userService.getOngoingMogakkos(userId);
+    public ResponseEntity<List<MogakkoSimpleInfoResponseDto>> getOngoingMogakkos(@PathVariable Long userId) {
+        List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = userService.getOngoingMogakkos(userId);
+
         return ResponseEntity.ok(mogakkoInfoDtos);
     }
 
     @Operation(summary = "종료된 모각코 목록 조회", description = "사용자가 참여했던 모각코 목록을 조회합니다.")
     @GetMapping("/users/{userId}/mogakko/complete")
-    public ResponseEntity<List<MogakkoInfoDto>> getCompleteMogakkos(@PathVariable Long userId) {
-        List<MogakkoInfoDto> mogakkoInfoDtos = userService.getCompletedMogakkos(userId);
+    public ResponseEntity<List<MogakkoSimpleInfoResponseDto>> getCompleteMogakkos(@PathVariable Long userId) {
+        List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = userService.getCompletedMogakkos(userId);
+
         return ResponseEntity.ok(mogakkoInfoDtos);
     }
 
