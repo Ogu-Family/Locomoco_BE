@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ChatErrorType {
-    NO_CONTENT(HttpStatus.NO_CONTENT, "Chat Message has No Content")
+    CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "Chat Room does not exist")
     ;
 
     private final HttpStatus status;
