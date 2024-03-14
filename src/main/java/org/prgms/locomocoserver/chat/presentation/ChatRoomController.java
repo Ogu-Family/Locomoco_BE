@@ -37,4 +37,11 @@ public class ChatRoomController {
         return ResponseEntity.ok(chatMessageDtos);
     }
 
+    @Operation(summary = "모각코 id로 채팅방 id 조회", description = "모각코와 연결되어 있는 채팅방 id를 반환합니다.")
+    @GetMapping("/chats/room/mogakko/{mogakkoId}")
+    public ResponseEntity<Long> getChatRoomIdByMogakkoId(@PathVariable Long mogakkoId) {
+        Long chatRoomId = chatRoomService.getChatRoomIdByMogakkoId(mogakkoId);
+        return ResponseEntity.ok(chatRoomId);
+    }
+
 }
