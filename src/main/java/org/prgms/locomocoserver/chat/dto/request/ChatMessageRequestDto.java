@@ -17,11 +17,12 @@ public record ChatMessageRequestDto(
         @NotBlank
         String message // TODO: 글자수 초과 시 예외 처리
 ) {
-    public ChatMessage toChatMessageEntity(User sender, ChatRoom chatRoom) {
+    public ChatMessage toChatMessageEntity(User sender, ChatRoom chatRoom, boolean isNotice) {
         return ChatMessage.builder()
                 .sender(sender)
                 .chatRoom(chatRoom)
-                .content(message).build();
+                .content(message)
+                .isNotice(isNotice).build();
     }
 
 }
