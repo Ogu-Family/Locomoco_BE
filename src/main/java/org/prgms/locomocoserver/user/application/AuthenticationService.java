@@ -41,7 +41,7 @@ public class AuthenticationService {
         } catch (HttpClientErrorException.Unauthorized e) {
             log.error("AuthenticationService - Unauthorized Exception: " + e.getMessage());
             if (e.getMessage().contains("expire")) throw new ExpiredTokenException(ErrorCode.ACCESSTOKEN_EXPIRED);
-            throw new AuthException(ErrorCode.UNAUTHORIZED);
+            throw new AuthException(ErrorCode.UNAUTHORIZED, e.getMessage());
         } catch (HttpClientErrorException.BadRequest e) {
             log.error("AuthenticationService - BadRequest Exception: " + e.getMessage());
             throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
