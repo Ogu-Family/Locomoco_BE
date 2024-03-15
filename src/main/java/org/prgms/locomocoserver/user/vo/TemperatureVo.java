@@ -1,6 +1,8 @@
 package org.prgms.locomocoserver.user.vo;
 
 import lombok.Getter;
+import org.prgms.locomocoserver.user.exception.UserErrorType;
+import org.prgms.locomocoserver.user.exception.UserException;
 
 @Getter
 public class TemperatureVo {
@@ -8,7 +10,7 @@ public class TemperatureVo {
 
     public TemperatureVo(double temperature) {
         if (!isValidTemperature(temperature)) {
-            throw new IllegalArgumentException("Invalid temperature");
+            throw new UserException(UserErrorType.TEMPERATURE_TYPE_ERROR);
         }
         this.temperature = temperature;
     }
