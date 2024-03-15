@@ -47,6 +47,19 @@ public class ChatRoomService {
     }
 
     @Transactional
+    public ChatRoom createChatRoom(ChatCreateRequestDto requestDto) {
+        ChatRoom chatRoom = requestDto.toChatRoomEntity();
+        ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.creator())
+                .chatRoom(chatRoom).build());
+
+        chatRoom.addChatParticipant(chatParticipant);
+        chatRoomRepository.save(chatRoom);
+        chatMessageRepository.save(toEnterMessage(chatRoom, requestDto.creator()));
+
+        return chatRoom;
+    }
+
+    @Transactional
     public ChatMessageDto saveChatMessage(ChatMessageRequestDto requestDto) {
         User sender = userService.getById(requestDto.senderId());
         ChatRoom chatRoom = getById(requestDto.chatRoomId());
@@ -96,6 +109,13 @@ public class ChatRoomService {
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
+    public Long getChatRoomIdByMogakkoId(Long mogakkoId) {
+        ChatRoom chatRoom = chatRoomRepository.findByMogakkoId(mogakkoId)
+                .orElseThrow(() -> new IllegalArgumentException("Mogakko has no ChatRoom"));
+        return chatRoom.getId();
+    }
+
     private boolean isParticipantExist(ChatRoom chatRoom, User user) {
         return chatRoom.getChatParticipants().stream()
                 .anyMatch(chatParticipant -> chatParticipant.getUser().getId().equals(user.getId()));
@@ -108,25 +128,5 @@ public class ChatRoomService {
 
     private ChatMessage getLastMessage(Long roomId) {
         return chatMessageRepository.findLastMessageByRoomId(roomId);
-    }
-
-    @Transactional
-    public ChatRoom createChatRoom(ChatCreateRequestDto requestDto) {
-        ChatRoom chatRoom = requestDto.toChatRoomEntity();
-        ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.creator())
-            .chatRoom(chatRoom).build());
-
-        chatRoom.addChatParticipant(chatParticipant);
-        chatRoomRepository.save(chatRoom);
-        chatMessageRepository.save(toEnterMessage(chatRoom, requestDto.creator()));
-
-        return chatRoom;
-    }
-
-    @Transactional(readOnly = true)
-    public Long getChatRoomIdByMogakkoId(Long mogakkoId) {
-        ChatRoom chatRoom = chatRoomRepository.findByMogakkoId(mogakkoId)
-                .orElseThrow(() -> new IllegalArgumentException("Mogakko has no ChatRoom"));
-        return chatRoom.getId();
     }
 }
