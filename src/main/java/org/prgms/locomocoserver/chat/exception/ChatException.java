@@ -10,4 +10,9 @@ public class ChatException extends RuntimeException{
         super(type.getMessage());
         this.errorType = type;
     }
+
+    public ChatException(ChatErrorType type, String message) {
+        super(message);
+        this.errorType = type;
+    }
 }
