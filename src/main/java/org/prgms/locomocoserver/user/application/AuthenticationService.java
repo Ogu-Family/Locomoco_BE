@@ -51,7 +51,7 @@ public class AuthenticationService {
         }
     }
 
-    public boolean authenticateKakaoUser(String accessToken) {
+    private boolean authenticateKakaoUser(String accessToken) {
         String url = "https://kapi.kakao.com/v1/user/access_token_info";
         log.info("AuthenticationService - authenticateKakaoUser");
 
@@ -66,7 +66,7 @@ public class AuthenticationService {
         return response.getStatusCode() == HttpStatus.OK;
     }
 
-    public boolean authenticateGithubUser(String accessToken) {
+    private boolean authenticateGithubUser(String accessToken) {
         String url = "https://api.github.com/applications/Iv1.8a61f9b3a7aba766/token";
         log.info("AuthenticationService - authenticateGithubUser");
 
