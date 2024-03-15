@@ -1,7 +1,9 @@
 package org.prgms.locomocoserver.global.exception;
 
 public class InvalidTokenException extends RuntimeException {
-    public InvalidTokenException(String message) {
-        super(message);
+    private ErrorCode errorCode;
+    public InvalidTokenException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 }
