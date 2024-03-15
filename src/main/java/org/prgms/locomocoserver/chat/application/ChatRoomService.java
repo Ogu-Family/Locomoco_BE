@@ -1,15 +1,7 @@
 package org.prgms.locomocoserver.chat.application;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.prgms.locomocoserver.chat.domain.ChatMessage;
-import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
-import org.prgms.locomocoserver.chat.domain.ChatParticipant;
-import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
-import org.prgms.locomocoserver.chat.domain.ChatRoom;
-import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
+import org.prgms.locomocoserver.chat.domain.*;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
@@ -21,6 +13,10 @@ import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,11 +35,24 @@ public class ChatRoomService {
         if (!isParticipantExist(chatRoom, requestDto.participant())) {
             ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);
             ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.participant())
-                .chatRoom(chatRoom).build());
+                    .chatRoom(chatRoom).build());
 
             chatRoom.addChatParticipant(chatParticipant);
             stompChatService.sendToSubscribers(chatMessageDto);
         }
+    }
+
+    @Transactional
+    public ChatRoom createChatRoom(ChatCreateRequestDto requestDto) {
+        ChatRoom chatRoom = requestDto.toChatRoomEntity();
+        ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.creator())
+                .chatRoom(chatRoom).build());
+
+        chatRoom.addChatParticipant(chatParticipant);
+        chatRoomRepository.save(chatRoom);
+        chatMessageRepository.save(toEnterMessage(chatRoom, requestDto.creator()));
+
+        return chatRoom;
     }
 
     @Transactional
@@ -96,6 +105,13 @@ public class ChatRoomService {
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
+    public Long getChatRoomIdByMogakkoId(Long mogakkoId) {
+        ChatRoom chatRoom = chatRoomRepository.findByMogakkoId(mogakkoId)
+                .orElseThrow(() -> new IllegalArgumentException("Mogakko has no ChatRoom"));
+        return chatRoom.getId();
+    }
+
     private boolean isParticipantExist(ChatRoom chatRoom, User user) {
         return chatRoom.getChatParticipants().stream()
                 .anyMatch(chatParticipant -> chatParticipant.getUser().getId().equals(user.getId()));
@@ -103,30 +119,10 @@ public class ChatRoomService {
 
     private ChatMessage toEnterMessage(ChatRoom chatRoom, User participant) {
         return ChatMessage.builder().chatRoom(chatRoom).sender(
-            participant).content(participant.getNickname() + "님이 입장하셨습니다.").isNotice(true).build();
+                participant).content(participant.getNickname() + "님이 입장하셨습니다.").isNotice(true).build();
     }
 
     private ChatMessage getLastMessage(Long roomId) {
         return chatMessageRepository.findLastMessageByRoomId(roomId);
-    }
-
-    @Transactional
-    public ChatRoom createChatRoom(ChatCreateRequestDto requestDto) {
-        ChatRoom chatRoom = requestDto.toChatRoomEntity();
-        ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.creator())
-            .chatRoom(chatRoom).build());
-
-        chatRoom.addChatParticipant(chatParticipant);
-        chatRoomRepository.save(chatRoom);
-        chatMessageRepository.save(toEnterMessage(chatRoom, requestDto.creator()));
-
-        return chatRoom;
-    }
-
-    @Transactional(readOnly = true)
-    public Long getChatRoomIdByMogakkoId(Long mogakkoId) {
-        ChatRoom chatRoom = chatRoomRepository.findByMogakkoId(mogakkoId)
-                .orElseThrow(() -> new IllegalArgumentException("Mogakko has no ChatRoom"));
-        return chatRoom.getId();
     }
 }
