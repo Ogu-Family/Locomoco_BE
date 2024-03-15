@@ -20,7 +20,12 @@ import org.prgms.locomocoserver.mogakkos.dto.SearchRepositoryDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.*;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoParticipantDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -34,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class MogakkoService {
-
     private final MogakkoFindDetailService mogakkoFindDetailService;
     //private final PlatformTransactionManager transactionManager;
     private final MogakkoRepository mogakkoRepository;
@@ -95,13 +99,17 @@ public class MogakkoService {
         List<Mogakko> searchedMogakkos;
 
         if (tagIds == null || tagIds.isEmpty()) {
-            searchedMogakkos = searchPolicy.search(cursor, searchVal);
+            searchedMogakkos = searchPolicy.search(cursor, searchVal, pageSize);
         } else {
-            searchedMogakkos = searchPolicy.search(cursor, searchVal, tagIds);
+            searchedMogakkos = searchPolicy.search(cursor, searchVal, tagIds, pageSize);
         }
 
+        List<Location> locations = locationRepository.findAllByMogakkos(searchedMogakkos);
+        Map<Long, Long> mogakkoLocationMap = new HashMap<>();
+        locations.forEach(location -> mogakkoLocationMap.put(location.getMogakko().getId(), location.getId()));
+
         return searchedMogakkos.stream().map(mogakko -> {
-            Location location = locationRepository.findByMogakko(mogakko)
+            Location location = locationRepository.findById(mogakkoLocationMap.get(mogakko.getId()))
                 .orElseThrow(RuntimeException::new);
             return MogakkoSimpleInfoResponseDto.create(mogakko, location);
         }).toList();
