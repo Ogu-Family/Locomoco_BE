@@ -24,7 +24,6 @@ import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
-import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,8 +48,7 @@ class InquiryServiceTest {
         InquiryCreateRequestDto requestDto = new InquiryCreateRequestDto(userid, mogakkoId,
             content);
 
-        User user = User.builder().nickname("생성자").email("cho@gmail.com").job(
-            Job.JOB_SEEKER).birth(LocalDate.EPOCH).gender(Gender.MALE).temperature(36.5).provider("github")
+        User user = User.builder().nickname("생성자").email("cho@gmail.com").birth(LocalDate.EPOCH).gender(Gender.MALE).temperature(36.5).provider("github")
             .build();
         Mogakko mogakko = Mogakko.builder().title("title").content("제곧내").views(20).likeCount(10)
             .startTime(LocalDateTime.now()).endTime(LocalDateTime.now().plusHours(2))
@@ -79,7 +77,7 @@ class InquiryServiceTest {
         String updateContent = "updateContent";
         InquiryUpdateRequestDto requestDto = new InquiryUpdateRequestDto(userId, updateContent);
 
-        User user = User.builder().nickname("생성자").email("cho@gmail.com").job(Job.JOB_SEEKER)
+        User user = User.builder().nickname("생성자").email("cho@gmail.com")
             .birth(LocalDate.EPOCH).gender(Gender.MALE).temperature(36.5).provider("github")
             .build();
         Inquiry preInquiry = Inquiry.builder().user(user).mogakko(null).content("content").build();
