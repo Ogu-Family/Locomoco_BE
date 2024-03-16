@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.mogakkos.application.searchpolicy;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
@@ -13,12 +14,12 @@ public class TotalSearchPolicy implements SearchPolicy {
     }
 
     @Override
-    public List<Mogakko> search(Long cursor, String searchVal) {
-        return mogakkoRepository.findAllByFilter(cursor, searchVal);
+    public List<Mogakko> search(Long cursor, String searchVal, int pageSize) {
+        return mogakkoRepository.findAllByFilter(cursor, searchVal, pageSize, LocalDateTime.now());
     }
 
     @Override
-    public List<Mogakko> search(Long cursor, String searchVal, List<Long> tagIds) {
-        return mogakkoRepository.findAllByFilter(cursor, searchVal, tagIds, tagIds.size());
+    public List<Mogakko> search(Long cursor, String searchVal, List<Long> tagIds, int pageSize) {
+        return mogakkoRepository.findAllByFilter(cursor, searchVal, tagIds, tagIds.size(), pageSize, LocalDateTime.now());
     }
 }
