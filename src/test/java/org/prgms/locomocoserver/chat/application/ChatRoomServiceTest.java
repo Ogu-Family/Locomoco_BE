@@ -27,7 +27,6 @@ import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
-import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -76,7 +75,7 @@ class ChatRoomServiceTest {
         List<User> dummyUsers = new ArrayList<>();
         IntStream.rangeClosed(0, 2).forEach(i -> dummyUsers.add(
             User.builder().nickname("name" + i).email(i + "email@gmail.com").birth(LocalDate.EPOCH)
-                .temperature(36.5).provider("kakao").gender(Gender.MALE).job(Job.ETC).build()));
+                .temperature(36.5).provider("kakao").gender(Gender.MALE).build()));
         userRepository.saveAll(dummyUsers);
 
         Location location = Location.builder().city("Carry You").address("Martin Garrix")
