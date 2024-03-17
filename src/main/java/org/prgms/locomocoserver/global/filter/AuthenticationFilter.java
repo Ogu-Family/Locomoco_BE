@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.prgms.locomocoserver.global.exception.AuthException;
+import org.prgms.locomocoserver.global.exception.ErrorCode;
 import org.prgms.locomocoserver.global.exception.ExpiredTokenException;
 import org.prgms.locomocoserver.global.exception.InvalidTokenException;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
@@ -25,8 +27,6 @@ public class AuthenticationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        log.info("Authentication Filter START");
-
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
@@ -49,22 +49,8 @@ public class AuthenticationFilter implements Filter {
             return;
         }
 
-        Provider provider = Provider.valueOf(providerValue.toUpperCase());
-
         try {
-            boolean isValidToken = false;
-            switch (provider) {
-                case KAKAO:
-                    log.info("AuthenticationFilter.doFilter KAKAO authenticated called");
-                    isValidToken = authenticationService.authenticateKakaoUser(accessToken);
-                    break;
-                case GITHUB:
-                    log.info("AuthenticationFilter.doFilter GITHUB authenticated called");
-                    isValidToken = authenticationService.authenticateGithubUser(accessToken);
-                    break;
-                default:  // 잘못된 Provider
-                    throw new UserException(UserErrorType.PROVIDER_TYPE_ERROR);
-            }
+            boolean isValidToken = authenticationService.authenticateUser(providerValue, accessToken);
 
             if (!isValidToken) {
                 log.info("AuthenticationFilter.doFilter !isValidToken called");
@@ -72,15 +58,9 @@ public class AuthenticationFilter implements Filter {
                 return;
             }
 
-        } catch (ExpiredTokenException e) {
-            log.info("AuthenticationFilter.doFilter : " + e.getMessage());
-            throw new ExpiredTokenException(e.getMessage());
-        } catch (InvalidTokenException e) {
-            log.info("AuthenticationFilter.doFilter : "  + e.getMessage());
-            throw new InvalidTokenException(e.getMessage());
-        } catch (Exception e) {
-            log.info("AuthenticationFilter.doFilter : "  + e.getMessage());
-            throw new IllegalArgumentException(e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("AuthenticationFilter - Exception: " + e.getMessage());
+            throw e; // 예외를 ExceptionHandlerFilter로 전달
         }
 
         chain.doFilter(request, response);

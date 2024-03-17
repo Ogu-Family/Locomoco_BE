@@ -1,6 +1,8 @@
 package org.prgms.locomocoserver.user.vo;
 
 import lombok.Getter;
+import org.prgms.locomocoserver.user.exception.UserErrorType;
+import org.prgms.locomocoserver.user.exception.UserException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,7 +15,7 @@ public class BirthVo {
 
     public BirthVo(LocalDate birth) {
         if (!isValidBirth(birth)) {
-            throw new IllegalArgumentException("Invalid birth");
+            throw new UserException(UserErrorType.BIRTH_TYPE_ERROR);
         }
         this.birth = birth;
     }
