@@ -8,6 +8,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -21,9 +23,8 @@ import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.image.domain.Image;
+import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
-import org.prgms.locomocoserver.user.domain.enums.Job;
-import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
 
 @Entity
 @Getter
@@ -49,10 +50,6 @@ public class User extends BaseEntity {
     @Column(name = "temperature", nullable = false)
     private double temperature;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "job")
-    private Job job;
-
     @Column(name = "email", nullable = false)
     private String email;
 
@@ -66,36 +63,40 @@ public class User extends BaseEntity {
     @Builder.Default
     private List<ChatParticipant> chatRooms = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "job_id")
+    private Tag jobTag;
+
     public User(Long id, String nickname, LocalDate birth, Gender gender, double temperature,
-        Job job, String email, String provider, Image profileImage,
-        List<ChatParticipant> chatRooms) {
+        String email, String provider, Image profileImage, List<ChatParticipant> chatRooms,
+        Tag jobTag) {
         this.id = id;
         this.nickname = nickname;
         this.birth = birth;
         this.gender = gender;
         this.temperature = temperature;
-        this.job = job;
         this.email = email;
         this.provider = provider;
         this.profileImage = profileImage;
         this.chatRooms = chatRooms;
+        this.jobTag = jobTag;
     }
 
-    public void setInitInfo(String nickname, LocalDate birth, Gender gender, Job job) {
+    public void setInitInfo(String nickname, LocalDate birth, Gender gender, Tag jobTag) {
         this.nickname = nickname;
         this.birth = birth;
         this.gender = gender;
-        this.job = job;
+        this.jobTag = jobTag;
     }
 
     public void updateProfileImage(Image profileImage) {
         this.profileImage = profileImage;
     }
 
-    public void updateUserInfo(UserUpdateRequest request) {
-        if (request.nickname() != null) this.nickname = request.nickname();
-        if (request.birth()!= null) this.birth = request.birth();
-        if (request.gender()!= null) this.gender = request.gender();
-        if (request.job()!= null) this.job = request.job();
+    public void updateUserInfo(String nickname, LocalDate birth, Gender gender, Tag jobTag) {
+        this.nickname = nickname != null ? nickname : this.nickname;
+        this.birth = birth != null ? birth : this.birth;
+        this.gender = gender != null ? gender : this.gender;
+        this.jobTag = jobTag != null ? jobTag : this.jobTag;
     }
 }

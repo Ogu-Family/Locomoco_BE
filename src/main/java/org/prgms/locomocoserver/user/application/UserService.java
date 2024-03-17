@@ -8,7 +8,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.image.application.ImageService;
 import org.prgms.locomocoserver.image.domain.Image;
-import org.prgms.locomocoserver.image.dto.ImageDto;
 import org.prgms.locomocoserver.image.exception.ImageErrorType;
 import org.prgms.locomocoserver.image.exception.ImageException;
 import org.prgms.locomocoserver.location.domain.Location;
@@ -18,10 +17,11 @@ import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.likes.MogakkoLikeRepository;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
+import org.prgms.locomocoserver.tags.domain.Tag;
+import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
-import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.prgms.locomocoserver.user.dto.OAuthUserInfoDto;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
@@ -44,6 +44,7 @@ public class UserService {
     private final LocationRepository locationRepository;
     private final MogakkoLikeRepository mogakkoLikeRepository;
     private final ParticipantRepository participantRepository;
+    private final TagRepository tagRepository;
     private final ImageService imageService;
 
     @Transactional
@@ -59,18 +60,16 @@ public class UserService {
             user = userRepository.save(oAuthUserInfoDto.toEntity());
         }
 
-        // UserDto 생성
-        UserInfoDto userDto = new UserInfoDto(user.getId(), user.getNickname(), user.getBirth(), user.getGender(), user.getTemperature(),
-                user.getJob(), user.getEmail(), ImageDto.of(user.getProfileImage()), user.getProvider());
-        return new UserLoginResponse(tokenResponseDto, userDto, isNewUser);
+        return new UserLoginResponse(tokenResponseDto, UserInfoDto.of(user), isNewUser);
     }
 
     @Transactional
     public UserInfoDto insertInitInfo(Long userId, UserInitInfoRequestDto requestDto, MultipartFile multipartFile) {
         User user = getById(userId);
 
+        Tag jobTag = tagRepository.findById(requestDto.jobId()).orElseThrow(RuntimeException::new); // TODO: 태그 예외 반환
         user.setInitInfo(requestDto.nickname(), requestDto.birth(),
-                Gender.valueOf(requestDto.gender().toUpperCase()), Job.valueOf(requestDto.job().toUpperCase()));
+                Gender.valueOf(requestDto.gender().toUpperCase()), jobTag);
         if (multipartFile != null) uploadProfileImage(userId, multipartFile);
 
         return UserInfoDto.of(user);
@@ -79,7 +78,9 @@ public class UserService {
     @Transactional
     public UserInfoDto updateUserInfo(Long userId, UserUpdateRequest request, MultipartFile multipartFile) {
         User user = getById(userId);
-        user.updateUserInfo(request);
+        Tag jobTag = tagRepository.findById(request.jobId()).orElse(null);
+
+        user.updateUserInfo(request.nickname(), request.birth(), request.gender(), jobTag);
 
         if(multipartFile != null) uploadProfileImage(userId, multipartFile);
 

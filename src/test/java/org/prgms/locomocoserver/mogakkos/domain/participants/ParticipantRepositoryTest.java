@@ -14,7 +14,6 @@ import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
-import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -40,10 +39,10 @@ class ParticipantRepositoryTest {
     void success_find_by_mogakko_and_user() {
         // given
         User creator = User.builder().email("creator@gmail.com").nickname("creator").temperature(36.5)
-            .birth(LocalDate.EPOCH).job(Job.JOB_SEEKER).gender(Gender.MALE).provider("kakao")
+            .birth(LocalDate.EPOCH).gender(Gender.MALE).provider("kakao")
             .build();
         User user = User.builder().email("email@gmail.com").nickname("temp").temperature(36.5)
-            .birth(LocalDate.EPOCH).job(Job.ETC).gender(Gender.MALE).provider("kakao")
+            .birth(LocalDate.EPOCH).gender(Gender.MALE).provider("kakao")
             .build();
         Mogakko mogakko = Mogakko.builder().title("title").startTime(LocalDateTime.now())
             .endTime(LocalDateTime.now()).deadline(LocalDateTime.now()).content("content")

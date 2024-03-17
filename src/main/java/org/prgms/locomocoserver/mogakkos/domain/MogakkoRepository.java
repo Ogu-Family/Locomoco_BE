@@ -14,25 +14,25 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
     Optional<Mogakko> findByIdAndDeletedAtIsNull(Long id);
 
     @Query(value = "SELECT m.* FROM mogakko m "
-        + "JOIN locations l ON (m.id > :cursor AND m.deleted_at IS NULL AND l.mogakko_id = m.id AND l.city LIKE :city%) "
-        + "LIMIT 20", nativeQuery = true)
-    List<Mogakko> findAllByCity(Long cursor, String city);
+        + "JOIN locations l ON (m.id > :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND l.mogakko_id = m.id AND l.city LIKE :city%) "
+        + "LIMIT :pageSize", nativeQuery = true)
+    List<Mogakko> findAllByCity(Long cursor, String city, int pageSize, LocalDateTime now);
 
     @Query(value = "SELECT m.* FROM mogakko m "
-        + "INNER JOIN users u ON m.id > :cursor AND m.deleted_at IS NULL AND m.creator_id = u.id "
+        + "INNER JOIN users u ON m.id > :cursor AND m.deleted_at IS NULL AND m.deadline > :now AND m.creator_id = u.id "
         + "INNER JOIN locations l ON l.mogakko_id = m.id "
         + "INNER JOIN mogakko_tags mt ON mt.tag_id IN :tagIds AND mt.mogakko_id = m.id "
         + "WHERE (m.title LIKE %:searchVal% OR m.content LIKE %:searchVal% OR u.nickname LIKE %:searchVal% OR l.city LIKE %:searchVal%) "
         + "GROUP BY m.id HAVING count(m.id) = :tagSize "
-        + "LIMIT 20", nativeQuery = true)
-    List<Mogakko> findAllByFilter(Long cursor, String searchVal, List<Long> tagIds, int tagSize); // TODO: 테스트 필요
+        + "LIMIT :pageSize", nativeQuery = true)
+    List<Mogakko> findAllByFilter(Long cursor, String searchVal, List<Long> tagIds, int tagSize, int pageSize, LocalDateTime now);
 
     @Query(value = "SELECT DISTINCT m.* FROM mogakko m "
-        + "INNER JOIN users u ON m.id > :cursor AND m.deleted_at IS NULL AND m.creator_id = u.id "
+        + "INNER JOIN users u ON m.id > :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND m.creator_id = u.id "
         + "INNER JOIN locations l ON l.mogakko_id = m.id "
         + "WHERE (m.title LIKE %:searchVal% OR m.content LIKE %:searchVal% OR u.nickname LIKE %:searchVal% OR l.city LIKE %:searchVal%) "
-        + "LIMIT 20", nativeQuery = true)
-    List<Mogakko> findAllByFilter(Long cursor, String searchVal); // TODO: 테스트 필요
+        + "LIMIT :pageSize", nativeQuery = true)
+    List<Mogakko> findAllByFilter(Long cursor, String searchVal, int pageSize, LocalDateTime now);
 
     @Query("SELECT m FROM Mogakko m JOIN m.participants p WHERE p.user = :user AND m.endTime >= :now AND m.deletedAt IS NULL AND p.user.deletedAt IS NULL")
     List<Mogakko> findOngoingMogakkosByUser(@Param("user") User user, @Param("now") LocalDateTime now);

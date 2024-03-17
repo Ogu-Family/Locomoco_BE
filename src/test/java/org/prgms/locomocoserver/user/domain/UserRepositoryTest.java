@@ -11,7 +11,6 @@ import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
-import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -32,11 +31,9 @@ class UserRepositoryTest {
         LocalDateTime startTime = LocalDateTime.now();
 
         User user1 = User.builder().nickname("name").birth(startTime.toLocalDate())
-            .email("email@gmail.com").job(
-                Job.JOB_SEEKER).gender(Gender.MALE).provider("provider").temperature(1).build();
+            .email("email@gmail.com").gender(Gender.MALE).provider("provider").temperature(1).build();
         User user2 = User.builder().nickname("namae").birth(startTime.toLocalDate())
-            .email("cho@gmail.com").job(
-                Job.JOB_SEEKER).gender(Gender.MALE).provider("provider").temperature(2).build();
+            .email("cho@gmail.com").gender(Gender.MALE).provider("provider").temperature(2).build();
 
         userRepository.saveAll(List.of(user1, user2));
 

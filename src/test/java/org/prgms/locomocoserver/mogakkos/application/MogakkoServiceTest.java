@@ -48,7 +48,6 @@ import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
-import org.prgms.locomocoserver.user.domain.enums.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -105,10 +104,10 @@ class MogakkoServiceTest {
         tagRepository.saveAll(List.of(js, python, codingTest, backend));
 
         setUpUser1 = userRepository.save(
-            User.builder().nickname("생성자").email("cho@gmail.com").job(Job.JOB_SEEKER).birth(
+            User.builder().nickname("생성자").email("cho@gmail.com").birth(
                 LocalDate.EPOCH).gender(Gender.MALE).temperature(36.5).provider("github").build());
         setUpUser2 = userRepository.save(
-            User.builder().nickname("참여자1").email("part@gmail.com").job(Job.DEVELOPER).birth(
+            User.builder().nickname("참여자1").email("part@gmail.com").birth(
                 LocalDate.EPOCH).gender(Gender.FEMALE).temperature(42.1).provider("kakao").build());
         testMogakko = Mogakko.builder().title("title").content("제곧내").views(20).likeCount(10)
             .startTime(LocalDateTime.now())
@@ -147,7 +146,7 @@ class MogakkoServiceTest {
     void success_create_mogakko() {
         // given
         User savedCreator = userRepository.save(
-            User.builder().nickname("생성자").email("cho@gmail.com").job(Job.JOB_SEEKER).birth(
+            User.builder().nickname("생성자").email("cho@gmail.com").birth(
                 LocalDate.EPOCH).gender(Gender.MALE).temperature(36.5).provider("github").build());
 
         LocalDateTime startTime = LocalDateTime.now();

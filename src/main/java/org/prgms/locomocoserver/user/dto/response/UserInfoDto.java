@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.prgms.locomocoserver.image.dto.ImageDto;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
-import org.prgms.locomocoserver.user.domain.enums.Job;
 
 import java.time.LocalDate;
 
@@ -19,8 +18,8 @@ public record UserInfoDto(
         Gender gender,
         @Schema(description = "사용자 온도", example = "36.5")
         double temperature,
-        @Schema(description = "사용자 직업", example = "DEVELOPER")
-        Job job,
+        @Schema(description = "사용자 직업 태그 id", example = "1")
+        Long jobId,
         @Schema(description = "사용자 email", example = "example@gmail.com")
         String email,
         @Schema(description = "사용자 프로필 사진")
@@ -35,7 +34,7 @@ public record UserInfoDto(
                         user.getBirth(),
                         user.getGender(),
                         user.getTemperature(),
-                        user.getJob(),
+                        user.getJobTag().getId(),
                         user.getEmail(),
                         ImageDto.of(user.getProfileImage()),
                         user.getProvider()
