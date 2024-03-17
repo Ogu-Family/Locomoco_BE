@@ -29,14 +29,14 @@ public record UserInfoDto(
         String provider
 ) {
         public static UserInfoDto of(User user) {
-                Tag jobTag = user.getJobTag() == null ? null : user.getJobTag();
+                Long jobTagId = user.getJobTag() == null ? null : user.getJobTag().getId();
                 return new UserInfoDto(
                         user.getId(),
                         user.getNickname(),
                         user.getBirth(),
                         user.getGender(),
                         user.getTemperature(),
-                        jobTag.getId(),
+                        jobTagId,
                         user.getEmail(),
                         ImageDto.of(user.getProfileImage()),
                         user.getProvider()
