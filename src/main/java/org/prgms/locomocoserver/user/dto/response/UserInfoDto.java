@@ -2,6 +2,7 @@ package org.prgms.locomocoserver.user.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.prgms.locomocoserver.image.dto.ImageDto;
+import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 
@@ -28,13 +29,14 @@ public record UserInfoDto(
         String provider
 ) {
         public static UserInfoDto of(User user) {
+                Tag jobTag = user.getJobTag() == null ? null : user.getJobTag();
                 return new UserInfoDto(
                         user.getId(),
                         user.getNickname(),
                         user.getBirth(),
                         user.getGender(),
                         user.getTemperature(),
-                        user.getJobTag().getId(),
+                        jobTag.getId(),
                         user.getEmail(),
                         ImageDto.of(user.getProfileImage()),
                         user.getProvider()
