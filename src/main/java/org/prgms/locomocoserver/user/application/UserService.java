@@ -19,6 +19,8 @@ import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantReposito
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
+import org.prgms.locomocoserver.user.domain.DeviceKey;
+import org.prgms.locomocoserver.user.domain.DeviceKeyRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
@@ -45,6 +47,7 @@ public class UserService {
     private final MogakkoLikeRepository mogakkoLikeRepository;
     private final ParticipantRepository participantRepository;
     private final TagRepository tagRepository;
+    private final DeviceKeyRepository deviceKeyRepository;
     private final ImageService imageService;
 
     @Transactional
@@ -70,6 +73,8 @@ public class UserService {
         Tag jobTag = tagRepository.findById(requestDto.jobId()).orElseThrow(RuntimeException::new); // TODO: 태그 예외 반환
         user.setInitInfo(requestDto.nickname(), requestDto.birth(),
                 Gender.valueOf(requestDto.gender().toUpperCase()), jobTag);
+        deviceKeyRepository.save(DeviceKey.builder().user(user).build());
+
         if (multipartFile != null) uploadProfileImage(userId, multipartFile);
 
         return UserInfoDto.of(user);

@@ -108,7 +108,7 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public Long getChatRoomIdByMogakkoId(Long mogakkoId) {
         ChatRoom chatRoom = chatRoomRepository.findByMogakkoId(mogakkoId)
-                .orElseThrow(() -> new IllegalArgumentException("Mogakko has no ChatRoom"));
+                .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND, "해당 모각코의 채팅방이 존재하지 않습니다. : mogakkoId[" + mogakkoId + "]"));
         return chatRoom.getId();
     }
 

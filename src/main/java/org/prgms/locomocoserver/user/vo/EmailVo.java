@@ -1,6 +1,8 @@
 package org.prgms.locomocoserver.user.vo;
 
 import lombok.Getter;
+import org.prgms.locomocoserver.user.exception.UserErrorType;
+import org.prgms.locomocoserver.user.exception.UserException;
 
 @Getter
 public class EmailVo {
@@ -10,7 +12,7 @@ public class EmailVo {
 
     public EmailVo(String email) {
         if (!isValidEmail(email)) {
-            throw new IllegalArgumentException("Invalid email");
+            throw new UserException(UserErrorType.EMAIL_TYPE_ERROR);
         }
         this.email = email;
     }
