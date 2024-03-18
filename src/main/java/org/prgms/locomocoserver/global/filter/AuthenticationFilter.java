@@ -46,8 +46,9 @@ public class AuthenticationFilter implements Filter {
             log.info("AuthenticationFilter.doFilter OPTION called");
             // preflight 요청에 대한 허용 응답 설정
             String origin = httpRequest.getHeader("Origin");
-            if(alloweOrigin.contains(origin) == false) return;
-            httpResponse.setHeader("Access-Control-Allow-Origin", origin);            httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+            if(origin != null && alloweOrigin.contains(origin) == false) return;
+            httpResponse.setHeader("Access-Control-Allow-Origin", origin);
+            httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
             httpResponse.setHeader("Access-Control-Allow-Headers", "Authorization, provider");
             httpResponse.setHeader("Access-Control-Expose-Headers", "Authorization, provider");  // 이건 있어야 하는지 확인
             httpResponse.setStatus(HttpServletResponse.SC_OK);
