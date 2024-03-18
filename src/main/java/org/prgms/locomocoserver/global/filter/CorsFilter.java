@@ -31,9 +31,9 @@ public class CorsFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        String origin = request.getHeader("Origin");
+        String origin = request.getHeader("Origin") == null ? "https://locomoco.kro.kr" : request.getHeader("Origin");
         log.info("CorsFilter Origin : " + origin);
-        if(origin != null && alloweOrigin.contains(origin) == false) return;
+        if(alloweOrigin.contains(origin) == false) return;
         response.setHeader("Access-Control-Allow-Origin", origin);
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, PATCH, OPTIONS");

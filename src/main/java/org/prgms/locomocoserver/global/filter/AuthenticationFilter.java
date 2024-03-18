@@ -43,10 +43,9 @@ public class AuthenticationFilter implements Filter {
         String providerValue = httpRequest.getHeader("provider");
 
         if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
-            log.info("AuthenticationFilter.doFilter OPTION called");
-            // preflight 요청에 대한 허용 응답 설정
-            String origin = httpRequest.getHeader("Origin");
-            if(origin != null && alloweOrigin.contains(origin) == false) return;
+            String origin = httpRequest.getHeader("Origin") == null ? "https://locomoco.kro.kr" : httpRequest.getHeader("Origin");
+            log.info("CorsFilter Origin : " + origin);
+            if(alloweOrigin.contains(origin) == false) return;
             httpResponse.setHeader("Access-Control-Allow-Origin", origin);
             httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
             httpResponse.setHeader("Access-Control-Allow-Headers", "Authorization, provider");
