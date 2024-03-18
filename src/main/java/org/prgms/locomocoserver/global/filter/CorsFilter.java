@@ -10,10 +10,20 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 @Slf4j
 @Component
 public class CorsFilter implements Filter {
+
+    private static HashSet<String> alloweOrigin = new HashSet<>();
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        Filter.super.init(filterConfig);
+        alloweOrigin.add("http://localhost:3000");
+        alloweOrigin.add("https://locomoco.kro.kr");
+    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -21,7 +31,9 @@ public class CorsFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        response.setHeader("Access-Control-Allow-Origin", "https://locomoco.kro.kr");
+        String origin = request.getHeader("Origin");
+        if(alloweOrigin.contains(origin) == false) return;
+        response.setHeader("Access-Control-Allow-Origin", origin);
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, PATCH, OPTIONS");
         response.setHeader("Access-Control-Max-Age", "3600");

@@ -17,6 +17,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 @Slf4j
 @Component
@@ -24,6 +25,14 @@ import java.io.IOException;
 public class AuthenticationFilter implements Filter {
 
     private final AuthenticationService authenticationService;
+    private static HashSet<String> alloweOrigin = new HashSet<>();
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        Filter.super.init(filterConfig);
+        alloweOrigin.add("http://localhost:3000");
+        alloweOrigin.add("https://locomoco.kro.kr");
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -36,8 +45,9 @@ public class AuthenticationFilter implements Filter {
         if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
             log.info("AuthenticationFilter.doFilter OPTION called");
             // preflight 요청에 대한 허용 응답 설정
-            httpResponse.setHeader("Access-Control-Allow-Origin", "https://locomoco.kro.kr");
-            httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+            String origin = httpRequest.getHeader("Origin");
+            if(alloweOrigin.contains(origin) == false) return;
+            httpResponse.setHeader("Access-Control-Allow-Origin", origin);            httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
             httpResponse.setHeader("Access-Control-Allow-Headers", "Authorization, provider");
             httpResponse.setHeader("Access-Control-Expose-Headers", "Authorization, provider");  // 이건 있어야 하는지 확인
             httpResponse.setStatus(HttpServletResponse.SC_OK);
