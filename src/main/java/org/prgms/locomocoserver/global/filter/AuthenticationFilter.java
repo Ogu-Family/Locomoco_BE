@@ -32,6 +32,7 @@ public class AuthenticationFilter implements Filter {
         Filter.super.init(filterConfig);
         alloweOrigin.add("http://localhost:3000");
         alloweOrigin.add("https://locomoco.kro.kr");
+        alloweOrigin.add("https://locomoco.shop");
     }
 
     @Override
