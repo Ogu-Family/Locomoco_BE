@@ -36,7 +36,7 @@ public class AuthenticationFilter implements Filter {
         if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
             log.info("AuthenticationFilter.doFilter OPTION called");
             // preflight 요청에 대한 허용 응답 설정
-            httpResponse.setHeader("Access-Control-Allow-Origin", "http://locomoco.kro.kr");
+            httpResponse.setHeader("Access-Control-Allow-Origin", "https://locomoco.kro.kr");
             httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
             httpResponse.setHeader("Access-Control-Allow-Headers", "Authorization, provider");
             httpResponse.setHeader("Access-Control-Expose-Headers", "Authorization, provider");  // 이건 있어야 하는지 확인
