@@ -6,6 +6,7 @@ import org.prgms.locomocoserver.categories.domain.Category;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
 import org.prgms.locomocoserver.categories.dto.response.CategoriesWithTagsDto;
+import org.prgms.locomocoserver.global.common.aop.Logging;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.tags.dto.TagsInfoDto;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    @Logging
     @Transactional(readOnly = true)
     public Results<CategoriesWithTagsDto> findAllBy(CategoryType categoryType) {
 

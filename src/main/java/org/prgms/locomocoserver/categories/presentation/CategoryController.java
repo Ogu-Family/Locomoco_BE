@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.categories.application.CategoryService;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
 import org.prgms.locomocoserver.categories.dto.response.CategoriesWithTagsDto;
+import org.prgms.locomocoserver.global.common.aop.Logging;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    @Logging
     @GetMapping("/category")
     @Operation(summary = "카테고리 가져오기", description = "특정 타입에 관한 카테고리와 연관된 태그들을 전부 가져옵니다.")
     @ApiResponses(
