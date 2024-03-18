@@ -34,6 +34,8 @@ import org.prgms.locomocoserver.user.domain.User;
 public class Mogakko extends BaseEntity {
 
     public static final int DEFAULT_MAX_PARTICIPANTS = 10;
+    public static final int MAX_TITLE_LEN = 255;
+    public static final int MAX_CONTENT_LEN = 500;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -101,6 +103,7 @@ public class Mogakko extends BaseEntity {
         this.inquiries = inquiries;
         this.creator = creator;
         this.chatRoom = chatRoom;
+        validate();
     }
 
     public void addMogakkoTag(MogakkoTag mogakkoTag) {
@@ -132,17 +135,34 @@ public class Mogakko extends BaseEntity {
     }
 
     public void updateInfo(String title, String content, LocalDateTime startTime, LocalDateTime endTime,
-        LocalDateTime deadline, int maxParticipants) {
-        this.title = title;
-        this.content = content;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.deadline = deadline;
-        this.maxParticipants = maxParticipants;
+        LocalDateTime deadline, Integer maxParticipants) {
+        this.title = title != null ? title : this.title;
+        this.content = content != null ? content : this.content;
+        this.startTime = startTime != null ? startTime : this.startTime;
+        this.endTime = endTime != null ? endTime : this.endTime;
+        this.deadline = deadline != null ? deadline : this.deadline;
+        this.maxParticipants = maxParticipants != null ? maxParticipants : this.maxParticipants;
+        validate();
     }
 
     public void updateLikeCount(boolean flag) {
         if(flag) this.likeCount++;  // 변경 후 값 true -> +1
         else this.likeCount--;  // 변경 후 값 false -> -1
+    }
+
+    private void validate() { // TODO: 모각코 예외 반환
+        if (this.title.length() > MAX_TITLE_LEN) {
+            throw new RuntimeException("제목 최대 길이를 초과했습니다!");
+        }
+        if (this.content.length() > MAX_CONTENT_LEN) {
+            throw new RuntimeException("내용 최대 길이를 초과했습니다!");
+        }
+        if (this.startTime.isAfter(this.endTime) || this.deadline.isAfter(this.endTime) || this.startTime.isAfter(this.deadline)) {
+            throw new RuntimeException("날짜 설정이 잘못되었습니다!");
+        }
+        if (this.maxParticipants < 0 || this.maxParticipants > DEFAULT_MAX_PARTICIPANTS) {
+            throw new RuntimeException("최대 인원 수가 잘못되었습니다!");
+        }
+
     }
 }
