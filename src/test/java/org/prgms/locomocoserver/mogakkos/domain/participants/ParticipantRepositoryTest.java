@@ -44,8 +44,9 @@ class ParticipantRepositoryTest {
         User user = User.builder().email("email@gmail.com").nickname("temp").temperature(36.5)
             .birth(LocalDate.EPOCH).gender(Gender.MALE).provider("kakao")
             .build();
-        Mogakko mogakko = Mogakko.builder().title("title").startTime(LocalDateTime.now())
-            .endTime(LocalDateTime.now()).deadline(LocalDateTime.now()).content("content")
+        LocalDateTime startTime = LocalDateTime.now();
+        Mogakko mogakko = Mogakko.builder().title("title").startTime(startTime)
+            .endTime(startTime.plusHours(2)).deadline(startTime.plusMinutes(30)).content("content")
             .maxParticipants(8).likeCount(0).creator(creator)
             .build();
         Participant participant = Participant.builder().mogakko(mogakko).user(user)
