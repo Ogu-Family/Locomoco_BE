@@ -27,6 +27,7 @@ public class ExceptionHandlerFilter extends GenericFilterBean {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
         try {
+            log.info("ExceptionHandler - doFilter : started");
             chain.doFilter(request, response);
         } catch (RuntimeException e) {
             handleException(httpServletResponse, e);
@@ -37,13 +38,17 @@ public class ExceptionHandlerFilter extends GenericFilterBean {
         log.error("ExceptionHandlerFilter - Exception: " + e.getMessage());
 
         if (e instanceof ExpiredTokenException) {
+            log.info("ExpiredTokenException! {}", e.getStackTrace());
             setErrorResponse(response, ErrorCode.ACCESSTOKEN_EXPIRED);
         } else if (e instanceof InvalidTokenException) {
+            log.info("InvalidTokenException! {}", e.getStackTrace());
             setErrorResponse(response, ErrorCode.INVALID_TOKEN);
         } else if (e instanceof AuthException) {
+            log.info("AuthException! {}", e.getStackTrace());
             setErrorResponse(response, ErrorCode.UNAUTHORIZED);
         } else {
             // 기타 예외 처리
+            log.info("기타 에러! {}", e.getStackTrace());
             setErrorResponse(response, ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }

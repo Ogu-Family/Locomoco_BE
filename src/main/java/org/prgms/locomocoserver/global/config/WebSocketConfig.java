@@ -14,7 +14,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
         registry.addEndpoint("/api/v1/stomp/chat")
-                .setAllowedOrigins("http://localhost:8090", "http://localhost:3000", "http://locomoco.kro.kr")
+                .setAllowedOrigins("http://localhost:8090", "http://localhost:3000", "https://locomoco.kro.kr")
                 .withSockJS(); // 웹소켓 핸드셰이크 커넥션 생성 경로
     }
 
