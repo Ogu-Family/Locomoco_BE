@@ -7,6 +7,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.prgms.locomocoserver.global.common.aop.Logging;
 import org.prgms.locomocoserver.global.common.dto.ErrorResponse;
 import org.prgms.locomocoserver.global.exception.AuthException;
 import org.prgms.locomocoserver.global.exception.ErrorCode;
@@ -22,6 +23,7 @@ import java.io.IOException;
 @Component
 public class ExceptionHandlerFilter extends GenericFilterBean {
 
+    @Logging
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
@@ -33,17 +35,22 @@ public class ExceptionHandlerFilter extends GenericFilterBean {
         }
     }
 
+    @Logging
     private void handleException(HttpServletResponse response, RuntimeException e) {
         log.error("ExceptionHandlerFilter - Exception: " + e.getMessage());
 
         if (e instanceof ExpiredTokenException) {
+            log.info("ExpiredTokenException! {}", e.getStackTrace());
             setErrorResponse(response, ErrorCode.ACCESSTOKEN_EXPIRED);
         } else if (e instanceof InvalidTokenException) {
+            log.info("InvalidTokenException! {}", e.getStackTrace());
             setErrorResponse(response, ErrorCode.INVALID_TOKEN);
         } else if (e instanceof AuthException) {
+            log.info("AuthException! {}", e.getStackTrace());
             setErrorResponse(response, ErrorCode.UNAUTHORIZED);
         } else {
             // 기타 예외 처리
+            log.info("기타 에러! {}", e.getStackTrace());
             setErrorResponse(response, ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
