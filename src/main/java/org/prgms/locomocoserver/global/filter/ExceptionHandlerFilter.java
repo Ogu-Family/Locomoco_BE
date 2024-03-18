@@ -7,7 +7,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.prgms.locomocoserver.global.common.aop.Logging;
 import org.prgms.locomocoserver.global.common.dto.ErrorResponse;
 import org.prgms.locomocoserver.global.exception.AuthException;
 import org.prgms.locomocoserver.global.exception.ErrorCode;
@@ -23,19 +22,18 @@ import java.io.IOException;
 @Component
 public class ExceptionHandlerFilter extends GenericFilterBean {
 
-    @Logging
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
         try {
+            log.info("ExceptionHandler - doFilter : started");
             chain.doFilter(request, response);
         } catch (RuntimeException e) {
             handleException(httpServletResponse, e);
         }
     }
 
-    @Logging
     private void handleException(HttpServletResponse response, RuntimeException e) {
         log.error("ExceptionHandlerFilter - Exception: " + e.getMessage());
 
