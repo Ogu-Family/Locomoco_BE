@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -39,6 +40,9 @@ public class GithubController {
     @Value("${oauth.github.REDIRECT_URI}")
     private String github_redirect_url;
 
+    @Value("${oauth.github.REDIRECT_URI_LOCAL}")
+    private String github_redirect_url_local;
+
     @Operation(summary = "깃허브 로그인 페이지", description = "깃허브 로그인 페이지 반환")
     @GetMapping("/users/login/github")
     public void getGithubAuth(HttpServletResponse response) throws IOException {
@@ -49,8 +53,10 @@ public class GithubController {
     @ApiResponse(responseCode = "200", description = "로그인 성공")
     @Parameter(name = "code", description = "로그인 정보 입력 시 깃허브에서 반환되는 일회성 code")
     @GetMapping("/users/login/github/callback")
-    public ResponseEntity<UserLoginResponse> getGithubLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
-        TokenResponseDto tokenResponseDto = getTokenDto(code);
+    public ResponseEntity<UserLoginResponse> getGithubLoginCallback(@RequestParam(name = "code") String code,
+                                                                    HttpServletRequest request) throws JsonProcessingException {
+        String origin = request.getHeader("Origin");
+        TokenResponseDto tokenResponseDto = origin.contains("local") ? getTokenDto(code, github_redirect_url_local) : getTokenDto(code, github_redirect_url);
         GithubUserInfoResponseDto githubUserInfoResponseDto = loadUserInfo(tokenResponseDto.accessToken());
         UserLoginResponse userLoginResponse = userService.saveOrUpdate(githubUserInfoResponseDto, tokenResponseDto);
 
@@ -65,13 +71,13 @@ public class GithubController {
         return ResponseEntity.ok(userInfo);
     }
 
-    private TokenResponseDto getTokenDto(String code) {
+    private TokenResponseDto getTokenDto(String code, String redirectUrl) {
         String tokenUrl = "https://github.com/login/oauth/access_token";
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<TokenResponseDto> response = restTemplate.postForEntity(
                 tokenUrl + "?client_id={clientId}&client_secret={clientSecret}&code={code}&redirect_uri={redirectUri}",
-                null, TokenResponseDto.class, github_client_id, github_client_secret_key, code, github_redirect_url);
+                null, TokenResponseDto.class, github_client_id, github_client_secret_key, code, redirectUrl);
         return response.getBody();
     }
 

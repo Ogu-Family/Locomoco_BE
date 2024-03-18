@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,8 @@ public class KakaoController {
     private String kakao_api_key;
     @Value("${oauth.kakao.REDIRECT_URI}")
     private String kakao_redirect_uri;
+    @Value("${oauth.kakao.REDIRECT_URI_LOCAL}")
+    private String kakao_redirect_uri_local;
 
     @Operation(summary = "카카오 로그인 페이지", description = "카카오 로그인 페이지 반환")
     @GetMapping("/users/login/kakao")
@@ -45,10 +48,12 @@ public class KakaoController {
     @ApiResponse(responseCode = "200", description = "로그인 성공")
     @Parameter(name = "code", description = "로그인 정보 입력 시 카카오에서 반환되는 일회성 code")
     @GetMapping("/users/login/kakao/callback")
-    public ResponseEntity<UserLoginResponse> getKakaoLoginCallback(@RequestParam(name = "code") String code) throws JsonProcessingException {
+    public ResponseEntity<UserLoginResponse> getKakaoLoginCallback(@RequestParam(name = "code") String code,
+                                                                   HttpServletRequest request) throws JsonProcessingException {
         log.info("KakaoController.getKakaoLoginCallback " + code);
 
-        TokenResponseDto tokenResponseDto = getTokenDto(code);
+        String origin = request.getHeader("Origin");
+        TokenResponseDto tokenResponseDto = origin.contains("local") ? getTokenDto(code, kakao_redirect_uri_local) : getTokenDto(code, kakao_redirect_uri);
         KakaoUserInfoResponseDto kakaoUserInfoResponseDto = loadUserInfo(tokenResponseDto.accessToken());
 
         log.info("KakaoController.getKakaoLoginCallback after loadUserInfo : " + kakaoUserInfoResponseDto.getEmail());
@@ -69,7 +74,7 @@ public class KakaoController {
         return ResponseEntity.ok(responseDto);
     }
 
-    private TokenResponseDto getTokenDto(String code) throws JsonProcessingException {
+    private TokenResponseDto getTokenDto(String code, String redirectUri) throws JsonProcessingException {
         // Kakao 인증 서버 엔드포인트 URL
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
 
@@ -80,7 +85,7 @@ public class KakaoController {
         // HTTP 요청 바디 설정
         String requestBody = "grant_type=authorization_code" +
                 "&client_id=" + kakao_api_key +
-                "&redirect_uri=" + kakao_redirect_uri +
+                "&redirect_uri=" + redirectUri +
                 "&code=" + code;
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(tokenUrl, HttpMethod.POST, new HttpEntity<>(requestBody, headers), String.class);
