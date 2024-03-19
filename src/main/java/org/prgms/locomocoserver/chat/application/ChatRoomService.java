@@ -113,6 +113,11 @@ public class ChatRoomService {
     }
 
     @Transactional
+    public void leave(ChatRoom chatRoom, Long userId) {
+        chatParticipantRepository.deleteByChatRoomIdAndUserId(chatRoom.getId(), userId);
+    }
+
+    @Transactional
     public void delete(ChatRoom chatRoom) {
         // 채팅방 참여자 목록 삭제
         chatParticipantRepository.deleteAllByChatRoom(chatRoom);
