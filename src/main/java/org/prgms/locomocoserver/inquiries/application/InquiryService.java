@@ -10,6 +10,8 @@ import org.prgms.locomocoserver.inquiries.dto.response.InquiryResponseDto;
 import org.prgms.locomocoserver.inquiries.dto.response.InquiryUpdateResponseDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,7 @@ public class InquiryService {
         User user = userRepository.findById(requestDto.userid())
             .orElseThrow(RuntimeException::new); // TODO: 유저 예외 반환
         Mogakko mogakko = mogakkoRepository.findById(requestDto.mogakkoId())
-            .orElseThrow(RuntimeException::new);// TODO: 모각코 예외 반환
+            .orElseThrow(() -> new MogakkoException(MogakkoErrorCode.NOT_FOUND));
 
         Inquiry inquiry = Inquiry.builder().mogakko(mogakko).user(user).content(requestDto.content())
             .build();

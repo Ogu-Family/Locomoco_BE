@@ -11,6 +11,8 @@ import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.ParticipationCheckingDto;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,7 @@ public class MogakkoParticipationService {
 
     public void participate(Long mogakkoId, ParticipationRequestDto requestDto) {
         Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
-            .orElseThrow(RuntimeException::new); // TODO: 모각코 에러 반환
+            .orElseThrow(() -> new MogakkoException(MogakkoErrorCode.NOT_FOUND));
         User user = userService.getById(requestDto.userId());
 
         validateIfDeadlineIsPast(mogakko);
@@ -51,7 +53,7 @@ public class MogakkoParticipationService {
 
     public void cancel(Long mogakkoId, Long userId) { // TODO: 참여 취소 시 채팅방 자동 나가기
         Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
-            .orElseThrow(RuntimeException::new); // TODO: 모각코 에러 반환
+            .orElseThrow(() -> new MogakkoException(MogakkoErrorCode.NOT_FOUND));
 
         validateIfEndTimeIsPast(mogakko);
 
