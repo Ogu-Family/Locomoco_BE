@@ -33,15 +33,15 @@ public class MogakkoController {
     private final MogakkoLikeService mogakkoLikeService;
 
     @GetMapping("/mogakko/map")
-    @Operation(summary = "모각코 리스트 반환", description = "홈 화면(리스트 화면)에서 필터링된 모각코 리스트를 반환합니다. 종료되었거나 삭제된 모각코는 보이지 않습니다.")
+    @Operation(summary = "모각코 리스트 반환", description = "홈 화면(리스트 화면)에서 필터링된 모각코 리스트를 반환합니다. 종료되었거나 삭제된 모각코는 보이지 않습니다. cursor default value는 실제로는 9223372036854775807입니다.")
     @ApiResponses(
             @ApiResponse(responseCode = "200", description = "모각코 목록 반환 성공")
     )
     public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
-            @Parameter(description = "필터링 커서") @RequestParam(required = false, defaultValue = "0") Long cursor,
+            @Parameter(description = "필터링 커서") @RequestParam(required = false, defaultValue = "9223372036854775807") Long cursor,
             @Parameter(description = "검색 값") @RequestParam(name = "search", required = false, defaultValue = "") String searchVal,
             @Parameter(description = "검색 타입") @RequestParam SearchType searchType,
-            @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "10000") Integer pageSize,
+            @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "100") Integer pageSize,
             @Parameter(description = "필터링 태그 id 목록") @RequestParam(required = false) List<Long> tags) {
         searchVal = searchVal.strip();
 
