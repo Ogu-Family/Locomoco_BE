@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.chat.domain;
+package org.prgms.locomocoserver.chat.domain.chatParticipant;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.user.domain.User;
 
 @Entity

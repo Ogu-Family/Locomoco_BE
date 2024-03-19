@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.chat.domain;
+package org.prgms.locomocoserver.chat.domain.chatParticipant;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

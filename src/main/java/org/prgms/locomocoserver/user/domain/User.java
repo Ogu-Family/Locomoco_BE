@@ -20,7 +20,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.prgms.locomocoserver.chat.domain.ChatParticipant;
+import org.prgms.locomocoserver.chat.domain.chatParticipant.ChatParticipant;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.tags.domain.Tag;
