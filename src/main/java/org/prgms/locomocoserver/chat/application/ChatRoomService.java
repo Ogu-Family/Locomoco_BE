@@ -122,8 +122,7 @@ public class ChatRoomService {
         // 채팅방 참여자 목록 삭제
         chatParticipantRepository.deleteAllByChatRoom(chatRoom);
         // 채팅방 메시지 삭제
-        chatMessageRepository.findAllByChatRoom(chatRoom)
-                .stream().forEach(chatMessage -> chatMessage.delete());
+        chatMessageRepository.findAllByChatRoom(chatRoom).forEach(chatMessage -> chatMessage.delete());
         // 채팅방 삭제
         chatRoom.delete();
     }
