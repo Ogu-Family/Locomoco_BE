@@ -25,12 +25,15 @@ class MogakkoTest {
     @DisplayName("정상적으로 모각코를 생성한다")
     void success_create_Mogakko() {
         // given when
-        Mogakko mogakko = Mogakko.builder().title("title").content("content").views(1L).likeCount(0)
+        Mogakko mogakko1 = Mogakko.builder().title("title").content("content").views(1L).likeCount(0)
             .startTime(LocalDateTime.now()).deadline(LocalDateTime.now()).endTime(LocalDateTime.now())
             .maxParticipants(10).creator(testUser).build();
-
+        Mogakko mogakko2 = Mogakko.builder().title(" ").content("content").views(1L).likeCount(0)
+            .startTime(LocalDateTime.now()).deadline(LocalDateTime.now()).endTime(LocalDateTime.now())
+            .maxParticipants(10).creator(testUser).build();
         // then
-        assertThat(mogakko).isNotNull();
+        assertThat(mogakko1).isNotNull();
+        assertThat(mogakko2.getTitle()).isEqualTo(Mogakko.DEFAULT_TITLE);
     }
 
     @Test
