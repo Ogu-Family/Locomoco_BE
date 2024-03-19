@@ -27,7 +27,7 @@ import org.prgms.locomocoserver.categories.domain.CategoryInputType;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
 import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
-import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
+import org.prgms.locomocoserver.chat.domain.chatParticipant.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.location.domain.Location;
 import org.prgms.locomocoserver.location.domain.LocationRepository;

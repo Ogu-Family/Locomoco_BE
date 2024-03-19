@@ -11,7 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
-import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
+import org.prgms.locomocoserver.chat.domain.chatParticipant.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;

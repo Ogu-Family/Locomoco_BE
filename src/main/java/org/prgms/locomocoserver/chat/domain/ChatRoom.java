@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.prgms.locomocoserver.chat.domain.chatParticipant.ChatParticipant;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.user.domain.User;

@@ -2,6 +2,8 @@ package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.domain.*;
+import org.prgms.locomocoserver.chat.domain.chatParticipant.ChatParticipant;
+import org.prgms.locomocoserver.chat.domain.chatParticipant.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
