@@ -49,7 +49,7 @@ public class MogakkoParticipationService {
         chatRoomService.enterChatRoom(new ChatEnterRequestDto(mogakko.getChatRoom().getId(), user));
     }
 
-    public void cancel(Long mogakkoId, Long userId) { // TODO: 참여 취소 시 채팅방 자동 나가기
+    public void cancel(Long mogakkoId, Long userId) {
         Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
             .orElseThrow(RuntimeException::new); // TODO: 모각코 에러 반환
 
@@ -58,6 +58,8 @@ public class MogakkoParticipationService {
         Participant participant = participantRepository.findByMogakkoIdAndUserId(mogakkoId, userId)
             .orElseThrow(RuntimeException::new);// TODO: 참여 예외 반환
         participantRepository.delete(participant);
+
+        chatRoomService.leave(mogakko.getChatRoom(), userId);
     }
 
     private void validateIfDeadlineIsPast(Mogakko mogakko) {
