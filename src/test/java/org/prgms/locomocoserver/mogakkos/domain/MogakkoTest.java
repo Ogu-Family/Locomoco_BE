@@ -51,20 +51,16 @@ class MogakkoTest {
     }
 
     @Test
-    @DisplayName("데드 라인이 시작 시간과 끝 시간 사이에 있지 않은 모각코는 생성할 수 없다")
+    @DisplayName("데드 라인이 끝 시간 뒤에 존재하는 모각코는 생성할 수 없다")
     void fail_create_Mogakko_given_deadline_is_not_between_endTime_and_startTime() {
         // given
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusHours(2);
-        LocalDateTime deadline1 = startTime.plusHours(3);
-        LocalDateTime deadline2 = startTime.minusHours(1);
+        LocalDateTime deadline = startTime.plusHours(3);
 
         // when then
         assertThrows(RuntimeException.class, () -> Mogakko.builder().title("title").content("content").views(1L).likeCount(0) // TODO: 모각코 예외 반환
-            .startTime(startTime).deadline(deadline1).endTime(endTime)
-            .maxParticipants(10).creator(testUser).build());
-        assertThrows(RuntimeException.class, () -> Mogakko.builder().title("title").content("content").views(1L).likeCount(0) // TODO: 모각코 예외 반환
-            .startTime(startTime).deadline(deadline2).endTime(endTime)
+            .startTime(startTime).deadline(deadline).endTime(endTime)
             .maxParticipants(10).creator(testUser).build());
     }
 

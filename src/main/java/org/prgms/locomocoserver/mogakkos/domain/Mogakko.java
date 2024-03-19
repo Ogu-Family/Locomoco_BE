@@ -160,7 +160,7 @@ public class Mogakko extends BaseEntity {
         if (this.content.length() > MAX_CONTENT_LEN) {
             throw new RuntimeException("내용 최대 길이를 초과했습니다!");
         }
-        if (this.startTime.isAfter(this.endTime) || this.deadline.isAfter(this.endTime) || this.startTime.isAfter(this.deadline)) {
+        if (this.startTime.isAfter(this.endTime) || this.deadline.isAfter(this.endTime)) {
             throw new RuntimeException("날짜 설정이 잘못되었습니다!");
         }
         if (this.maxParticipants < 0 || this.maxParticipants > DEFAULT_MAX_PARTICIPANTS) {
