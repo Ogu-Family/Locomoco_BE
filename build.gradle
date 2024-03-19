@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.8'
     id 'io.spring.dependency-management' version '1.1.4'
+    id 'jacoco'
 }
 
 group = 'org.prgms'
@@ -9,6 +10,10 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '17'
+}
+
+jacoco {
+    toolVersion = '0.8.11'
 }
 
 configurations {
@@ -50,4 +55,44 @@ tasks.named('bootBuildImage') {
 
 tasks.named('test') {
     useJUnitPlatform()
+    testLogging {
+        showCauses = true
+        showExceptions = true
+        showStackTraces = true
+        exceptionFormat = 'full'
+    }
+    finalizedBy 'testCoverage'
+}
+
+tasks.register('testCoverage', Test) {
+    group 'verification'
+    description 'Runs the tests with coverage'
+
+    dependsOn 'test', 'jacocoTestReport', 'jacocoTestCoverageVerification'
+}
+
+tasks.named('jacocoTestReport') {
+    reports {
+        html.required = true
+        xml.required = false
+        csv.required = false
+    }
+
+    mustRunAfter 'test'
+}
+
+tasks.named('jacocoTestCoverageVerification') {
+    violationRules {
+        rule {
+            element = 'CLASS'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.00 // TODO: 추후 라인 커버리지 비율 설정 (0.80 ~ 0.90 권장)
+            }
+        }
+    }
+
+    mustRunAfter 'jacocoTestReport'
 }
