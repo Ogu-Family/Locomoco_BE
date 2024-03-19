@@ -12,6 +12,8 @@ import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
+import org.prgms.locomocoserver.user.exception.UserErrorType;
+import org.prgms.locomocoserver.user.exception.UserException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +26,7 @@ public class InquiryService {
 
     public void save(InquiryCreateRequestDto requestDto) {
         User user = userRepository.findById(requestDto.userid())
-            .orElseThrow(RuntimeException::new); // TODO: 유저 예외 반환
+            .orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND)); // TODO: 유저 예외 반환
         Mogakko mogakko = mogakkoRepository.findById(requestDto.mogakkoId())
             .orElseThrow(RuntimeException::new);// TODO: 모각코 예외 반환
 
