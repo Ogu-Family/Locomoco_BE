@@ -112,6 +112,17 @@ public class ChatRoomService {
         return chatRoom.getId();
     }
 
+    @Transactional
+    public void delete(ChatRoom chatRoom) {
+        // 채팅방 참여자 목록 삭제
+        chatParticipantRepository.deleteAllByChatRoom(chatRoom);
+        // 채팅방 메시지 삭제
+        chatMessageRepository.findAllByChatRoom(chatRoom)
+                .stream().forEach(chatMessage -> chatMessage.delete());
+        // 채팅방 삭제
+        chatRoom.delete();
+    }
+
     private boolean isParticipantExist(ChatRoom chatRoom, User user) {
         return chatRoom.getChatParticipants().stream()
                 .anyMatch(chatParticipant -> chatParticipant.getUser().getId().equals(user.getId()));
