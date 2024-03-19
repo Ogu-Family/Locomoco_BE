@@ -36,6 +36,7 @@ public class Mogakko extends BaseEntity {
     public static final int DEFAULT_MAX_PARTICIPANTS = 10;
     public static final int MAX_TITLE_LEN = 255;
     public static final int MAX_CONTENT_LEN = 500;
+    public static final String DEFAULT_TITLE = "모각코 모집합니다~";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -151,6 +152,8 @@ public class Mogakko extends BaseEntity {
     }
 
     private void validate() { // TODO: 모각코 예외 반환
+        this.title = !this.title.isBlank() ? this.title : DEFAULT_TITLE;
+
         if (this.title.length() > MAX_TITLE_LEN) {
             throw new RuntimeException("제목 최대 길이를 초과했습니다!");
         }
