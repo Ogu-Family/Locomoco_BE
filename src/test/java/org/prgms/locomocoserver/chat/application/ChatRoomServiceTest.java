@@ -15,6 +15,8 @@ import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
+import org.prgms.locomocoserver.chat.exception.ChatErrorType;
+import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.location.domain.Location;
 import org.prgms.locomocoserver.location.domain.LocationRepository;
 import org.prgms.locomocoserver.location.dto.LocationInfoDto;
@@ -96,7 +98,7 @@ class ChatRoomServiceTest {
         TransactionStatus status = tx.getTransaction(new DefaultTransactionDefinition());
 
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(
-            mogakko.getChatRoom().getId()).orElseThrow(RuntimeException::new);
+            mogakko.getChatRoom().getId()).orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
 
         assertThat(chatRoom.getMogakko().getId()).isEqualTo(mogakko.getId());
         assertThat(chatRoom.getCreator().getId()).isEqualTo(dummyUsers.get(0).getId());
