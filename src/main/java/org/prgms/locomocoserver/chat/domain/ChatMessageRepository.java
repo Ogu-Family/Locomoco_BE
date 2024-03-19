@@ -20,4 +20,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             nativeQuery = true)
     ChatMessage findLastMessageByRoomId(Long roomId);
 
+    List<ChatMessage> findAllByChatRoom(ChatRoom chatRoom);
+
 }

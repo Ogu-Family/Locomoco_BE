@@ -131,8 +131,10 @@ public class MogakkoService {
     @Transactional
     public void delete(Long id) {
         Mogakko foundMogakko = getByIdNotDeleted(id);
+        ChatRoom chatRoom = foundMogakko.getChatRoom();
 
         foundMogakko.delete();
+        chatRoomService.delete(chatRoom);
     }
 
     public Mogakko getByIdNotDeleted(Long id) {
