@@ -14,23 +14,36 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
     Optional<Mogakko> findByIdAndDeletedAtIsNull(Long id);
 
     @Query(value = "SELECT m.* FROM mogakko m "
-        + "JOIN locations l ON (m.id > :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND l.mogakko_id = m.id AND l.city LIKE :city%) "
+        + "JOIN locations l ON (m.id < :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND l.mogakko_id = m.id AND l.city LIKE :city%) "
+        + "ORDER BY m.created_at DESC "
         + "LIMIT :pageSize", nativeQuery = true)
     List<Mogakko> findAllByCity(Long cursor, String city, int pageSize, LocalDateTime now);
 
+    @Query(value = "SELECT m.* "
+        + "FROM mogakko_tags mt "
+        + "INNER JOIN mogakko m ON m.id < :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND m.id = mt.mogakko_id "
+        + "INNER JOIN locations l ON l.mogakko_id = m.id AND l.city LIKE :city% "
+        + "WHERE mt.tag_id IN :tagIds "
+        + "GROUP BY mt.mogakko_id HAVING COUNT(mt.mogakko_id) = :tagSize "
+        + "ORDER BY m.created_at DESC "
+        + "LIMIT :pageSize", nativeQuery = true)
+    List<Mogakko> findAllByCity(Iterable<Long> tagIds, int tagSize, Long cursor, String city, int pageSize, LocalDateTime now);
+
     @Query(value = "SELECT m.* FROM mogakko m "
-        + "INNER JOIN users u ON m.id > :cursor AND m.deleted_at IS NULL AND m.deadline > :now AND m.creator_id = u.id "
+        + "INNER JOIN users u ON m.id < :cursor AND m.deleted_at IS NULL AND m.deadline > :now AND m.creator_id = u.id "
         + "INNER JOIN locations l ON l.mogakko_id = m.id "
         + "INNER JOIN mogakko_tags mt ON mt.tag_id IN :tagIds AND mt.mogakko_id = m.id "
         + "WHERE (m.title LIKE %:searchVal% OR m.content LIKE %:searchVal% OR u.nickname LIKE %:searchVal% OR l.city LIKE %:searchVal%) "
         + "GROUP BY m.id HAVING count(m.id) = :tagSize "
+        + "ORDER BY m.created_at DESC "
         + "LIMIT :pageSize", nativeQuery = true)
     List<Mogakko> findAllByFilter(Long cursor, String searchVal, List<Long> tagIds, int tagSize, int pageSize, LocalDateTime now);
 
     @Query(value = "SELECT DISTINCT m.* FROM mogakko m "
-        + "INNER JOIN users u ON m.id > :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND m.creator_id = u.id "
+        + "INNER JOIN users u ON m.id < :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND m.creator_id = u.id "
         + "INNER JOIN locations l ON l.mogakko_id = m.id "
         + "WHERE (m.title LIKE %:searchVal% OR m.content LIKE %:searchVal% OR u.nickname LIKE %:searchVal% OR l.city LIKE %:searchVal%) "
+        + "ORDER BY m.created_at DESC "
         + "LIMIT :pageSize", nativeQuery = true)
     List<Mogakko> findAllByFilter(Long cursor, String searchVal, int pageSize, LocalDateTime now);
 

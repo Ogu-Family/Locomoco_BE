@@ -8,8 +8,7 @@ import org.prgms.locomocoserver.mogakkos.dto.SearchRepositoryDto;
 
 public enum SearchType {
     TOTAL(dto -> new TotalSearchPolicy(dto.mogakkoRepository())),
-    LOCATION(dto -> new LocationSearchPolicy(dto.mogakkoRepository(),
-        dto.mogakkoTagRepository()));
+    LOCATION(dto -> new LocationSearchPolicy(dto.mogakkoRepository()));
 
     private final Function<SearchRepositoryDto, SearchPolicy> searchPolicy;
 
