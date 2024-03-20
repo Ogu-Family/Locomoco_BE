@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 
@@ -45,9 +47,11 @@ class MogakkoTest {
         LocalDateTime deadline = startTime.plusHours(2);
 
         // when then
-        assertThrows(RuntimeException.class, () -> Mogakko.builder().title("title").content("content").views(1L).likeCount(0) // TODO: 모각코 예외 반환
-            .startTime(startTime).deadline(deadline).endTime(endTime)
-            .maxParticipants(10).creator(testUser).build());
+        MogakkoException mogakkoException = assertThrows(MogakkoException.class,
+            () -> Mogakko.builder().title("title").content("content").views(1L)
+                .likeCount(0).startTime(startTime).deadline(deadline).endTime(endTime)
+                .maxParticipants(10).creator(testUser).build());
+        assertThat(mogakkoException.getErrorCode()).isEqualTo(MogakkoErrorCode.CREATE_FORBIDDEN);
     }
 
     @Test
@@ -59,9 +63,11 @@ class MogakkoTest {
         LocalDateTime deadline = startTime.plusHours(3);
 
         // when then
-        assertThrows(RuntimeException.class, () -> Mogakko.builder().title("title").content("content").views(1L).likeCount(0) // TODO: 모각코 예외 반환
-            .startTime(startTime).deadline(deadline).endTime(endTime)
-            .maxParticipants(10).creator(testUser).build());
+        MogakkoException mogakkoException = assertThrows(MogakkoException.class,
+            () -> Mogakko.builder().title("title").content("content").views(1L)
+                .likeCount(0).startTime(startTime).deadline(deadline).endTime(endTime)
+                .maxParticipants(10).creator(testUser).build());
+        assertThat(mogakkoException.getErrorCode()).isEqualTo(MogakkoErrorCode.CREATE_FORBIDDEN);
     }
 
     @Test
@@ -71,9 +77,12 @@ class MogakkoTest {
         String title = "a".repeat(256);
 
         // when then
-        assertThrows(RuntimeException.class, () -> Mogakko.builder().title(title).content("content").views(1L).likeCount(0) // TODO: 모각코 예외 반환
-            .startTime(LocalDateTime.now()).deadline(LocalDateTime.now()).endTime(LocalDateTime.now())
-            .maxParticipants(10).creator(testUser).build());
+        MogakkoException mogakkoException = assertThrows(MogakkoException.class,
+            () -> Mogakko.builder().title(title).content("content").views(1L).likeCount(0)
+                .startTime(LocalDateTime.now()).deadline(LocalDateTime.now())
+                .endTime(LocalDateTime.now())
+                .maxParticipants(10).creator(testUser).build());
+        assertThat(mogakkoException.getErrorCode()).isEqualTo(MogakkoErrorCode.CREATE_FORBIDDEN);
     }
 
     @Test
@@ -83,9 +92,12 @@ class MogakkoTest {
         String content = "a".repeat(501);
 
         // when then
-        assertThrows(RuntimeException.class, () -> Mogakko.builder().title("title").content(content).views(1L).likeCount(0) // TODO: 모각코 예외 반환
-            .startTime(LocalDateTime.now()).deadline(LocalDateTime.now()).endTime(LocalDateTime.now())
-            .maxParticipants(10).creator(testUser).build());
+        MogakkoException mogakkoException = assertThrows(MogakkoException.class,
+            () -> Mogakko.builder().title("title").content(content).views(1L).likeCount(0)
+                .startTime(LocalDateTime.now()).deadline(LocalDateTime.now())
+                .endTime(LocalDateTime.now())
+                .maxParticipants(10).creator(testUser).build());
+        assertThat(mogakkoException.getErrorCode()).isEqualTo(MogakkoErrorCode.CREATE_FORBIDDEN);
     }
 
     @Test
@@ -95,9 +107,12 @@ class MogakkoTest {
         int maxParticipants = 25;
 
         // when then
-        assertThrows(RuntimeException.class, () -> Mogakko.builder().title("title").content("content").views(1L).likeCount(0) // TODO: 모각코 예외 반환
-            .startTime(LocalDateTime.now()).deadline(LocalDateTime.now()).endTime(LocalDateTime.now())
-            .maxParticipants(maxParticipants).creator(testUser).build());
+        MogakkoException mogakkoException = assertThrows(MogakkoException.class,
+            () -> Mogakko.builder().title("title").content("content").views(1L).likeCount(0)
+                .startTime(LocalDateTime.now()).deadline(LocalDateTime.now())
+                .endTime(LocalDateTime.now())
+                .maxParticipants(maxParticipants).creator(testUser).build());
+        assertThat(mogakkoException.getErrorCode()).isEqualTo(MogakkoErrorCode.CREATE_FORBIDDEN);
     }
 
     @Test

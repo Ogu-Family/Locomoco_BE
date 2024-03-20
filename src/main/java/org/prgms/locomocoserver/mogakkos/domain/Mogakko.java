@@ -24,6 +24,8 @@ import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.inquiries.domain.Inquiry;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.user.domain.User;
 
 @Entity
@@ -151,21 +153,26 @@ public class Mogakko extends BaseEntity {
         else this.likeCount--;  // 변경 후 값 false -> -1
     }
 
-    private void validate() { // TODO: 모각코 예외 반환
+    private void validate() {
         this.title = !this.title.isBlank() ? this.title : DEFAULT_TITLE;
 
         if (this.title.length() > MAX_TITLE_LEN) {
-            throw new RuntimeException("제목 최대 길이를 초과했습니다!");
+            throw generateCreateException("제목 최대 길이를 초과했습니다!");
         }
         if (this.content.length() > MAX_CONTENT_LEN) {
-            throw new RuntimeException("내용 최대 길이를 초과했습니다!");
+            throw generateCreateException("내용 최대 길이를 초과했습니다!");
         }
         if (this.startTime.isAfter(this.endTime) || this.deadline.isAfter(this.endTime)) {
-            throw new RuntimeException("날짜 설정이 잘못되었습니다!");
+            throw generateCreateException("날짜 설정이 잘못되었습니다!");
         }
         if (this.maxParticipants < 0 || this.maxParticipants > DEFAULT_MAX_PARTICIPANTS) {
-            throw new RuntimeException("최대 인원 수가 잘못되었습니다!");
+            throw generateCreateException("최대 인원 수가 잘못되었습니다!");
         }
 
+    }
+
+    private MogakkoException generateCreateException(String msg) {
+        return new MogakkoException(
+            MogakkoErrorCode.CREATE_FORBIDDEN.appendMessage(msg));
     }
 }

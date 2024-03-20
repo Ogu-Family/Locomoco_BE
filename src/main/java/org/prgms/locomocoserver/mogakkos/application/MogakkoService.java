@@ -26,6 +26,8 @@ import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoParticipantDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.prgms.locomocoserver.user.application.UserService;
@@ -139,12 +141,12 @@ public class MogakkoService {
 
     public Mogakko getByIdNotDeleted(Long id) {
         return mogakkoRepository.findByIdAndDeletedAtIsNull(id)
-            .orElseThrow(RuntimeException::new); // TODO: 모각코 에러 반환
+            .orElseThrow(() -> new MogakkoException(MogakkoErrorCode.NOT_FOUND));
     }
 
     private static void validateCreator(MogakkoUpdateRequestDto requestDto, Mogakko foundMogakko) {
         if (!foundMogakko.isSameCreatorId(requestDto.creatorId())) {
-            throw new RuntimeException(); // TODO: 모각코 예외 반환
+            throw new MogakkoException(MogakkoErrorCode.PROCESS_FORBIDDEN);
         }
     }
 
