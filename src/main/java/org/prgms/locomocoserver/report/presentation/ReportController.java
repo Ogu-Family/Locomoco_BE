@@ -40,7 +40,7 @@ public class ReportController {
 
     @Operation(summary = "신고 전체 조회", description = "신고한 모든 목록을 조회합니다.")
     @GetMapping("/reports")
-    public ResponseEntity<List<ReportDto>> getAllReports(@RequestParam(name = "cursor") Long cursor,
+    public ResponseEntity<List<ReportDto>> getAllReports(@RequestParam(name = "cursor", required = false) Long cursor,
                                                          @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         List<ReportDto> reportDtos = reportService.getAllReports(cursor, pageSize);
         return ResponseEntity.ok(reportDtos);
