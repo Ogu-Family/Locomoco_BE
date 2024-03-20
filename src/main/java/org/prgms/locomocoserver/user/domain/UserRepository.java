@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmailAndProviderDeletedAtIsNull(String email, String provider);
+    Optional<User> findByEmailAndProviderAndDeletedAtIsNull(String email, String provider);
     Optional<User> findByIdAndDeletedAtIsNull(Long id);
     Optional<User> findByNicknameAndDeletedAtIsNull(String nickname);
     @Query("SELECT u FROM User u WHERE u.id IN (SELECT p.user.id FROM Participant p WHERE p.mogakko = :mogakko)")
