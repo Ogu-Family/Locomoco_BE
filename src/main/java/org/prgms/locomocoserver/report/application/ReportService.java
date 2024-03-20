@@ -46,7 +46,7 @@ public class ReportService {
         if (cursor == null) cursor = 0L;
         return reportRepository.findAllByDeletedAtIsNull(cursor, pageSize).stream()
               .map(report -> {
-                  User reported = userRepository.findById(report.getId())
+                  User reported = userRepository.findById(report.getReportedId())
                           .orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND));
                   return ReportDto.of(report, reported);
               })
