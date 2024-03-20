@@ -8,6 +8,9 @@ import org.prgms.locomocoserver.report.dto.request.ReportCreateRequest;
 import org.prgms.locomocoserver.report.dto.request.ReportUpdateRequest;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
+import org.prgms.locomocoserver.user.domain.UserRepository;
+import org.prgms.locomocoserver.user.exception.UserErrorType;
+import org.prgms.locomocoserver.user.exception.UserException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,7 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     public ReportDto create(ReportCreateRequest request) {
         User reporter = userService.getById(request.reporterId());
@@ -41,7 +45,11 @@ public class ReportService {
     public List<ReportDto> getAllReports(Long cursor, int pageSize) {
         if (cursor == null) cursor = 0L;
         return reportRepository.findAllByDeletedAtIsNull(cursor, pageSize).stream()
-              .map(report -> ReportDto.of(report, userService.getById(report.getReportedId())))
+              .map(report -> {
+                  User reported = userRepository.findById(report.getId())
+                          .orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND));
+                  return ReportDto.of(report, reported);
+              })
               .toList();
     }
 
