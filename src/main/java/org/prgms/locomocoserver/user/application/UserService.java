@@ -53,7 +53,7 @@ public class UserService {
     @Transactional
     public UserLoginResponse saveOrUpdate(OAuthUserInfoDto oAuthUserInfoDto, TokenResponseDto tokenResponseDto) {
         boolean isNewUser = false;
-        Optional<User> optionalUser = userRepository.findByEmailAndDeletedAtIsNull(oAuthUserInfoDto.getEmail());
+        Optional<User> optionalUser = userRepository.findByEmailAndProviderDeletedAtIsNull(oAuthUserInfoDto.getEmail(), oAuthUserInfoDto.getProvider());
 
         User user;
         if (optionalUser.isPresent()) {
