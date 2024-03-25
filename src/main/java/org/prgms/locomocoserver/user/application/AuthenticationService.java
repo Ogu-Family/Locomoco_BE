@@ -9,6 +9,7 @@ import org.prgms.locomocoserver.global.exception.InvalidTokenException;
 import org.prgms.locomocoserver.user.domain.enums.Provider;
 import org.prgms.locomocoserver.user.exception.UserErrorType;
 import org.prgms.locomocoserver.user.exception.UserException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -19,6 +20,9 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+
+    @Value("${oauth.github.CLIENT_ID}")
+    private String github_client_id;
 
     public boolean authenticateUser(String providerValue, String accessToken) {
         Provider provider = Provider.valueOf(providerValue.toUpperCase());
@@ -67,7 +71,7 @@ public class AuthenticationService {
     }
 
     private boolean authenticateGithubUser(String accessToken) {
-        String url = "https://api.github.com/applications/Iv1.8a61f9b3a7aba766/token";
+        String url = "https://api.github.com/applications"+ github_client_id + "token";
         log.info("AuthenticationService - authenticateGithubUser");
 
         HttpHeaders headers = new HttpHeaders();
