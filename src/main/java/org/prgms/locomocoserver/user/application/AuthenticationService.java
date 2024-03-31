@@ -77,7 +77,10 @@ public class AuthenticationService {
     }
 
     public boolean authenticateGithubUser(String accessToken) {
+
+        accessToken = accessToken.replace("Bearer ", "");
         log.info("Authenticate GithubUser : " + accessToken);
+
         String url = "https://api.github.com/applications/" + github_client_id + "/token";
 
         HttpHeaders headers = new HttpHeaders();
