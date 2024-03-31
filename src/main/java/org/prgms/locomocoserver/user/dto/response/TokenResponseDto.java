@@ -3,6 +3,7 @@ package org.prgms.locomocoserver.user.dto.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.prgms.locomocoserver.user.domain.RefreshToken;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record TokenResponseDto(
@@ -22,4 +23,12 @@ public record TokenResponseDto(
         @Schema(description = "리프레시 토큰 만료", example = "28000")
         int refreshTokenExpiresIn
 ) {
+        public RefreshToken toRefreshTokenEntity() {
+                return RefreshToken.builder()
+                        .refreshToken(refreshToken)
+                        .refreshTokenExpiresIn(refreshTokenExpiresIn)
+                        .accessTokenExpiresIn(expiresIn)
+                        .accessToken(accessToken)
+                        .build();
+        }
 }
