@@ -16,6 +16,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Base64;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,9 @@ public class AuthenticationService {
 
     @Value("${oauth.github.CLIENT_ID}")
     private String github_client_id;
+
+    @Value("${oauth.github.CLIENT_SECRET_KEY}")
+    private String github_client_secret_key;
 
     public boolean authenticateUser(String providerValue, String accessToken) {
         Provider provider = Provider.valueOf(providerValue.toUpperCase());
@@ -70,20 +75,24 @@ public class AuthenticationService {
         return response.getStatusCode() == HttpStatus.OK;
     }
 
-    private boolean authenticateGithubUser(String accessToken) {
-        String url = "https://api.github.com/applications"+ github_client_id + "token";
-        log.info("AuthenticationService - authenticateGithubUser");
-
+    public boolean authenticateGithubUser(String accessToken) {
+        String url = "https://api.github.com/applications/" + github_client_id + "/token";
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", accessToken);
+        headers.set("Authorization", "Basic " + encodeCredentials(github_client_id, github_client_secret_key));
         headers.set("Accept", "application/vnd.github+json");
         headers.set("X-GitHub-Api-Version", "2022-11-28");
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
         return response.getStatusCode() == HttpStatus.OK;
+    }
+
+    private String encodeCredentials(String clientId, String clientSecret) {
+        String credentials = clientId + ":" + clientSecret;
+        byte[] credentialsBytes = credentials.getBytes();
+        return new String(Base64.getEncoder().encode(credentialsBytes));
     }
 }
