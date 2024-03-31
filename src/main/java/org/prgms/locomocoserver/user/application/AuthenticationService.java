@@ -61,6 +61,7 @@ public class AuthenticationService {
     }
 
     private boolean authenticateKakaoUser(String accessToken) {
+        log.info("Authenticate KakaoUser : " + accessToken);
         String url = "https://kapi.kakao.com/v1/user/access_token_info";
         log.info("AuthenticationService - authenticateKakaoUser");
 
@@ -76,6 +77,7 @@ public class AuthenticationService {
     }
 
     public boolean authenticateGithubUser(String accessToken) {
+        log.info("Authenticate GithubUser : " + accessToken);
         String url = "https://api.github.com/applications/" + github_client_id + "/token";
 
         HttpHeaders headers = new HttpHeaders();
