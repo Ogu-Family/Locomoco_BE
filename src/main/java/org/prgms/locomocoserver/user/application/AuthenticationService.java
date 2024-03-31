@@ -77,22 +77,20 @@ public class AuthenticationService {
 
     public boolean authenticateGithubUser(String accessToken) {
         String url = "https://api.github.com/applications/" + github_client_id + "/token";
+
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic " + encodeCredentials(github_client_id, github_client_secret_key));
+        headers.setBasicAuth(github_client_id, github_client_secret_key);
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Accept", "application/vnd.github+json");
         headers.set("X-GitHub-Api-Version", "2022-11-28");
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+        String requestBody = "{\"access_token\": \"" + accessToken + "\"}";
+
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
         return response.getStatusCode() == HttpStatus.OK;
-    }
-
-    private String encodeCredentials(String clientId, String clientSecret) {
-        String credentials = clientId + ":" + clientSecret;
-        byte[] credentialsBytes = credentials.getBytes();
-        return new String(Base64.getEncoder().encode(credentialsBytes));
     }
 }
