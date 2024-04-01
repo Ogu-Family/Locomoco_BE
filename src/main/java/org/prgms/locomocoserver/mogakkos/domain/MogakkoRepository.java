@@ -40,7 +40,7 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
         + "LIMIT :pageSize", nativeQuery = true)
     List<Mogakko> findAllByFilter(Long cursor, String searchVal, List<Long> tagIds, int tagSize, int pageSize, LocalDateTime now);
 
-    @Query(value = "SELECT DISTINCT m.* FROM mogakko m "
+    @Query(value = "SELECT m.* FROM mogakko m "
         + "INNER JOIN users u ON m.id < :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND m.creator_id = u.id "
         + "INNER JOIN locations l ON l.mogakko_id = m.id "
         + "WHERE MATCH(m.title) AGAINST(:searchVal IN BOOLEAN MODE) OR MATCH(m.content) AGAINST(:searchVal IN BOOLEAN MODE) OR u.nickname LIKE :searchVal% OR MATCH(l.city) AGAINST(:searchVal IN BOOLEAN MODE) "
