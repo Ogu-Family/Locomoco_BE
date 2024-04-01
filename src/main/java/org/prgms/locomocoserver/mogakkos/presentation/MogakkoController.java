@@ -17,6 +17,8 @@ import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoLikeDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,10 @@ public class MogakkoController {
             @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "100") Integer pageSize,
             @Parameter(description = "필터링 태그 id 목록") @RequestParam(required = false) List<Long> tags) {
         searchVal = searchVal.strip();
+
+        if (searchVal.length() == 1) {
+            throw new MogakkoException(MogakkoErrorCode.TOO_LITTLE_INPUT.appendMessage("2"));
+        }
 
         List<MogakkoSimpleInfoResponseDto> responseDtos = mogakkoService.findAllByFilter(tags,
                 cursor, searchVal, searchType, pageSize);
