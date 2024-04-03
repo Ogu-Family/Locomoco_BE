@@ -61,6 +61,7 @@ public class KakaoController {
         log.info("KakaoController.getKakaoLoginCallback after loadUserInfo : " + kakaoUserInfoResponseDto.getEmail());
 
         UserLoginResponse userLoginResponse = userService.saveOrUpdate(kakaoUserInfoResponseDto, tokenResponseDto);
+        refreshTokenService.saveTokenInfo(tokenResponseDto);
 
         log.info("KakaoController.getKakaoLoginCallback after saveOrUpdate : " + userLoginResponse.isNewUser());
 
