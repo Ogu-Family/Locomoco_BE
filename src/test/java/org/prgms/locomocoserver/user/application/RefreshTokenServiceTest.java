@@ -1,7 +1,5 @@
 package org.prgms.locomocoserver.user.application;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +9,9 @@ import org.prgms.locomocoserver.user.domain.RefreshTokenRepository;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class RefreshTokenServiceTest extends AbstractRedisContainerBaseTest {
@@ -20,6 +21,9 @@ class RefreshTokenServiceTest extends AbstractRedisContainerBaseTest {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @BeforeEach
     void setUp() {
@@ -31,7 +35,7 @@ class RefreshTokenServiceTest extends AbstractRedisContainerBaseTest {
     }
 
     @Test
-    @DisplayName("accessToken을 저장할 수 있다.")
+    @DisplayName("refreshToken을 저장할 수 있다.")
     void saveTokenInfo() {
         // given
         TokenResponseDto tokenResponseDto = new TokenResponseDto("accessToken", "bearer", "refreshToken", 3800, 14000);
@@ -44,10 +48,16 @@ class RefreshTokenServiceTest extends AbstractRedisContainerBaseTest {
     }
 
     @Test
+    @DisplayName("refreshToken을 지울 수 있다.")
     void removeRefreshToken() {
-    }
+        // given
+        TokenResponseDto tokenResponseDto = new TokenResponseDto("accessToken", "bearer", "refreshToken", 3800, 14000);
+        String accessToken = refreshTokenService.saveTokenInfo(tokenResponseDto);
 
-    @Test
-    void updateRefreshToken() {
+        // when
+        refreshTokenService.removeAccessToken(accessToken);
+
+        // then
+        assertEquals(0, refreshTokenRepository.count());
     }
 }
