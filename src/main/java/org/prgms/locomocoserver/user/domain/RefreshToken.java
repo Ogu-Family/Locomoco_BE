@@ -13,18 +13,14 @@ public class RefreshToken {
     @Id
     private String id;
 
-    private String refreshToken;
-    private long refreshTokenExpiresIn;
-
     @Indexed
     private String accessToken;
-    private long accessTokenExpiresIn;
+
+    private String refreshToken;
 
     @Builder
-    public RefreshToken(String refreshToken, long refreshTokenExpiresIn, String accessToken, long accessTokenExpiresIn) {
-        this.refreshToken = refreshToken;
-        this.refreshTokenExpiresIn = refreshTokenExpiresIn;
+    public RefreshToken(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
-        this.accessTokenExpiresIn = accessTokenExpiresIn;
+        this.refreshToken = refreshToken;
     }
 }
