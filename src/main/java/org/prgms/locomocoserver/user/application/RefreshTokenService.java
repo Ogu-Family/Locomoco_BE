@@ -1,9 +1,13 @@
 package org.prgms.locomocoserver.user.application;
 
 import lombok.RequiredArgsConstructor;
+import org.prgms.locomocoserver.global.exception.AuthException;
+import org.prgms.locomocoserver.global.exception.ErrorCode;
 import org.prgms.locomocoserver.user.domain.RefreshToken;
 import org.prgms.locomocoserver.user.domain.RefreshTokenRepository;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
+import org.prgms.locomocoserver.user.exception.UserErrorType;
+import org.prgms.locomocoserver.user.exception.UserException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -27,17 +31,29 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public void removeRefreshToken(String accessToken) {
-        refreshTokenRepository.deleteByAccessToken(accessToken);
+    public void removeAccessToken(String accessToken) {
+        RefreshToken refreshToken = getByAccessToken(accessToken);
+        refreshTokenRepository.delete(refreshToken);
     }
 
     @Transactional
-    public TokenResponseDto updateRefreshToken(String refreshToken) {
-        TokenResponseDto tokenResponseDto = refreshAccessToken(refreshToken);
+    public TokenResponseDto updateAccessToken(String accessToken) {
+        RefreshToken refreshToken = getByAccessToken(accessToken);
+
+        TokenResponseDto tokenResponseDto = refreshKakaoAccessToken(refreshToken.getRefreshToken());
+
+        saveTokenInfo(tokenResponseDto);
+        removeAccessToken(accessToken);
+
         return tokenResponseDto;
     }
 
-    private TokenResponseDto refreshAccessToken(String refreshToken) {
+    private RefreshToken getByAccessToken(String accessToken) {
+        return refreshTokenRepository.findByAccessToken(accessToken)
+               .orElseThrow(() -> new UserException(UserErrorType.ACCESSTOKEN_NOT_FOUND));
+    }
+
+    private TokenResponseDto refreshKakaoAccessToken(String refreshToken) {
         String url = "https://kauth.kakao.com/oauth/token";
 
         HttpHeaders headers = new HttpHeaders();
