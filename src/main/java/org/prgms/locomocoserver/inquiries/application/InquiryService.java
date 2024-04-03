@@ -27,7 +27,7 @@ public class InquiryService {
     private final UserRepository userRepository;
 
     public void save(InquiryCreateRequestDto requestDto) {
-        User user = userRepository.findById(requestDto.userid())
+        User user = userRepository.findById(requestDto.userId())
             .orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND)); // TODO: 유저 예외 반환
         Mogakko mogakko = mogakkoRepository.findById(requestDto.mogakkoId())
             .orElseThrow(() -> new MogakkoException(MogakkoErrorCode.NOT_FOUND));
