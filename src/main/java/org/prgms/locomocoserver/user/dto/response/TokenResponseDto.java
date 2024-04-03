@@ -26,8 +26,6 @@ public record TokenResponseDto(
         public RefreshToken toRefreshTokenEntity() {
                 return RefreshToken.builder()
                         .refreshToken(refreshToken)
-                        .refreshTokenExpiresIn(refreshTokenExpiresIn)
-                        .accessTokenExpiresIn(expiresIn)
                         .accessToken(accessToken)
                         .build();
         }
