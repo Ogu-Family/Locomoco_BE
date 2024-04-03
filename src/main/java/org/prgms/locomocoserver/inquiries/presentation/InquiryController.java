@@ -61,7 +61,7 @@ public class InquiryController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "문의 생성 성공"),
     })
-    @PutMapping("/inquries")
+    @PutMapping("/inquiries")
     public ResponseEntity<Void> create(
         @Parameter(description = "문의 생성을 위해 보내주는 정보") @RequestBody InquiryCreateRequestDto requestDto) {
         inquiryService.save(requestDto);
