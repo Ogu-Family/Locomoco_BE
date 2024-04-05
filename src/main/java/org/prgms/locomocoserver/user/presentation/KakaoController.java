@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.prgms.locomocoserver.user.application.RefreshTokenService;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.dto.kakao.KakaoUserInfoResponseDto;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
@@ -29,6 +30,7 @@ import java.io.IOException;
 public class KakaoController {
 
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${oauth.kakao.REST_API_KEY}")
     private String kakao_api_key;
@@ -59,10 +61,18 @@ public class KakaoController {
         log.info("KakaoController.getKakaoLoginCallback after loadUserInfo : " + kakaoUserInfoResponseDto.getEmail());
 
         UserLoginResponse userLoginResponse = userService.saveOrUpdate(kakaoUserInfoResponseDto, tokenResponseDto);
+        refreshTokenService.saveTokenInfo(tokenResponseDto);
 
         log.info("KakaoController.getKakaoLoginCallback after saveOrUpdate : " + userLoginResponse.isNewUser());
 
         return ResponseEntity.ok(userLoginResponse);
+    }
+
+    @Operation(summary = "accessToken 재발급", description = "accessToken이 만료되어 재발급합니다.")
+    @GetMapping("/users/refresh/kakao")
+    public ResponseEntity<TokenResponseDto> refreshToken(@RequestHeader String accessToken) {
+        TokenResponseDto tokenResponseDto = refreshTokenService.updateAccessToken(accessToken);
+        return ResponseEntity.ok(tokenResponseDto);
     }
 
     @Operation(summary = "로그인된 사용자 정보 조회", description = "access token으로 사용자 정보를 조회합니다.")
