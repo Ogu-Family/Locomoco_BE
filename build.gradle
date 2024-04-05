@@ -60,6 +60,7 @@ tasks.named('bootBuildImage') {
 
 tasks.named('test') {
     useJUnitPlatform()
+    systemProperty 'spring.profiles.active', 'test'
     testLogging {
         showCauses = true
         showExceptions = true
