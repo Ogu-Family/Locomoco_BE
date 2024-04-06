@@ -17,7 +17,7 @@ import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoLikeDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
-import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorType;
 import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +48,7 @@ public class MogakkoController {
         searchVal = searchVal.strip();
 
         if (searchVal.length() == 1) {
-            throw new MogakkoException(MogakkoErrorCode.TOO_LITTLE_INPUT.appendMessage("2"));
+            throw new MogakkoException(MogakkoErrorType.TOO_LITTLE_INPUT.appendMessage("2"));
         }
 
         List<MogakkoSimpleInfoResponseDto> responseDtos = mogakkoService.findAllByFilter(tags,
