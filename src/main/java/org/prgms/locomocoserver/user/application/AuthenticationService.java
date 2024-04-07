@@ -49,7 +49,7 @@ public class AuthenticationService {
             return isValidToken;
         } catch (HttpClientErrorException.Unauthorized e) {
             log.error("AuthenticationService - Unauthorized Exception: " + e.getMessage());
-            if (e.getMessage().contains("expire") || e.getMessage().contains("exist")) throw new ExpiredTokenException(ErrorCode.ACCESSTOKEN_EXPIRED);
+            if (e.getMessage().contains("expire")) throw new ExpiredTokenException(ErrorCode.ACCESSTOKEN_EXPIRED);
             throw new AuthException(ErrorCode.UNAUTHORIZED, e.getMessage());
         } catch (HttpClientErrorException.BadRequest e) {
             log.error("AuthenticationService - BadRequest Exception: " + e.getMessage());
