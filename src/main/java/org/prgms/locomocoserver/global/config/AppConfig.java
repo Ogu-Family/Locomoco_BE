@@ -24,6 +24,7 @@ public class AppConfig {
         FilterRegistrationBean<AuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setOrder(3);
         registrationBean.setFilter(filter);
+        registrationBean.addUrlPatterns("/api/v1/chats/rooms/*"); // 필터를 적용할 URL 패턴 지정
         return registrationBean;
     }
 
