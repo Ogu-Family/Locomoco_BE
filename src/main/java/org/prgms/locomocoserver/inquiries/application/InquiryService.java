@@ -10,7 +10,7 @@ import org.prgms.locomocoserver.inquiries.dto.response.InquiryResponseDto;
 import org.prgms.locomocoserver.inquiries.dto.response.InquiryUpdateResponseDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
-import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorType;
 import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
@@ -30,7 +30,7 @@ public class InquiryService {
         User user = userRepository.findById(requestDto.userId())
             .orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND)); // TODO: 유저 예외 반환
         Mogakko mogakko = mogakkoRepository.findById(requestDto.mogakkoId())
-            .orElseThrow(() -> new MogakkoException(MogakkoErrorCode.NOT_FOUND));
+            .orElseThrow(() -> new MogakkoException(MogakkoErrorType.NOT_FOUND));
 
         Inquiry inquiry = Inquiry.builder().mogakko(mogakko).user(user).content(requestDto.content())
             .build();

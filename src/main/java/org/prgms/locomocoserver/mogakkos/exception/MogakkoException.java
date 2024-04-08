@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class MogakkoException extends RuntimeException{
-    private final MogakkoErrorCode errorCode;
+    private final MogakkoErrorType errorType;
 
-    public MogakkoException(MogakkoErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public MogakkoException(MogakkoErrorType errorType) {
+        this.errorType = errorType;
     }
 }

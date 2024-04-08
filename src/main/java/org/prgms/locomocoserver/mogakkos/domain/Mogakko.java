@@ -24,7 +24,7 @@ import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.inquiries.domain.Inquiry;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
-import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorType;
 import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.user.domain.User;
 
@@ -173,6 +173,6 @@ public class Mogakko extends BaseEntity {
 
     private MogakkoException generateCreateException(String msg) {
         return new MogakkoException(
-            MogakkoErrorCode.CREATE_FORBIDDEN.appendMessage(msg));
+            MogakkoErrorType.CREATE_FORBIDDEN.appendMessage(msg));
     }
 }
