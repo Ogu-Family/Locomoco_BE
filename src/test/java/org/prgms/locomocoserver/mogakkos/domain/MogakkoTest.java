@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorType;
 import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
@@ -51,7 +51,7 @@ class MogakkoTest {
             () -> Mogakko.builder().title("title").content("content").views(1L)
                 .likeCount(0).startTime(startTime).deadline(deadline).endTime(endTime)
                 .maxParticipants(10).creator(testUser).build());
-        assertThat(mogakkoException.getErrorCode()).isEqualTo(MogakkoErrorCode.CREATE_FORBIDDEN);
+        assertThat(mogakkoException.getErrorType()).isEqualTo(MogakkoErrorType.CREATE_FORBIDDEN);
     }
 
     @Test
@@ -67,7 +67,7 @@ class MogakkoTest {
             () -> Mogakko.builder().title("title").content("content").views(1L)
                 .likeCount(0).startTime(startTime).deadline(deadline).endTime(endTime)
                 .maxParticipants(10).creator(testUser).build());
-        assertThat(mogakkoException.getErrorCode()).isEqualTo(MogakkoErrorCode.CREATE_FORBIDDEN);
+        assertThat(mogakkoException.getErrorType()).isEqualTo(MogakkoErrorType.CREATE_FORBIDDEN);
     }
 
     @Test
@@ -82,7 +82,7 @@ class MogakkoTest {
                 .startTime(LocalDateTime.now()).deadline(LocalDateTime.now())
                 .endTime(LocalDateTime.now())
                 .maxParticipants(10).creator(testUser).build());
-        assertThat(mogakkoException.getErrorCode()).isEqualTo(MogakkoErrorCode.CREATE_FORBIDDEN);
+        assertThat(mogakkoException.getErrorType()).isEqualTo(MogakkoErrorType.CREATE_FORBIDDEN);
     }
 
     @Test
@@ -97,7 +97,7 @@ class MogakkoTest {
                 .startTime(LocalDateTime.now()).deadline(LocalDateTime.now())
                 .endTime(LocalDateTime.now())
                 .maxParticipants(10).creator(testUser).build());
-        assertThat(mogakkoException.getErrorCode()).isEqualTo(MogakkoErrorCode.CREATE_FORBIDDEN);
+        assertThat(mogakkoException.getErrorType()).isEqualTo(MogakkoErrorType.CREATE_FORBIDDEN);
     }
 
     @Test
@@ -112,7 +112,7 @@ class MogakkoTest {
                 .startTime(LocalDateTime.now()).deadline(LocalDateTime.now())
                 .endTime(LocalDateTime.now())
                 .maxParticipants(maxParticipants).creator(testUser).build());
-        assertThat(mogakkoException.getErrorCode()).isEqualTo(MogakkoErrorCode.CREATE_FORBIDDEN);
+        assertThat(mogakkoException.getErrorType()).isEqualTo(MogakkoErrorType.CREATE_FORBIDDEN);
     }
 
     @Test

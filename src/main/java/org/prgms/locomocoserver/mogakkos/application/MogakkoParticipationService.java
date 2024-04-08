@@ -11,7 +11,7 @@ import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.ParticipationCheckingDto;
-import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorCode;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorType;
 import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
@@ -39,7 +39,7 @@ public class MogakkoParticipationService {
 
     public void participate(Long mogakkoId, ParticipationRequestDto requestDto) {
         Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
-            .orElseThrow(() -> new MogakkoException(MogakkoErrorCode.NOT_FOUND));
+            .orElseThrow(() -> new MogakkoException(MogakkoErrorType.NOT_FOUND));
         User user = userService.getById(requestDto.userId());
 
         validateIfDeadlineIsPast(mogakko);
@@ -53,7 +53,7 @@ public class MogakkoParticipationService {
 
     public void cancel(Long mogakkoId, Long userId) {
         Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
-            .orElseThrow(() -> new MogakkoException(MogakkoErrorCode.NOT_FOUND));
+            .orElseThrow(() -> new MogakkoException(MogakkoErrorType.NOT_FOUND));
 
         validateIfEndTimeIsPast(mogakko);
 
