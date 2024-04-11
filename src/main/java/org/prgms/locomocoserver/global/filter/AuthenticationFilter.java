@@ -7,73 +7,88 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.global.exception.AuthException;
 import org.prgms.locomocoserver.global.exception.ErrorCode;
-import org.prgms.locomocoserver.global.exception.ExpiredTokenException;
-import org.prgms.locomocoserver.global.exception.InvalidTokenException;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
-import org.prgms.locomocoserver.user.domain.enums.Provider;
-import org.prgms.locomocoserver.user.exception.UserErrorType;
-import org.prgms.locomocoserver.user.exception.UserException;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AuthenticationFilter implements Filter {
 
+    private static final Set<String> allowedOrigin = new HashSet<>(Arrays.asList(
+            "http://localhost:3000",
+            "https://locomoco.kro.kr",
+            "https://locomoco.shop",
+            "http://localhost:8090"
+    ));
+    private static final List<String> authRequired = List.of(
+            "GET:/api/v1/chats/rooms/\\d+",
+            "PATCH:/api/v1/mogakko/map/\\d+"
+    );
     private final AuthenticationService authenticationService;
-    private static HashSet<String> alloweOrigin = new HashSet<>();
-
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        Filter.super.init(filterConfig);
-        alloweOrigin.add("http://localhost:3000");
-        alloweOrigin.add("https://locomoco.kro.kr");
-        alloweOrigin.add("https://locomoco.shop");
-    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String accessToken = httpRequest.getHeader("Authorization");
-        String providerValue = httpRequest.getHeader("provider");
-
         if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
-            String origin = httpRequest.getHeader("Origin") == null ? "https://locomoco.kro.kr" : httpRequest.getHeader("Origin");
-            log.info("CorsFilter Origin : " + origin);
-            if(alloweOrigin.contains(origin) == false) return;
-            httpResponse.setHeader("Access-Control-Allow-Origin", origin);
-            httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-            httpResponse.setHeader("Access-Control-Allow-Headers", "Authorization, provider");
-            httpResponse.setHeader("Access-Control-Expose-Headers", "Authorization, provider");  // 이건 있어야 하는지 확인
-            httpResponse.setStatus(HttpServletResponse.SC_OK);
+            handleOptionCors(httpRequest, httpResponse);
             return;
         }
 
-        if (accessToken == null || providerValue == null) {
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+        String method = httpRequest.getMethod();
+        String url = httpRequest.getRequestURI();
 
-        try {
-            boolean isValidToken = authenticationService.authenticateUser(providerValue, accessToken);
+        if (authRequired.stream().anyMatch(pattern -> isPatternMatch(pattern, method, url))) {
+            String accessToken = httpRequest.getHeader("Authorization");
+            String providerValue = httpRequest.getHeader("provider");
 
-            if (!isValidToken) {
-                log.info("AuthenticationFilter.doFilter !isValidToken called");
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+            if (accessToken == null || providerValue == null) {
+                log.error("AuthenticationFilter - Exception: " + ErrorCode.NO_ACCESS_TOKEN.getMessage());
+                throw new AuthException(ErrorCode.NO_ACCESS_TOKEN);
             }
 
-        } catch (RuntimeException e) {
-            log.error("AuthenticationFilter - Exception: " + e.getMessage());
-            throw e; // 예외를 ExceptionHandlerFilter로 전달
+            try {
+                boolean isValidToken = authenticationService.authenticateUser(providerValue, accessToken);
+
+                if (!isValidToken) {
+                    log.info("AuthenticationFilter.doFilter !isValidToken called");
+                    httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+
+            } catch (RuntimeException e) {
+                log.error("AuthenticationFilter - Exception: " + e.getMessage());
+                throw e; // 예외를 ExceptionHandlerFilter로 전달
+            }
         }
 
         chain.doFilter(request, response);
+    }
+
+    private void handleOptionCors(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        String origin = httpRequest.getHeader("Origin") == null ? "https://locomoco.kro.kr" : httpRequest.getHeader("Origin");
+        log.info("CorsFilter Origin : " + origin);
+        if (!allowedOrigin.contains(origin)) return;
+        httpResponse.setHeader("Access-Control-Allow-Origin", origin);
+        httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+        httpResponse.setHeader("Access-Control-Allow-Headers", "Authorization, provider");
+        httpResponse.setHeader("Access-Control-Expose-Headers", "Authorization, provider");
+        httpResponse.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    private boolean isPatternMatch(String pattern, String method, String url) {
+        String[] parts = pattern.split(":");
+        String patternMethod = parts[0];
+        String patternUrl = parts[1];
+
+        return method.equalsIgnoreCase(patternMethod) && url.matches(patternUrl);
     }
 }
