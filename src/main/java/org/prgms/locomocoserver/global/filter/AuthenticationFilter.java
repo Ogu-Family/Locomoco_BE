@@ -84,9 +84,9 @@ public class AuthenticationFilter implements Filter {
 
     private boolean isPatternMatch(String pattern, String method, String url) {
         String[] parts = pattern.split(":");
-        String requestMethod = parts[0];
-        String requestUrl = parts[1];
+        String patternMethod = parts[0];
+        String patternUrl = parts[1];
 
-        return method.equalsIgnoreCase(requestMethod) && (url.equals(requestUrl) || url.matches(requestUrl.replace("*", "\\d*")));
+        return method.equalsIgnoreCase(patternMethod) && url.matches(patternUrl);
     }
 }
