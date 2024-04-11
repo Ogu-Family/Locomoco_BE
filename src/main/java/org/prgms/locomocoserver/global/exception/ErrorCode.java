@@ -9,6 +9,7 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.BAD_REQUEST,400, "Invalid Token"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 401, "Unauthorized"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Internal Server Error"),
+    NO_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 401, "No AccessToken or Provider"),
     ;
 
     private final HttpStatus httpStatus;
