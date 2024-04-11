@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.prgms.locomocoserver.global.exception.AuthException;
+import org.prgms.locomocoserver.global.exception.ErrorCode;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
 import org.springframework.stereotype.Component;
 
@@ -49,8 +51,8 @@ public class AuthenticationFilter implements Filter {
             String providerValue = httpRequest.getHeader("provider");
 
             if (accessToken == null || providerValue == null) {
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+                log.error("AuthenticationFilter - Exception: " + ErrorCode.NO_ACCESS_TOKEN.getMessage());
+                throw new AuthException(ErrorCode.NO_ACCESS_TOKEN);
             }
 
             try {
