@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -19,18 +19,17 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthenticationFilter implements Filter {
 
-    private final AuthenticationService authenticationService;
     private static final Set<String> allowedOrigin = new HashSet<>(Arrays.asList(
             "http://localhost:3000",
             "https://locomoco.kro.kr",
             "https://locomoco.shop",
             "http://localhost:8090"
     ));
-
-    private static final Set<String> authRequired = new HashSet<>(Arrays.asList(
+    private static final List<String> authRequired = List.of(
             "GET:/api/v1/chats/rooms/\\d+",
             "PATCH:/api/v1/mogakko/map/\\d+"
-    ));
+    );
+    private final AuthenticationService authenticationService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
