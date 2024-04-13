@@ -45,6 +45,9 @@ dependencies {
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // mongodb
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
     // Slack 연동
     implementation 'com.slack.api:slack-api-client:1.39.0'
 
