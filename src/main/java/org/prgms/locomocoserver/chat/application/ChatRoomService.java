@@ -25,6 +25,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatParticipantRepository chatParticipantRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomMongoRepository chatRoomMongoRepository;
     private final UserService userService;
     private final StompChatService stompChatService;
 

@@ -1,9 +1,8 @@
-package org.prgms.locomocoserver.chat.domain;
+package org.prgms.locomocoserver.chat.domain.mongo;
 
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
-import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;

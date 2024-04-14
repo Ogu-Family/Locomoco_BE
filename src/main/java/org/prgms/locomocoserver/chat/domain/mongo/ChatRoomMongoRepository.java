@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.chat.domain;
+package org.prgms.locomocoserver.chat.domain.mongo;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

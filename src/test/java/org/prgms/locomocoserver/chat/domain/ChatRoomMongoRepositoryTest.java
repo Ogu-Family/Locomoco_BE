@@ -1,6 +1,9 @@
 package org.prgms.locomocoserver.chat.domain;
 
 import org.junit.jupiter.api.*;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongo;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatRoomMongo;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatRoomMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

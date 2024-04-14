@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.chat.domain;
+package org.prgms.locomocoserver.chat.domain.mongo;
 
 import jakarta.persistence.Id;
 import lombok.Builder;
