@@ -7,6 +7,7 @@ import org.prgms.locomocoserver.chat.domain.mongo.ChatRoomMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +50,7 @@ class ChatRoomMongoRepositoryTest {
                 .senderNickname("senderNickname")
                 .senderImage("senderImage")
                 .senderId("senderId")
-                .timestamp(System.currentTimeMillis()).build();
+                .createdAt(LocalDateTime.now()).build();
 
         // when
         chatRoom.addChatMessage(chatMessage);
