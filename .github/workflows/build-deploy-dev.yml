@@ -82,15 +82,15 @@ jobs:
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: task-definition.json
-        container-name: $ECS_CONTAINER_NAME
+        container-name: ${{ env.ECS_CONTAINER_NAME }}
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy to Amazon ECS
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: task-definition.json
-        service: $ECS_SERVICE_NAME
-        cluster: $ECS_CLUSTER_NAME
+        service: ${{ env.ECS_SERVICE_NAME }}
+        cluster: ${{ env.ECS_CLUSTER_NAME }}
         wait-for-service-stability: true
     
   dependency-submission:
