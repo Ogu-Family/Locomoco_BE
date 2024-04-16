@@ -132,4 +132,9 @@ public class MogakkoController {
 
         return ResponseEntity.ok(mogakkoLikeDto);
     }
+
+    @GetMapping("/mogakko/temp")
+    public ResponseEntity<?> temp() {
+        return ResponseEntity.ok("ECS 배포가 제대로 작동중!");
+    }
 }
