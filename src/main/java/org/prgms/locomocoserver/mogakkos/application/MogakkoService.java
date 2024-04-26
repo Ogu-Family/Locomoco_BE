@@ -99,11 +99,9 @@ public class MogakkoService {
         SearchPolicy searchPolicy = searchType.getSearchPolicy(new SearchRepositoryDto(mogakkoRepository));
         List<Mogakko> searchedMogakkos;
 
-        if (tagIds == null || tagIds.isEmpty()) {
-            searchedMogakkos = searchPolicy.search(cursor, searchVal, pageSize);
-        } else {
-            searchedMogakkos = searchPolicy.search(cursor, searchVal, tagIds, pageSize);
-        }
+        validateFilter(searchVal);
+
+        searchedMogakkos = search(tagIds, cursor, searchVal, pageSize, searchPolicy);
 
         List<Location> locations = locationRepository.findAllByMogakkos(searchedMogakkos);
         Map<Long, Long> mogakkoLocationMap = new HashMap<>();
@@ -111,7 +109,7 @@ public class MogakkoService {
 
         return searchedMogakkos.stream().map(mogakko -> {
             Location location = locationRepository.findById(mogakkoLocationMap.get(mogakko.getId()))
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(RuntimeException::new); // TODO: 장소 에러 반환
             return MogakkoSimpleInfoResponseDto.create(mogakko, location);
         }).toList();
     }
@@ -234,5 +232,22 @@ public class MogakkoService {
                 locationInfoDto.longitude(),
                 locationInfoDto.address(),
                 locationInfoDto.city());
+    }
+
+    private void validateFilter(String searchVal) {
+        if (searchVal.length() == 1) {
+            throw new MogakkoException(MogakkoErrorType.TOO_LITTLE_INPUT.appendMessage("2"));
+        }
+    }
+
+    private List<Mogakko> search(List<Long> tagIds, Long cursor, String searchVal,
+        int pageSize, SearchPolicy searchPolicy) {
+        List<Mogakko> searchedMogakkos;
+        if (tagIds == null || tagIds.isEmpty()) {
+            searchedMogakkos = searchPolicy.search(cursor, searchVal, pageSize);
+        } else {
+            searchedMogakkos = searchPolicy.search(cursor, searchVal, tagIds, pageSize);
+        }
+        return searchedMogakkos;
     }
 }
