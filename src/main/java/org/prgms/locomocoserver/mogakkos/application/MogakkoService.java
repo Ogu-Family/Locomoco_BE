@@ -54,12 +54,12 @@ public class MogakkoService {
 
     @Transactional
     public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) {
+        User creator = userService.getById(requestDto.creatorId());
         Mogakko mogakko = createMogakkoBy(requestDto);
 
         Location location = requestDto.toLocation();
         location.updateMogakko(mogakko);
 
-        User creator = userService.getById(requestDto.creatorId());
         mogakko.updateCreator(creator);
 
         Mogakko savedMogakko = mogakkoRepository.save(mogakko);
