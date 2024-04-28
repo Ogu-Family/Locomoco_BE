@@ -28,13 +28,15 @@ public class ChatRoomService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserService userService;
     private final StompChatService stompChatService;
+    private final MongoChatService mongoChatService;
 
     @Transactional
     public void enterChatRoom(ChatEnterRequestDto requestDto) {
         ChatRoom chatRoom = getById(requestDto.chatRoomId());
 
         if (!isParticipantExist(chatRoom, requestDto.participant())) {
-            ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);
+            ChatMessageDto chatMessageDto = saveEnterMessage(requestDto); // TODO : mysql chat
+            mongoChatService.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant().getId()); // TODO : mongo chat
             ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.participant())
                     .chatRoom(chatRoom).build());
 
@@ -51,7 +53,8 @@ public class ChatRoomService {
 
         chatRoom.addChatParticipant(chatParticipant);
         chatRoomRepository.save(chatRoom);
-        chatMessageRepository.save(toEnterMessage(chatRoom, requestDto.creator()));
+        chatMessageRepository.save(toEnterMessage(chatRoom, requestDto.creator()));  // TODO : mysql chat
+        mongoChatService.saveEnterMessage(chatRoom.getId(), requestDto.creator().getId()); // TODO : mongo chat
 
         return chatRoom;
     }
