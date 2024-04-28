@@ -5,7 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
 import org.prgms.locomocoserver.chat.domain.ChatMessage;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongo;
 import org.prgms.locomocoserver.user.domain.User;
+
+import java.time.LocalDateTime;
 
 public record ChatMessageRequestDto(
         @Nonnull
@@ -23,4 +26,14 @@ public record ChatMessageRequestDto(
                 .isNotice(isNotice).build();
     }
 
+    public ChatMessageMongo toChatMessageMongo(User sender, ChatRoom chatRoom, boolean isNotice) {
+        return ChatMessageMongo.builder()
+               .senderId(senderId.toString())
+               .senderNickname(sender.getNickname())
+               .senderImage(sender.getProfileImage().getPath())
+               .message(message)
+               .isNotice(isNotice)
+               .createdAt(LocalDateTime.now())
+               .build();
+    }
 }
