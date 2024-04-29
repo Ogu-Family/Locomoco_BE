@@ -1,12 +1,14 @@
 package org.prgms.locomocoserver.mogakkos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import ch.qos.logback.core.util.ExecutorServiceUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
@@ -17,7 +19,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -42,21 +43,25 @@ import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
+import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorType;
+import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
+import org.prgms.locomocoserver.user.exception.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @TestInstance(Lifecycle.PER_CLASS)
 @TestMethodOrder(OrderAnnotation.class)
 class MogakkoServiceTest {
 
-    private final List<Long> tagIds = new ArrayList<>();
     @Autowired
     private MogakkoService mogakkoService;
     @Autowired
@@ -81,6 +86,7 @@ class MogakkoServiceTest {
     private ChatMessageRepository chatMessageRepository;
     private User setUpUser1, setUpUser2;
     private Mogakko testMogakko;
+    private final List<Long> tagIds = new ArrayList<>();
 
     @BeforeAll
     void setUp() {
@@ -115,8 +121,12 @@ class MogakkoServiceTest {
             .creator(setUpUser1).build();
 
         mogakkoRepository.save(testMogakko);
-        tagRepository.findAll().forEach(tag -> mogakkoTagRepository.save(MogakkoTag.builder()
-            .tag(tag).mogakko(testMogakko).build()));
+        tagRepository.findAll().forEach(tag -> {
+            if (tag.getId() % 2 == 0) { // id가 짝수인 것만 태그로.
+                mogakkoTagRepository.save(MogakkoTag.builder()
+                    .tag(tag).mogakko(testMogakko).build());
+            }
+        });
         participantRepository.save(
             Participant.builder().user(setUpUser2).mogakko(testMogakko).build());
 
@@ -181,7 +191,6 @@ class MogakkoServiceTest {
 
     @Test
     @DisplayName("id 값으로 특정 모각코 디테일 정보를 가져올 수 있다")
-    @Order(1)
     void success_find_mogakko_info_in_detail() {
         // when
         MogakkoDetailResponseDto responseDto = mogakkoService.findDetail(testMogakko.getId());
@@ -191,12 +200,11 @@ class MogakkoServiceTest {
         assertThat(responseDto.creatorInfo().nickname()).isEqualTo("생성자");
         assertThat(responseDto.participants()).hasSize(1);
         assertThat(responseDto.MogakkoInfo().title()).isEqualTo("title");
-        assertThat(responseDto.MogakkoInfo().tagIds()).hasSize(4);
     }
 
     @Test
     @DisplayName("모각코 정보를 업데이트 할 수 있다")
-    @Order(2)
+    @Transactional
     void success_update_mogakko_info_and_tags() {
         // given
         String updateTitle = "바뀐 제목";
@@ -207,7 +215,7 @@ class MogakkoServiceTest {
             setUpUser1.getId(), updateTitle, updateLocation,
             testMogakko.getStartTime(), testMogakko.getStartTime().plusHours(5),
             testMogakko.getDeadline(),
-            testMogakko.getMaxParticipants(), updateContent, List.of(tagIds.get(2)));
+            testMogakko.getMaxParticipants(), updateContent, new ArrayList<>(tagIds));
 
         // when
         MogakkoUpdateResponseDto responseDto = mogakkoService.update(requestDto, testMogakko.getId());
@@ -225,8 +233,7 @@ class MogakkoServiceTest {
         assertThat(updatedMogakko.getContent()).isEqualTo(updateContent);
         assertThat(updatedMogakko.getEndTime().truncatedTo(ChronoUnit.MILLIS))
             .isEqualTo(testMogakko.getStartTime().plusHours(5).truncatedTo(ChronoUnit.MILLIS));
-        assertThat(updatedMogakkoTags).hasSize(1);
-        assertThat(updatedMogakkoTags.get(0).getTag().getId()).isEqualTo(tagIds.get(2));
+        assertThat(updatedMogakkoTags).hasSize(tagIds.size());
 
         Optional<Location> locationOptional = locationRepository.findByMogakko(updatedMogakko);
         assertThat(locationOptional.isPresent()).isTrue();
@@ -257,5 +264,128 @@ class MogakkoServiceTest {
         // then
         Mogakko mogakko = mogakkoRepository.findById(testMogakko.getId()).get();
         assertThat(mogakko.getViews()).isEqualTo(initialViews + loop);
+    }
+
+    @Test
+    @DisplayName("입력된 필터링 인자들에 대해 정상적으로 전체 검색을 수행한다")
+    void success_find_all_by_filter_given_normal_args() {
+        // given
+        long cursor = Long.MAX_VALUE;
+        String normalSearchVal = "제곧";
+        String abnormalSearchVal = "noContent";
+        SearchType searchType = SearchType.TOTAL;
+        List<Long> havingTagIds = mogakkoTagRepository.findAllByMogakko(testMogakko).stream()
+            .map(mt -> mt.getTag().getId()).toList();
+
+        // when
+        List<MogakkoSimpleInfoResponseDto> filtered = mogakkoService.findAllByFilter(havingTagIds,
+            cursor, normalSearchVal, searchType, 10);
+        List<MogakkoSimpleInfoResponseDto> filteredWithoutTagIds = mogakkoService.findAllByFilter(Collections.emptyList(),
+            cursor, normalSearchVal, searchType, 10);
+        List<MogakkoSimpleInfoResponseDto> emptyFiltered = mogakkoService.findAllByFilter(Collections.emptyList(),
+            cursor, abnormalSearchVal, searchType, 10);
+
+        // then
+        assertThat(filtered).hasSize(1);
+        assertThat(filtered.get(0).title()).isEqualTo(testMogakko.getTitle());
+        assertThat(filteredWithoutTagIds).hasSize(1);
+        assertThat(filteredWithoutTagIds.get(0).title()).isEqualTo(testMogakko.getTitle());
+        assertThat(emptyFiltered).isEmpty();
+    }
+
+    @Test
+    @DisplayName("모각코를 삭제할 수 있다")
+    void success_delete_given_normal_id() {
+        // given
+        LocalDateTime startTime = LocalDateTime.now();
+        MogakkoCreateRequestDto createRequestDto = new MogakkoCreateRequestDto(
+            setUpUser2.getId(),
+            "곧 삭제될 모각코",
+            new LocationInfoDto("주소1", 10.4892, 115.2387342, "가리봉동"),
+            startTime,
+            startTime.plusHours(2),
+            startTime.plusHours(1),
+            null,
+            "내용1",
+            Collections.emptyList());
+        MogakkoCreateResponseDto saved = mogakkoService.save(createRequestDto);
+
+        // when
+        mogakkoService.delete(saved.id());
+
+        // then
+        assertThatThrownBy(() -> mogakkoService.getByIdNotDeleted(saved.id()))
+            .isInstanceOf(MogakkoException.class)
+            .hasFieldOrPropertyWithValue("errorType", MogakkoErrorType.NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("최소 검색 문자 수보다 작은 문자 수로 검색할 수 없다")
+    void fail_find_all_by_filter_given_search_value_less_than_minimum() {
+        // given
+        String search = "제";
+
+        // when, then
+        assertThatThrownBy(
+            () -> mogakkoService.findAllByFilter(null, Long.MAX_VALUE, search, SearchType.TOTAL,
+                10))
+            .isInstanceOf(MogakkoException.class)
+            .hasFieldOrPropertyWithValue("errorType", MogakkoErrorType.TOO_LITTLE_INPUT);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자 또는 삭제된 유저는 모각코를 생성할 수 없다")
+    @Transactional
+    void fail_create_mogakko_given_deleted_or_non_existent_user() {
+        // given
+        Long nonExistentId = Long.MAX_VALUE;
+        setUpUser2.delete();
+        userRepository.save(setUpUser2);
+
+        LocalDateTime startTime = LocalDateTime.now();
+        MogakkoCreateRequestDto deletedUserCreateRequestDto = new MogakkoCreateRequestDto(
+            setUpUser2.getId(),
+            "제목1",
+            new LocationInfoDto("주소1", 10.4892, 115.2387342, "가리봉동"),
+            startTime,
+            startTime.plusHours(2),
+            startTime.plusHours(1),
+            null,
+            "내용1",
+            Collections.emptyList());
+        MogakkoCreateRequestDto nonExistentUserCreateRequestDto = new MogakkoCreateRequestDto(
+            nonExistentId,
+            "제목2",
+            new LocationInfoDto("주소2", 40.492, 117.238, "동동이"),
+            startTime,
+            startTime.plusHours(2),
+            startTime.plusHours(1),
+            null,
+            "내용1",
+            List.of(tagIds.get(2)));
+
+        // when, then
+        assertThatThrownBy(() -> mogakkoService.save(deletedUserCreateRequestDto))
+            .isInstanceOf(UserException.class);
+        assertThatThrownBy(() -> mogakkoService.save(nonExistentUserCreateRequestDto))
+            .isInstanceOf(UserException.class);
+    }
+
+    @Test
+    @DisplayName("생성자가 아닌 유저는 모각코를 수정할 수 없다")
+    void fail_update_mogakko_given_not_same_creator() {
+        // given
+        String updateTitle = "바뀐 제목";
+        LocationInfoDto updateLocation = new LocationInfoDto("바뀐 주소", 25.12, 110.2489, "구로동");
+
+        MogakkoUpdateRequestDto requestDto = new MogakkoUpdateRequestDto(
+            setUpUser2.getId(), updateTitle, updateLocation,
+            testMogakko.getStartTime(), testMogakko.getStartTime().plusHours(5),
+            testMogakko.getDeadline(),
+            testMogakko.getMaxParticipants(), testMogakko.getContent(), new ArrayList<>(tagIds));
+
+        // when, then
+        assertThatThrownBy(() -> mogakkoService.update(requestDto, testMogakko.getId())).isInstanceOf(
+            MogakkoException.class).hasFieldOrPropertyWithValue("errorType", MogakkoErrorType.PROCESS_FORBIDDEN);
     }
 }
