@@ -3,7 +3,6 @@ package org.prgms.locomocoserver.chat.application;
 import org.junit.jupiter.api.*;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
-import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongo;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.global.TestFactory;
@@ -21,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -30,7 +27,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 class MongoChatServiceTest {
 
     @Autowired
-    MongoChatService mongoChatService;
+    MongoChatMessageService mongoChatMessageService;
     @Autowired
     MongoTemplate mongoTemplate;
     @Autowired
@@ -65,7 +62,7 @@ class MongoChatServiceTest {
         Long roomId = 1L;
 
         // when
-        mongoChatService.createChatRoom(roomId);
+        mongoChatMessageService.createChatRoom(roomId);
         boolean collectionExists = mongoTemplate.collectionExists("chat_messages_1");
 
         // then
@@ -84,10 +81,9 @@ class MongoChatServiceTest {
         imageRepository.save(sender.getProfileImage());
         tagRepository.save(sender.getJobTag());
         sender = userRepository.save(sender);
-        Long senderId = sender.getId();
 
         // when
-        mongoChatService.saveEnterMessage(roomId, senderId);
+        mongoChatMessageService.saveEnterMessage(roomId, sender);
         boolean collectionExists = mongoTemplate.collectionExists("chat_messages_1");
 
         // then
@@ -113,9 +109,9 @@ class MongoChatServiceTest {
         Long senderId = sender.getId();
 
         // when
-        mongoChatService.saveChatMessage(roomId, new ChatMessageRequestDto(roomId, senderId, "message"));
+        mongoChatMessageService.saveChatMessage(roomId, new ChatMessageRequestDto(roomId, senderId, "message"));
         boolean collectionExists = mongoTemplate.collectionExists("chat_messages_1");
-        String collectionName = mongoChatService.getChatRoomName(roomId);
+        String collectionName = mongoChatMessageService.getChatRoomName(roomId);
         long messageCount = mongoTemplate.getCollection(collectionName).countDocuments();
 
         // then
@@ -128,10 +124,10 @@ class MongoChatServiceTest {
     void getAllChatMessages() {
         // given
         Long roomId = 1L;
-        String collectionName = mongoChatService.getChatRoomName(roomId);
+        String collectionName = mongoChatMessageService.getChatRoomName(roomId);
 
         // when
-        List<ChatMessageDto> chatMessageMongoList = mongoChatService.getAllChatMessages(roomId);
+        List<ChatMessageDto> chatMessageMongoList = mongoChatMessageService.getAllChatMessages(roomId, null, 10);
 
         // then
         assertThat(chatMessageMongoList.size()).isEqualTo(2);
