@@ -19,7 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MongoChatService {
+public class MongoChatMessageService implements ChatMessagePolicy {
 
     private static final String BASE_CHATROOM_NAME = "chat_messages_";
     private final MongoTemplate mongoTemplate;
@@ -27,34 +27,42 @@ public class MongoChatService {
     private final ChatRoomRepository chatRoomRepository;
 
     @Transactional
-    public void createChatRoom(Long roomId) {
+    public ChatRoom createChatRoom(Long roomId) {
         String collectionName = BASE_CHATROOM_NAME + roomId;
 
         if (!mongoTemplate.collectionExists(collectionName)) {
             mongoTemplate.createCollection(collectionName);
         }
+
+        return chatRoomRepository.findById(roomId).orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
     }
 
-    public ChatMessageDto saveEnterMessage(Long roomId, Long senderId) {
+    public ChatMessageDto saveEnterMessage(Long roomId, User sender) {
         String collectionName = BASE_CHATROOM_NAME + roomId;
-        User participant = userService.getById(senderId);
-        ChatMessageMongo chatMessageMongo = mongoTemplate.save(toEnterMessage(participant), collectionName);
+        ChatMessageMongo chatMessageMongo = mongoTemplate.save(toEnterMessage(sender), collectionName);
 
         return ChatMessageDto.of(roomId, chatMessageMongo);
     }
 
-    public void saveChatMessage(Long roomId, ChatMessageRequestDto message) {
+    public ChatMessageDto saveChatMessage(Long roomId, ChatMessageRequestDto message) {
         String collectionName = BASE_CHATROOM_NAME + roomId;
         User participant = userService.getById(message.senderId());
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
-        mongoTemplate.save(message.toChatMessageMongo(participant, chatRoom, false), collectionName);
+        ChatMessageMongo chatMessageMongo = mongoTemplate.save(message.toChatMessageMongo(participant, chatRoom, false), collectionName);
+
+        return ChatMessageDto.of(roomId, chatMessageMongo);
     }
 
-    public List<ChatMessageDto> getAllChatMessages(Long roomId) {
+    public List<ChatMessageDto> getAllChatMessages(Long roomId, String cursor, int pageSize) {
         String collectionName = BASE_CHATROOM_NAME + roomId;
         return mongoTemplate.findAll(ChatMessageMongo.class, collectionName)
                 .stream().map(chatMessageMongo -> ChatMessageDto.of(roomId, chatMessageMongo)).toList();
+    }
+
+    @Override
+    public void deleteChatMessages(Long roomId) {
+
     }
 
     public String getChatRoomName(Long roomId) {
