@@ -62,6 +62,7 @@ public class ChatRoomService {
 
     @Transactional
     public ChatMessageDto saveChatMessage(ChatMessageRequestDto requestDto) {
+        mongoChatMessageService.saveChatMessage(requestDto.chatRoomId(), requestDto);  // TODO : mongo chat
         return mySqlChatMessageService.saveChatMessage(requestDto.chatRoomId(), requestDto);  // TODO : policy 변경
     }
 
