@@ -11,6 +11,7 @@ import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Primary  // TODO
 @Service
 @RequiredArgsConstructor
 public class MySqlChatMessageService implements ChatMessagePolicy {
@@ -54,7 +56,9 @@ public class MySqlChatMessageService implements ChatMessagePolicy {
     @Override
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, String cursorValue, int pageSize) {
-        Long cursor = cursorValue == null ? Long.MAX_VALUE : Long.valueOf(cursorValue);
+        Long cursor = Long.MAX_VALUE;
+        if (cursorValue != "null") cursor = Long.parseLong(cursorValue);
+
         List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomIdAndIdGreaterThan(roomId, cursor, pageSize);
 
         List<ChatMessageDto> chatMessageDtos = chatMessages.stream()
@@ -65,9 +69,15 @@ public class MySqlChatMessageService implements ChatMessagePolicy {
         return chatMessageDtos;
     }
 
+    @Transactional
+    public void deleteChatMessages(ChatRoom chatRoom) {
+        chatMessageRepository.findAllByChatRoom(chatRoom).forEach(chatMessage -> chatMessage.delete());
+    }
+
     @Override
-    public void deleteChatMessages(Long roomId) {
-        
+    @Transactional(readOnly = true)
+    public ChatMessageDto getLastChatMessage(Long roomId) {
+        return ChatMessageDto.of(chatMessageRepository.findLastMessageByRoomId(roomId));
     }
 
     private ChatMessage toEnterMessage(ChatRoom chatRoom, User participant) {
