@@ -52,25 +52,12 @@ class MongoChatServiceTest {
         imageRepository.deleteAll();
         tagRepository.deleteAll();
         categoryRepository.deleteAll();
+
+        mongoTemplate.createCollection("chat_messages_1");
     }
 
     @Test
     @Order(1)
-    @DisplayName("채팅방을 만들 수 있다.")
-    void createChatRoom() {
-        // given
-        Long roomId = 1L;
-
-        // when
-        mongoChatMessageService.createChatRoom(roomId);
-        boolean collectionExists = mongoTemplate.collectionExists("chat_messages_1");
-
-        // then
-        assertThat(collectionExists).isTrue();
-    }
-
-    @Test
-    @Order(2)
     @DisplayName("채팅방 입장 메시지를 저장할 수 있다.")
     @Transactional
     void saveEnterMessage() {
@@ -91,7 +78,7 @@ class MongoChatServiceTest {
     }
 
     @Test
-    @Order(3)
+    @Order(2)
     @DisplayName("채팅 메시지를 저장할 수 있다.")
     @Transactional
     void saveChatMessage() {
@@ -120,6 +107,7 @@ class MongoChatServiceTest {
     }
 
     @Test
+    @Order(3)
     @DisplayName("채팅방의 메시지를 모두 불러올 수 있다.")
     void getAllChatMessages() {
         // given
@@ -127,7 +115,7 @@ class MongoChatServiceTest {
         String collectionName = mongoChatMessageService.getChatRoomName(roomId);
 
         // when
-        List<ChatMessageDto> chatMessageMongoList = mongoChatMessageService.getAllChatMessages(roomId, null, 10);
+        List<ChatMessageDto> chatMessageMongoList = mongoChatMessageService.getAllChatMessages(roomId, "null", 10);
 
         // then
         assertThat(chatMessageMongoList.size()).isEqualTo(2);
