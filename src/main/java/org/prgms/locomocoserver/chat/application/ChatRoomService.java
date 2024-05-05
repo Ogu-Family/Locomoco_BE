@@ -11,6 +11,7 @@ import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,20 +24,19 @@ public class ChatRoomService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatParticipantRepository chatParticipantRepository;
-    private final UserService userService;
 
     private final StompChatService stompChatService;
     private final MySqlChatMessageService mySqlChatMessageService;
     private final MongoChatMessageService mongoChatMessageService;
 
-    private final ChatMessagePolicy chatMessagePolicy = new MySqlChatMessageService(userService, chatRoomRepository, chatMessageRepository); // TODO : service 두가지 의존 삭제
+    private final ChatMessagePolicy chatMessagePolicy; // TODO : service 두가지 의존 삭제
 
     @Transactional
     public void enterChatRoom(ChatEnterRequestDto requestDto) {
         ChatRoom chatRoom = getById(requestDto.chatRoomId());
 
         if (!isParticipantExist(chatRoom, requestDto.participant())) {
-            ChatMessageDto chatMessageDto = saveEnterMessage(requestDto); // TODO : mysql chat
+            ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);  // TODO : mysql chat
             mongoChatMessageService.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant()); // TODO : mongo chat
             ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.participant())
                     .chatRoom(chatRoom).build());
@@ -62,12 +62,12 @@ public class ChatRoomService {
 
     @Transactional
     public ChatMessageDto saveChatMessage(ChatMessageRequestDto requestDto) {
-        return mySqlChatMessageService.saveChatMessage(requestDto.chatRoomId(), requestDto);
+        return mySqlChatMessageService.saveChatMessage(requestDto.chatRoomId(), requestDto);  // TODO : policy 변경
     }
 
     @Transactional
     public ChatMessageDto saveEnterMessage(ChatEnterRequestDto requestDto) {
-        return mySqlChatMessageService.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant());
+        return mySqlChatMessageService.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant()); // TODO : policy 변경
     }
 
     @Transactional(readOnly = true)
@@ -76,14 +76,14 @@ public class ChatRoomService {
         List<ChatRoom> chatRooms = chatRoomRepository.findByParticipantsId(userId, cursor, pageSize);
 
         List<ChatRoomDto> chatRoomDtos = chatRooms.stream()
-                .map(chatRoom -> ChatRoomDto.of(chatRoom, ChatMessageDto.of(getLastMessage(chatRoom.getId()))))
+                .map(chatRoom -> ChatRoomDto.of(chatRoom, mySqlChatMessageService.getLastChatMessage(chatRoom.getId()))) // TODO : policy 교체
                 .toList();
         return chatRoomDtos;
     }
 
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, Long cursor, int pageSize) {
-        return mySqlChatMessageService.getAllChatMessages(roomId, String.valueOf(cursor), pageSize);
+        return mongoChatMessageService.getAllChatMessages(roomId, String.valueOf(cursor), pageSize); // TODO : mongo 페이지네이션 후 policy 교체
     }
 
     @Transactional(readOnly = true)
@@ -109,7 +109,8 @@ public class ChatRoomService {
         // 채팅방 참여자 목록 삭제
         chatParticipantRepository.deleteAllByChatRoom(chatRoom);
         // 채팅방 메시지 삭제
-        chatMessageRepository.findAllByChatRoom(chatRoom).forEach(chatMessage -> chatMessage.delete());  // TODO : reposiotory -> service 변환
+        mySqlChatMessageService.deleteChatMessages(chatRoom); // TODO : mysql
+        mongoChatMessageService.deleteChatMessages(chatRoom); // TODO : mongo
         // 채팅방 삭제
         chatRoom.delete();
     }
@@ -117,9 +118,5 @@ public class ChatRoomService {
     private boolean isParticipantExist(ChatRoom chatRoom, User user) {
         return chatRoom.getChatParticipants().stream()
                 .anyMatch(chatParticipant -> chatParticipant.getUser().getId().equals(user.getId()));
-    }
-
-    private ChatMessage getLastMessage(Long roomId) {
-        return chatMessageRepository.findLastMessageByRoomId(roomId); // TODO : reposiotory -> service 변환
     }
 }
