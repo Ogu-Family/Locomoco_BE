@@ -53,7 +53,7 @@ public class ChatRoomService {
         chatRoom.addChatParticipant(chatParticipant);
         chatRoomRepository.save(chatRoom); // TODO : mysql chat room create
         mongoChatMessageService.createChatRoom(chatRoom.getId()); // TODO : mongo chat room create
-        
+
         mySqlChatMessageService.saveEnterMessage(chatRoom.getId(), chatParticipant.getUser());  // TODO : mysql chat
         mongoChatMessageService.saveEnterMessage(chatRoom.getId(), requestDto.creator()); // TODO : mongo chat
 
