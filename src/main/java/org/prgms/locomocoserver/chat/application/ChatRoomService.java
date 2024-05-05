@@ -9,9 +9,7 @@ import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
-import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,7 +81,8 @@ public class ChatRoomService {
 
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, Long cursor, int pageSize) {
-        return mongoChatMessageService.getAllChatMessages(roomId, String.valueOf(cursor), pageSize); // TODO : mongo 페이지네이션 후 policy 교체
+        String cursorValue = cursor == null ? "null" : cursor.toString();
+        return mySqlChatMessageService.getAllChatMessages(roomId, cursorValue, pageSize); // TODO : mongo 페이지네이션 후 policy 교체
     }
 
     @Transactional(readOnly = true)
