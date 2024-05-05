@@ -2,6 +2,7 @@ package org.prgms.locomocoserver.chat.application;
 
 import org.junit.jupiter.api.*;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
+import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
@@ -45,6 +46,9 @@ class MongoChatServiceTest {
     @Autowired
     TestFactory testFactory;
 
+    private User creator;
+    private ChatRoom chatRoom;
+
     @BeforeAll
     void setUp() {
         mongoTemplate.getDb().drop();
@@ -52,8 +56,16 @@ class MongoChatServiceTest {
         imageRepository.deleteAll();
         tagRepository.deleteAll();
         categoryRepository.deleteAll();
+        chatRoomRepository.deleteAll();
 
-        mongoTemplate.createCollection("chat_messages_1");
+        User sender = testFactory.createUser();
+        categoryRepository.save(sender.getJobTag().getCategory());
+        imageRepository.save(sender.getProfileImage());
+        tagRepository.save(sender.getJobTag());
+        creator = userRepository.save(sender);
+
+        Mogakko mogakko = mogakkoRepository.save(testFactory.createMogakko(creator));
+        chatRoom = chatRoomRepository.save(testFactory.createChatRoom(creator, mogakko));
     }
 
     @Test
@@ -62,16 +74,11 @@ class MongoChatServiceTest {
     @Transactional
     void saveEnterMessage() {
         // given
-        Long roomId = 1L;
-        User sender = testFactory.createUser();
-        categoryRepository.save(sender.getJobTag().getCategory());
-        imageRepository.save(sender.getProfileImage());
-        tagRepository.save(sender.getJobTag());
-        sender = userRepository.save(sender);
+        Long roomId = chatRoom.getId();
 
         // when
-        mongoChatMessageService.saveEnterMessage(roomId, sender);
-        boolean collectionExists = mongoTemplate.collectionExists("chat_messages_1");
+        mongoChatMessageService.saveEnterMessage(roomId, creator);
+        boolean collectionExists = mongoTemplate.collectionExists("chat_messages_"+roomId);
 
         // then
         assertThat(collectionExists).isTrue();
@@ -83,21 +90,12 @@ class MongoChatServiceTest {
     @Transactional
     void saveChatMessage() {
         // given
-        Long roomId = 1L;
-        User sender = testFactory.createUser();
-
-        categoryRepository.save(sender.getJobTag().getCategory());
-        imageRepository.save(sender.getProfileImage());
-        tagRepository.save(sender.getJobTag());
-        sender = userRepository.save(sender);
-        Mogakko mogakko = mogakkoRepository.save(testFactory.createMogakko(sender));
-        chatRoomRepository.save(testFactory.createChatRoom(sender, mogakko));
-
-        Long senderId = sender.getId();
+        Long roomId = chatRoom.getId();
+        Long senderId = creator.getId();
 
         // when
         mongoChatMessageService.saveChatMessage(roomId, new ChatMessageRequestDto(roomId, senderId, "message"));
-        boolean collectionExists = mongoTemplate.collectionExists("chat_messages_1");
+        boolean collectionExists = mongoTemplate.collectionExists("chat_messages_" + roomId);
         String collectionName = mongoChatMessageService.getChatRoomName(roomId);
         long messageCount = mongoTemplate.getCollection(collectionName).countDocuments();
 
@@ -111,7 +109,7 @@ class MongoChatServiceTest {
     @DisplayName("채팅방의 메시지를 모두 불러올 수 있다.")
     void getAllChatMessages() {
         // given
-        Long roomId = 1L;
+        Long roomId = chatRoom.getId();
         String collectionName = mongoChatMessageService.getChatRoomName(roomId);
 
         // when
