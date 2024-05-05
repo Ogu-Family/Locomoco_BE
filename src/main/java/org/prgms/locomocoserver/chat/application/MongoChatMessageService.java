@@ -8,6 +8,7 @@ import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
+import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.data.domain.Sort;
@@ -101,8 +102,9 @@ public class MongoChatMessageService implements ChatMessagePolicy {
     }
 
     private ChatMessageMongo toEnterMessage(User participant) {
+        String profileImage = participant.getProfileImage() == null ? null : participant.getProfileImage().getPath();
         return ChatMessageMongo.builder().senderId(participant.getId().toString())
-                .senderImage(participant.getProfileImage().getPath()).createdAt(LocalDateTime.now())
+                .senderImage(profileImage).createdAt(LocalDateTime.now())
                 .message(participant.getNickname() + "님이 입장하셨습니다.").isNotice(true).build();
     }
 }
