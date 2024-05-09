@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Primary  // TODO
 @Service
 @RequiredArgsConstructor
 public class MySqlChatMessageService implements ChatMessagePolicy {

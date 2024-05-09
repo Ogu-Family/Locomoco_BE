@@ -11,6 +11,7 @@ import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Primary
 @Service
 @RequiredArgsConstructor
 public class MongoChatMessageService implements ChatMessagePolicy {
