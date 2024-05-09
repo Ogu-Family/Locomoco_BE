@@ -10,6 +10,7 @@ import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.user.domain.User;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,23 +20,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatRoomService {
 
-    private final ChatMessageRepository chatMessageRepository;
+    private final MongoChatMessageService mongoChatMessageService;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatParticipantRepository chatParticipantRepository;
 
     private final StompChatService stompChatService;
-    private final MySqlChatMessageService mySqlChatMessageService;
-    private final MongoChatMessageService mongoChatMessageService;
-
-    private final ChatMessagePolicy chatMessagePolicy; // TODO : service 두가지 의존 삭제
+    private final ChatMessagePolicy chatMessagePolicy;
 
     @Transactional
     public void enterChatRoom(ChatEnterRequestDto requestDto) {
         ChatRoom chatRoom = getById(requestDto.chatRoomId());
 
         if (!isParticipantExist(chatRoom, requestDto.participant())) {
-            ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);  // TODO : mysql chat
-            mongoChatMessageService.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant()); // TODO : mongo chat
+            ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);
+            chatMessagePolicy.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant());
             ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.participant())
                     .chatRoom(chatRoom).build());
 
@@ -51,24 +49,22 @@ public class ChatRoomService {
                 .chatRoom(chatRoom).build());
 
         chatRoom.addChatParticipant(chatParticipant);
-        chatRoomRepository.save(chatRoom); // TODO : mysql chat room create
-        mongoChatMessageService.createChatRoom(chatRoom.getId()); // TODO : mongo chat room create
+        chatRoomRepository.save(chatRoom); // mysql chat room create
+        mongoChatMessageService.createChatRoom(chatRoom.getId()); // mongo chat room create
 
-        mySqlChatMessageService.saveEnterMessage(chatRoom.getId(), chatParticipant.getUser());  // TODO : mysql chat
-        mongoChatMessageService.saveEnterMessage(chatRoom.getId(), requestDto.creator()); // TODO : mongo chat
+        chatMessagePolicy.saveEnterMessage(chatRoom.getId(), chatParticipant.getUser());
 
         return chatRoom;
     }
 
     @Transactional
     public ChatMessageDto saveChatMessage(ChatMessageRequestDto requestDto) {
-        mongoChatMessageService.saveChatMessage(requestDto.chatRoomId(), requestDto);  // TODO : mongo chat
-        return mySqlChatMessageService.saveChatMessage(requestDto.chatRoomId(), requestDto);  // TODO : policy 변경
+        return chatMessagePolicy.saveChatMessage(requestDto.chatRoomId(), requestDto);
     }
 
     @Transactional
     public ChatMessageDto saveEnterMessage(ChatEnterRequestDto requestDto) {
-        return mySqlChatMessageService.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant()); // TODO : policy 변경
+        return chatMessagePolicy.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant());
     }
 
     @Transactional(readOnly = true)
@@ -77,7 +73,7 @@ public class ChatRoomService {
         List<ChatRoom> chatRooms = chatRoomRepository.findByParticipantsId(userId, cursor, pageSize);
 
         List<ChatRoomDto> chatRoomDtos = chatRooms.stream()
-                .map(chatRoom -> ChatRoomDto.of(chatRoom, mySqlChatMessageService.getLastChatMessage(chatRoom.getId()))) // TODO : policy 교체
+                .map(chatRoom -> ChatRoomDto.of(chatRoom, chatMessagePolicy.getLastChatMessage(chatRoom.getId())))
                 .toList();
         return chatRoomDtos;
     }
@@ -85,7 +81,7 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, Long cursor, int pageSize) {
         String cursorValue = cursor == null ? "null" : cursor.toString();
-        return mySqlChatMessageService.getAllChatMessages(roomId, cursorValue, pageSize); // TODO : mongo 페이지네이션 후 policy 교체
+        return chatMessagePolicy.getAllChatMessages(roomId, cursorValue, pageSize);
     }
 
     @Transactional(readOnly = true)
@@ -111,8 +107,7 @@ public class ChatRoomService {
         // 채팅방 참여자 목록 삭제
         chatParticipantRepository.deleteAllByChatRoom(chatRoom);
         // 채팅방 메시지 삭제
-        mySqlChatMessageService.deleteChatMessages(chatRoom); // TODO : mysql
-        mongoChatMessageService.deleteChatMessages(chatRoom); // TODO : mongo
+        chatMessagePolicy.deleteChatMessages(chatRoom);
         // 채팅방 삭제
         chatRoom.delete();
     }
