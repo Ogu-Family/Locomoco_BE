@@ -49,7 +49,7 @@ jobs:
 
     - name: Restore database from data
       run: |
-        mysql -h mysql -u ${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_PASSWORD }} locomoco_db_test < ./src/main/resources/data.sql
+        mysql -h 127.0.0.1 -u ${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_PASSWORD }} locomoco_db_test < ./src/main/resources/data.sql
     
     - name: Build with Gradle Wrapper
       run: ./gradlew build
