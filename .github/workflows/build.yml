@@ -12,6 +12,17 @@ jobs:
     permissions:
       contents: read
 
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_DATABASE: 'locomoco_db_test'
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+       
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -35,18 +46,9 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@ec92e829475ac0c2315ea8f9eced72db85bb337a
 
-    - name: Setup mysql
-      uses: mirromutth/mysql-action@v1.1
-      with:
-        host port: 3306
-        container port: 3306
-        mysql database: 'locomoco_db_test'
-        mysql user: ${{ secrets.MYSQL_USER }}
-        mysql password: ${{ secrets.MYSQL_PASSWORD }}
-
     - name: Restore database from data
       run: |
-        mysql -h 127.0.0.1 -u ${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_PASSWORD }} locomoco_db_test < ./src/main/resources/data.sql
+        mysql -h mysql -u ${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_PASSWORD }} locomoco_db_test < ./src/main/resources/data.sql
     
     - name: Build with Gradle Wrapper
       run: ./gradlew build
