@@ -17,6 +17,7 @@ jobs:
         image: mysql:latest
         env:
           MYSQL_DATABASE: 'locomoco_db_test'
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         ports:
