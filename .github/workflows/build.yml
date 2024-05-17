@@ -12,6 +12,18 @@ jobs:
     permissions:
       contents: read
 
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_DATABASE: 'locomoco_db_test'
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+       
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -28,10 +40,17 @@ jobs:
 
     - name: Create test application.yml
       run: printf "%s" "${{ secrets.TEST_APPLICATION_YML }}" > ./src/test/resources/application.yml
+
+    - name: Create mysql test data
+      run: echo "${{ secrets.MYSQL_TEST_DATA }}" | base64 --decode > ./src/main/resources/data.sql
       
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@ec92e829475ac0c2315ea8f9eced72db85bb337a # v3.0.0
+      uses: gradle/actions/setup-gradle@ec92e829475ac0c2315ea8f9eced72db85bb337a
 
+    - name: Restore database from data
+      run: |
+        mysql -h 127.0.0.1 -u ${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_PASSWORD }} locomoco_db_test < ./src/main/resources/data.sql
+    
     - name: Build with Gradle Wrapper
       run: ./gradlew build
     
