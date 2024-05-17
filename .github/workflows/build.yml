@@ -28,6 +28,9 @@ jobs:
 
     - name: Create test application.yml
       run: printf "%s" "${{ secrets.TEST_APPLICATION_YML }}" > ./src/test/resources/application.yml
+
+    - name: Create mysql test data
+      run: printf "%s" "${{ secrets.MYSQL_TEST_DATA }}" > ./src/main/resources/data.sql
       
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@ec92e829475ac0c2315ea8f9eced72db85bb337a
@@ -41,6 +44,10 @@ jobs:
         mysql user: ${{ secrets.MYSQL_USER }}
         mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
+    - name: Restore database from data
+      run: |
+        mysql -h 127.0.0.1 -u ${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_PASSWORD }} locomoco_db_test < data.sql
+    
     - name: Build with Gradle Wrapper
       run: ./gradlew build
     
