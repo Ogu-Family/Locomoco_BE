@@ -31,6 +31,15 @@ jobs:
       - name: Create test application.yml
         run: printf "%s" "${{ secrets.TEST_APPLICATION_YML }}" > ./src/test/resources/application.yml
 
+      - name: Setup mysql
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          host port: 3306
+          container port: 3306
+          mysql database: 'locomoco_db_test'
+          mysql user: ${{ secrets.MYSQL_USER }}
+          mysql password: ${{ secrets.MYSQL_PASSWORD }}
+
       - name: Permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
