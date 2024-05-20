@@ -2,7 +2,6 @@ package org.prgms.locomocoserver.image.application;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.image.domain.Image;
@@ -50,8 +49,7 @@ public class ImageService {
     }
 
     private String putS3(File uploadFile, String fileName) {
-        amazonS3.putObject(new PutObjectRequest(bucket, fileName, uploadFile)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+        amazonS3.putObject(new PutObjectRequest(bucket, fileName, uploadFile));
         return getS3(bucket, fileName);
     }
 
