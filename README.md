@@ -27,9 +27,9 @@
 
 ## 1. 개발 환경
 
-- Back-end : Java17, Spring 3.1.8, Spring WebSocket, MySQL, Redis, MongoDB
+- 기술스택 : Java17, Spring 3.1.8, Spring WebSocket, MySQL, Redis, MongoDB
 - 버전 및 이슈관리 : Github, Github Issues, Github Project
-- 협업 툴 : Notion, Slack
+- 협업 툴 : Notion, Slack, Swagger
 - 서비스 배포 환경 : AWS EC2
 
 <br>
@@ -53,14 +53,14 @@
 ### 🍊 박유진
 
 - **기능**
-    - 유저 검색, 게시글 등록 및 수정, 게시글 상세 확인, 댓글 등록, 팔로워 게시글 불러오기, 좋아요 기능
+    - 블라블라
 
 <br>
 
 ### 👻 조인수
 
 - **기능**
-    - 프로필 설정 및 수정 페이지 유저 아이디 유효성 및 중복 검사, 상품 등록 및 수정
+    - 블라블라
 
 <br>
 
@@ -108,11 +108,8 @@
 
 <br>
 
-## 8. 개선 목표
 
-- 내용
-
-## 9. 프로젝트 후기
+## 8. 프로젝트 후기
 
 ### 🍊 박유진
 
@@ -122,3 +119,5 @@
 
 ### 👻 조인수
 
+
+<br>
