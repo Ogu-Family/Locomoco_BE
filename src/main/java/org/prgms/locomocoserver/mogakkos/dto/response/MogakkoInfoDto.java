@@ -3,7 +3,7 @@ package org.prgms.locomocoserver.mogakkos.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.prgms.locomocoserver.location.dto.LocationInfoDto;
+import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 
 public record MogakkoInfoDto(@Schema(description = "모각코 id", example = "1") Long mogakkoId,

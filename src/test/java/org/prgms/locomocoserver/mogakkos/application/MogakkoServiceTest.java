@@ -30,9 +30,9 @@ import org.prgms.locomocoserver.categories.domain.CategoryType;
 import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
 import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
-import org.prgms.locomocoserver.location.domain.Location;
-import org.prgms.locomocoserver.location.domain.LocationRepository;
-import org.prgms.locomocoserver.location.dto.LocationInfoDto;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
+import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
@@ -77,7 +77,7 @@ class MogakkoServiceTest {
     @Autowired
     private ParticipantRepository participantRepository;
     @Autowired
-    private LocationRepository locationRepository;
+    private MogakkoLocationRepository mogakkoLocationRepository;
     @Autowired
     private ChatRoomRepository chatRoomRepository;
     @Autowired
@@ -130,9 +130,9 @@ class MogakkoServiceTest {
         participantRepository.save(
             Participant.builder().user(setUpUser2).mogakko(testMogakko).build());
 
-        Location testLocation = Location.builder().address("테스트 주소~").latitude(10.31232)
+        MogakkoLocation testMogakkoLocation = MogakkoLocation.builder().address("테스트 주소~").latitude(10.31232)
             .longitude(105.4279823801).city("심곡본동").mogakko(testMogakko).build();
-        locationRepository.save(testLocation);
+        mogakkoLocationRepository.save(testMogakkoLocation);
 
         tagIds.addAll(List.of(js.getId(), python.getId(), codingTest.getId(), backend.getId()));
     }
@@ -142,7 +142,7 @@ class MogakkoServiceTest {
         chatMessageRepository.deleteAll();
         participantRepository.deleteAll();
         mogakkoTagRepository.deleteAll();
-        locationRepository.deleteAll();
+        mogakkoLocationRepository.deleteAll();
         chatParticipantRepository.deleteAll();
         chatRoomRepository.deleteAll();
         mogakkoRepository.deleteAll();
@@ -235,13 +235,13 @@ class MogakkoServiceTest {
             .isEqualTo(testMogakko.getStartTime().plusHours(5).truncatedTo(ChronoUnit.MILLIS));
         assertThat(updatedMogakkoTags).hasSize(tagIds.size());
 
-        Optional<Location> locationOptional = locationRepository.findByMogakko(updatedMogakko);
+        Optional<MogakkoLocation> locationOptional = mogakkoLocationRepository.findByMogakko(updatedMogakko);
         assertThat(locationOptional.isPresent()).isTrue();
-        Location updatedLocation = locationOptional.get();
-        assertThat(updatedLocation.getAddress()).isEqualTo(updateLocation.address());
-        assertThat(updatedLocation.getCity()).isEqualTo(updateLocation.city());
-        assertThat(updatedLocation.getLatitude()).isEqualTo(updateLocation.latitude());
-        assertThat(updatedLocation.getLongitude()).isEqualTo(updateLocation.longitude());
+        MogakkoLocation updatedMogakkoLocation = locationOptional.get();
+        assertThat(updatedMogakkoLocation.getAddress()).isEqualTo(updateLocation.address());
+        assertThat(updatedMogakkoLocation.getCity()).isEqualTo(updateLocation.city());
+        assertThat(updatedMogakkoLocation.getLatitude()).isEqualTo(updateLocation.latitude());
+        assertThat(updatedMogakkoLocation.getLongitude()).isEqualTo(updateLocation.longitude());
     }
 
     @Test

@@ -3,7 +3,7 @@ package org.prgms.locomocoserver.mogakkos.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.prgms.locomocoserver.location.dto.LocationInfoDto;
+import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 
 public record MogakkoUpdateRequestDto(@Schema(description = "수정하려는 유저 id", example = "1") Long creatorId,
                                       @Schema(description = "모각코 글 제목", example = "이게 무슨 일이야 이렇게 좋은 날에") String title,

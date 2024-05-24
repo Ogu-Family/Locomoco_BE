@@ -17,9 +17,9 @@ import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
-import org.prgms.locomocoserver.location.domain.Location;
-import org.prgms.locomocoserver.location.domain.LocationRepository;
-import org.prgms.locomocoserver.location.dto.LocationInfoDto;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
+import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
@@ -55,14 +55,14 @@ class ChatRoomServiceTest {
     @Autowired
     private ChatMessageRepository chatMessageRepository;
     @Autowired
-    private LocationRepository locationRepository;
+    private MogakkoLocationRepository mogakkoLocationRepository;
     @Autowired
     private ParticipantRepository participantRepository;
 
     @AfterEach
     void tearDown() {
         participantRepository.deleteAll();
-        locationRepository.deleteAll();
+        mogakkoLocationRepository.deleteAll();
         chatMessageRepository.deleteAll();
         chatParticipantRepository.deleteAll();
         chatRoomRepository.deleteAll();
@@ -80,11 +80,11 @@ class ChatRoomServiceTest {
                 .temperature(36.5).provider("kakao").gender(Gender.MALE).build()));
         userRepository.saveAll(dummyUsers);
 
-        Location location = Location.builder().city("Carry You").address("Martin Garrix")
+        MogakkoLocation mogakkoLocation = MogakkoLocation.builder().city("Carry You").address("Martin Garrix")
             .latitude(10.233214).longitude(23.312314).build();
         MogakkoCreateResponseDto responseDto = mogakkoService.save(
             new MogakkoCreateRequestDto(dummyUsers.get(0).getId(), "title",
-                LocationInfoDto.create(location),
+                LocationInfoDto.create(mogakkoLocation),
                 LocalDateTime.now(), LocalDateTime.now().plusHours(2),
                 LocalDateTime.now().plusHours(1),
                 10, "", List.of()));
