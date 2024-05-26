@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.mogakkos.domain.Location;
@@ -24,4 +25,12 @@ public class Midpoint extends Location {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mogakko_id")
     protected Mogakko mogakko;
+
+    @Builder
+    public Midpoint(double latitude, double longitude, String address, String city, Long id,
+        Mogakko mogakko) {
+        super(latitude, longitude, address, city);
+        this.id = id;
+        this.mogakko = mogakko;
+    }
 }
