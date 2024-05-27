@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,6 +80,7 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         List<ChatMessageDto> chatMessageDtos = chatMessages.stream()
                 .map(chatMessageMongo -> ChatMessageDto.of(roomId, chatMessageMongo))
                 .collect(Collectors.toList());
+        Collections.reverse(chatMessageDtos);
 
         return chatMessageDtos;
     }
