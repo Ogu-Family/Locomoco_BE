@@ -23,4 +23,16 @@ public class DeviceKeyMongo {
         this.pad = pad;
         this.desktop = desktop;
     }
+
+    public void updatePhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void updatePad(String pad) {
+        this.pad = pad;
+    }
+
+    public void updateDesktop(String desktop) {
+        this.desktop = desktop;
+    }
 }
