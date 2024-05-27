@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.global.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.prgms.locomocoserver.global.filter.AuthenticationFilter;
 import org.prgms.locomocoserver.global.filter.CorsFilter;
 import org.prgms.locomocoserver.global.filter.ExceptionHandlerFilter;
@@ -39,5 +40,10 @@ public class AppConfig {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }
