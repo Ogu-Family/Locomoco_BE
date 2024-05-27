@@ -47,7 +47,7 @@ public class UserService {
     private final MogakkoLikeRepository mogakkoLikeRepository;
     private final ParticipantRepository participantRepository;
     private final TagRepository tagRepository;
-    private final DeviceKeyRepository deviceKeyRepository;
+    private final DeviceKeyService deviceKeyService;
     private final ImageService imageService;
 
     @Transactional
@@ -73,7 +73,8 @@ public class UserService {
         Tag jobTag = tagRepository.findById(requestDto.jobId()).orElseThrow(RuntimeException::new); // TODO: 태그 예외 반환
         user.setInitInfo(requestDto.nickname(), requestDto.birth(),
                 Gender.valueOf(requestDto.gender().toUpperCase()), jobTag);
-        deviceKeyRepository.save(DeviceKey.builder().user(user).build());
+        deviceKeyService.saveDeviceKey(user.getId().toString());
+
 
         if (multipartFile != null) uploadProfileImage(userId, multipartFile);
 
