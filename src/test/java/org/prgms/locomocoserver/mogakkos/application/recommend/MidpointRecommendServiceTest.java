@@ -4,10 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpEntity;
 import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -22,11 +20,8 @@ import org.prgms.locomocoserver.mogakkos.application.mapsearch.KakaoMapSearch;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.midpoint.Midpoint;
 import org.prgms.locomocoserver.mogakkos.dto.Place;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
 @ExtendWith(MockitoExtension.class)
