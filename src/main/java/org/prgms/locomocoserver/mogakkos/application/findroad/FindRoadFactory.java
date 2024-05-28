@@ -14,13 +14,10 @@ public class FindRoadFactory {
     private String odsayApiKey;
 
     public FindRoadInfo getFindRoadInfo(String categoryGroup) {
-        switch (categoryGroup) {
-            case CAFE:
-                return new KakaoFindRoadInfo(kakaoApiKey);
-            case SUBWAY:
-                return new OdsayFindRoadInfo(odsayApiKey);
-            default:
-                return null;
-        }
+        return switch (categoryGroup) {
+            case CAFE -> new KakaoFindRoadInfo(kakaoApiKey);
+            case SUBWAY -> new OdsayFindRoadInfo(odsayApiKey);
+            default -> null;
+        };
     }
 }
