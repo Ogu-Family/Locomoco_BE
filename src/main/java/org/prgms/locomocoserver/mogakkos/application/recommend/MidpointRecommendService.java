@@ -62,7 +62,7 @@ public class MidpointRecommendService {
             midpointCandidate.add(cafeMidpointFuture.get());
             midpointCandidate.add(subwayMidpointFuture != null ? subwayMidpointFuture.get() : null);
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("중간 지점 계산 비동기 처리 중 예외가 발생했습니다."); // TODO: 중간 지점 예외로 교체
+            throw new RuntimeException("중간 지점 계산 비동기 처리 중 예외가 발생했습니다.", e); // TODO: 중간 지점 예외로 교체
         }
 
         return selectMidpoint(midpointCandidate);
