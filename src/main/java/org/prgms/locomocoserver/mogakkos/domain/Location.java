@@ -5,14 +5,12 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 
 @Getter
-@SuperBuilder
 @MappedSuperclass
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class Location extends BaseEntity {
+public abstract class Location extends BaseEntity { // TODO: 밸류 타입화
     @Column(name = "latitude", columnDefinition = "decimal(13, 10)", nullable = false)
     protected double latitude;
 
