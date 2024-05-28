@@ -33,4 +33,12 @@ public class Midpoint extends Location {
         this.id = id;
         this.mogakko = mogakko;
     }
+
+    public void update(Midpoint midpoint) {
+        this.latitude = midpoint.latitude;
+        this.longitude = midpoint.longitude;
+        this.address = midpoint.address;
+        this.city = midpoint.city;
+        this.mogakko = midpoint.mogakko;
+    }
 }
