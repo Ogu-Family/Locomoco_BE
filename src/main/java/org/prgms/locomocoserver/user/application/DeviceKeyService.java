@@ -16,8 +16,9 @@ public class DeviceKeyService {
 
     private final DeviceKeyMongoRepository deviceKeyMongoRepository;
 
-    public void saveDeviceKey(String userId) {
-        deviceKeyMongoRepository.save(DeviceKeyMongo.builder().userId(userId).build());
+    public DeviceKeyDto saveDeviceKey(String userId) {
+        DeviceKeyMongo deviceKeyMongo = deviceKeyMongoRepository.save(DeviceKeyMongo.builder().userId(userId).build());
+        return DeviceKeyDto.of(deviceKeyMongo);
     }
 
     public DeviceKeyDto getByUserId(String userId) {
