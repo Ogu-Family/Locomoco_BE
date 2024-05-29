@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.prgms.locomocoserver.global.filter.AuthenticationFilter;
 import org.prgms.locomocoserver.global.filter.CorsFilter;
 import org.prgms.locomocoserver.global.filter.ExceptionHandlerFilter;
@@ -44,6 +45,8 @@ public class AppConfig {
 
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
     }
 }
