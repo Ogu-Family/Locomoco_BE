@@ -13,6 +13,7 @@ public record Place (String name,
             .longitude(this.longitude)
             .latitude(this.latitude)
             .address(address)
+            .placeName(name)
             .build();
     }
 }
