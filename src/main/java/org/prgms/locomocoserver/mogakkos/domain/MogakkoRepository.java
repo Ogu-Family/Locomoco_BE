@@ -15,7 +15,7 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
 
     @Query(value = "SELECT m.* FROM mogakko m "
         + "JOIN locations l ON (m.id < :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND l.mogakko_id = m.id) "
-        + "WHERE MATCH(l.city) AGAINST(:city IN BOOLEAN MODE) "
+        + "WHERE MATCH(l.city) AGAINST(CONCAT('\"', :city, '\"') IN BOOLEAN MODE) "
         + "ORDER BY m.created_at DESC "
         + "LIMIT :pageSize", nativeQuery = true)
     List<Mogakko> findAllByCity(Long cursor, String city, int pageSize, LocalDateTime now);
@@ -24,7 +24,7 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
         + "FROM mogakko_tags mt "
         + "INNER JOIN mogakko m ON m.id < :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND m.id = mt.mogakko_id "
         + "INNER JOIN locations l ON l.mogakko_id = m.id "
-        + "WHERE mt.tag_id IN :tagIds AND MATCH(l.city) AGAINST(:city IN BOOLEAN MODE) "
+        + "WHERE mt.tag_id IN :tagIds AND MATCH(l.city) AGAINST(CONCAT('\"', :city, '\"') IN BOOLEAN MODE) "
         + "GROUP BY mt.mogakko_id HAVING COUNT(mt.mogakko_id) = :tagSize "
         + "ORDER BY m.created_at DESC "
         + "LIMIT :pageSize", nativeQuery = true)
