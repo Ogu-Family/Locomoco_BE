@@ -3,7 +3,7 @@ package org.prgms.locomocoserver.user.application;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.prgms.locomocoserver.user.domain.mongo.DeviceKeyMongo;
+import org.prgms.locomocoserver.user.domain.mongo.DeviceKey;
 import org.prgms.locomocoserver.user.domain.mongo.DeviceKeyMongoRepository;
 import org.prgms.locomocoserver.user.dto.request.DeviceKeyUpdateRequest;
 import org.prgms.locomocoserver.user.dto.response.DeviceKeyDto;
@@ -44,7 +44,7 @@ class DeviceKeyServiceTest {
     @DisplayName("userId로 디바이스 토큰을 조회할 수 있다.")
     void getByUserId() {
         // given
-        DeviceKeyMongo deviceKeyMongo = deviceKeyMongoRepository.save(DeviceKeyMongo.builder()
+        DeviceKey deviceKeyMongo = deviceKeyMongoRepository.save(DeviceKey.builder()
                 .userId("2").desktop("desktop test").pad("pad test").phone("phone test").build());
 
         // when
@@ -60,7 +60,7 @@ class DeviceKeyServiceTest {
     @DisplayName("userId, 디바이스 타입으로 token 값을 업데이트 할 수 있다.")
     void updateDeviceKey() {
         // given
-        DeviceKeyMongo deviceKeyMongo = deviceKeyMongoRepository.save(DeviceKeyMongo.builder()
+        DeviceKey deviceKey = deviceKeyMongoRepository.save(DeviceKey.builder()
                 .userId("2").desktop("desktop test").pad("pad test").phone("phone test").build());
         DeviceKeyUpdateRequest request = new DeviceKeyUpdateRequest("phone", "update");
 

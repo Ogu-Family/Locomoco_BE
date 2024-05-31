@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Document(collection = "device_keys")
-public class DeviceKeyMongo {
+public class DeviceKey {
 
     @Id
     private String id;
@@ -17,7 +17,7 @@ public class DeviceKeyMongo {
     private String desktop;
 
     @Builder
-    public DeviceKeyMongo(String userId, String phone, String pad, String desktop) {
+    public DeviceKey(String userId, String phone, String pad, String desktop) {
         this.userId = userId;
         this.phone = phone;
         this.pad = pad;

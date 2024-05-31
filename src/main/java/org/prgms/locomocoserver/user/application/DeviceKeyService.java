@@ -1,7 +1,7 @@
 package org.prgms.locomocoserver.user.application;
 
 import lombok.RequiredArgsConstructor;
-import org.prgms.locomocoserver.user.domain.mongo.DeviceKeyMongo;
+import org.prgms.locomocoserver.user.domain.mongo.DeviceKey;
 import org.prgms.locomocoserver.user.domain.mongo.DeviceKeyMongoRepository;
 import org.prgms.locomocoserver.user.dto.request.DeviceKeyUpdateRequest;
 import org.prgms.locomocoserver.user.dto.response.DeviceKeyDto;
@@ -17,8 +17,8 @@ public class DeviceKeyService {
     private final DeviceKeyMongoRepository deviceKeyMongoRepository;
 
     public DeviceKeyDto saveDeviceKey(String userId) {
-        DeviceKeyMongo deviceKeyMongo = deviceKeyMongoRepository.save(DeviceKeyMongo.builder().userId(userId).build());
-        return DeviceKeyDto.of(deviceKeyMongo);
+        DeviceKey deviceKey = deviceKeyMongoRepository.save(DeviceKey.builder().userId(userId).build());
+        return DeviceKeyDto.of(deviceKey);
     }
 
     public DeviceKeyDto getByUserId(String userId) {
@@ -27,20 +27,20 @@ public class DeviceKeyService {
 
     @Transactional
     public DeviceKeyDto updateDeviceKey(String userId, DeviceKeyUpdateRequest request) {
-        DeviceKeyMongo deviceKeyMongo = deviceKeyMongoRepository.findByUserId(userId).orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND));
+        DeviceKey deviceKey = deviceKeyMongoRepository.findByUserId(userId).orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND));
         switch (request.deviceType()) {
             case "phone":
-                deviceKeyMongo.updatePhone(request.token());
+                deviceKey.updatePhone(request.token());
                 break;
             case "pad":
-                deviceKeyMongo.updatePad(request.token());
+                deviceKey.updatePad(request.token());
                 break;
             case "desktop":
-                deviceKeyMongo.updateDesktop(request.token());
+                deviceKey.updateDesktop(request.token());
                 break;
             default:
                 throw new IllegalArgumentException("Device Type Error: " + request.deviceType());
         }
-        return DeviceKeyDto.of(deviceKeyMongo);
+        return DeviceKeyDto.of(deviceKey);
     }
 }
