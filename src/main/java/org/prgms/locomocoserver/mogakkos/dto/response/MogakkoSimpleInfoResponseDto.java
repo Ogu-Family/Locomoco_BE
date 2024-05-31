@@ -3,8 +3,8 @@ package org.prgms.locomocoserver.mogakkos.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.prgms.locomocoserver.location.domain.Location;
-import org.prgms.locomocoserver.location.dto.LocationInfoDto;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
+import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 
 public record MogakkoSimpleInfoResponseDto(@Schema(description = "모각코 id") Long id,
@@ -18,7 +18,7 @@ public record MogakkoSimpleInfoResponseDto(@Schema(description = "모각코 id")
                                            @Schema(description = "장소 정보") LocationInfoDto location,
                                            @Schema(description = "태그 id 목록") List<Long> tags) {
 
-    public static MogakkoSimpleInfoResponseDto create(Mogakko mogakko, Location location) {
+    public static MogakkoSimpleInfoResponseDto create(Mogakko mogakko, MogakkoLocation mogakkoLocation) {
         return new MogakkoSimpleInfoResponseDto(mogakko.getId(),
             mogakko.getTitle(),
             mogakko.getViews(),
@@ -27,7 +27,7 @@ public record MogakkoSimpleInfoResponseDto(@Schema(description = "모각코 id")
             mogakko.getUpdatedAt(),
             mogakko.getMaxParticipants(),
             mogakko.getParticipants().size(),
-            LocationInfoDto.create(location),
+            LocationInfoDto.create(mogakkoLocation),
             mogakko.getMogakkoTags().stream().map(mogakkoTag -> mogakkoTag.getTag().getId())
                 .toList());
     }

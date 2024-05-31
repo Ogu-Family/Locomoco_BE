@@ -10,8 +10,8 @@ import org.prgms.locomocoserver.image.application.ImageService;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.image.exception.ImageErrorType;
 import org.prgms.locomocoserver.image.exception.ImageException;
-import org.prgms.locomocoserver.location.domain.Location;
-import org.prgms.locomocoserver.location.domain.LocationRepository;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.likes.MogakkoLikeRepository;
@@ -43,7 +43,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final MogakkoRepository mogakkoRepository;
-    private final LocationRepository locationRepository;
+    private final MogakkoLocationRepository mogakkoLocationRepository;
     private final MogakkoLikeRepository mogakkoLikeRepository;
     private final ParticipantRepository participantRepository;
     private final TagRepository tagRepository;
@@ -115,9 +115,9 @@ public class UserService {
         User user = getById(userId);
         List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = mogakkoRepository.findOngoingMogakkosByUser(user, LocalDateTime.now())
             .stream().map(mogakko -> {
-                Location location = locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
+                MogakkoLocation mogakkoLocation = mogakkoLocationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
                     .orElseThrow(() -> new IllegalArgumentException("Not Found Location"));
-                return MogakkoSimpleInfoResponseDto.create(mogakko, location);
+                return MogakkoSimpleInfoResponseDto.create(mogakko, mogakkoLocation);
             }).toList();
 
         return mogakkoInfoDtos;
@@ -127,9 +127,9 @@ public class UserService {
         User user = getById(userId);
         List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = mogakkoRepository.findCompletedMogakkosByUser(user, LocalDateTime.now())
             .stream().map(mogakko -> {
-                Location location = locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
+                MogakkoLocation mogakkoLocation = mogakkoLocationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
                     .orElseThrow(() -> new IllegalArgumentException("Not Found Location")); // TODO: 장소 에러 반환
-                return MogakkoSimpleInfoResponseDto.create(mogakko, location);
+                return MogakkoSimpleInfoResponseDto.create(mogakko, mogakkoLocation);
             }).toList();
 
         return mogakkoInfoDtos;
@@ -141,9 +141,9 @@ public class UserService {
         List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = mogakkoLikeRepository.findAllByUser(user).stream()
                 .map(mogakkoLike -> {
                      Mogakko mogakko = mogakkoLike.getMogakko();
-                     Location location = locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
+                     MogakkoLocation mogakkoLocation = mogakkoLocationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
                              .orElseThrow(() -> new IllegalArgumentException("Not Found Location"));  // TODO : 장소 예외 반환
-                     return MogakkoSimpleInfoResponseDto.create(mogakko, location);
+                     return MogakkoSimpleInfoResponseDto.create(mogakko, mogakkoLocation);
                 }).toList();
 
         return mogakkoInfoDtos;
