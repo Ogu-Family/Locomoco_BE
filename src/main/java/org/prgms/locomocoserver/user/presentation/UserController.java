@@ -4,9 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
+import org.prgms.locomocoserver.user.application.DeviceKeyService;
 import org.prgms.locomocoserver.user.application.UserService;
+import org.prgms.locomocoserver.user.dto.request.DeviceKeyUpdateRequest;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
+import org.prgms.locomocoserver.user.dto.response.DeviceKeyDto;
 import org.prgms.locomocoserver.user.dto.response.UserInfoDto;
 import org.prgms.locomocoserver.user.dto.response.UserMyPageDto;
 import org.springframework.http.MediaType;
@@ -24,6 +27,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final DeviceKeyService deviceKeyService;
 
     @Operation(summary = "사용자 초기 회원가입", description = "사용자 id로 초기 정보를 입력합니다.")
     @PutMapping(value = "/users/init/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -76,6 +80,20 @@ public class UserController {
     public ResponseEntity<List<MogakkoSimpleInfoResponseDto>> getLikedMogakkos(@PathVariable Long userId) {
         List<MogakkoSimpleInfoResponseDto> mogakkoInfoDtos = userService.getLikedMogakkos(userId);
         return ResponseEntity.ok(mogakkoInfoDtos);
+    }
+
+    @Operation(summary = "사용자 device key 조회", description = "사용자의 device key 토큰을 조회합니다.")
+    @GetMapping("/users/{userId}/device-keys")
+    public ResponseEntity<DeviceKeyDto> getDeviceKeys(@PathVariable Long userId) {
+        DeviceKeyDto deviceKeyDto = deviceKeyService.getByUserId(userId.toString());
+        return ResponseEntity.ok(deviceKeyDto);
+    }
+
+    @Operation(summary = "사용자 device key 업데이트", description = "사용자의 device key 값을 업데이트 합니다.")
+    @PatchMapping("/users/{userId}/device-keys")
+    public ResponseEntity<DeviceKeyDto> updateDeviceKeys(@PathVariable Long userId, @RequestBody DeviceKeyUpdateRequest request) {
+        DeviceKeyDto updatedDeviceKeyDto = deviceKeyService.updateDeviceKey(userId.toString(), request);
+        return ResponseEntity.ok(updatedDeviceKeyDto);
     }
 
     @Operation(summary = "사용자 정보 수정", description = "프로필 이미지, 닉네임, 성별, 생년월일, 직업을 수정할 수 있습니다.")
