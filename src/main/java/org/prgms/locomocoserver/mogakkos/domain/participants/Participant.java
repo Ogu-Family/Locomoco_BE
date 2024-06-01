@@ -49,10 +49,6 @@ public class Participant {
         this.mogakko = mogakko;
     }
 
-    public void updateUser(User user) {
-        this.user = user;
-    }
-
     public void updateMogakko(Mogakko mogakko) {
         if (Objects.nonNull(mogakko)) {
             mogakko.getParticipants().remove(this);
@@ -60,5 +56,10 @@ public class Participant {
 
         this.mogakko = mogakko;
         mogakko.getParticipants().add(this);
+    }
+
+    public void updateLocation(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }
