@@ -48,7 +48,6 @@ public class GlobalExceptionHandler {
         slackAlertService.sendAlertLog(
             new SlackErrorAlertDto(request.getRequestURL().toString(), request.getMethod(),
                 ex.getErrorType().getMessage()));
-        log.error(ex.getErrorType().getMessage());
         return ResponseEntity.status(ex.getErrorType().getHttpStatus()).body(ex.getErrorType().getMessage());
     }
 
@@ -57,7 +56,7 @@ public class GlobalExceptionHandler {
         slackAlertService.sendAlertLog(
             new SlackErrorAlertDto(request.getRequestURL().toString(), request.getMethod(),
                 ex.getMessage()));
-        log.error("알 수 없는 에러 발생: {}", ex.getMessage());
+        log.error("알 수 없는 에러 발생: {}", ex.getMessage(), ex);
         return ResponseEntity.status(500).body(ex.getMessage());
     }
 }
