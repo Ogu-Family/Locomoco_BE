@@ -12,6 +12,7 @@ import org.prgms.locomocoserver.mogakkos.dto.response.ParticipationCheckingDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,6 +50,19 @@ public class MogakkoParticipationController {
         @Parameter(description = "모각코 id", example = "1") @PathVariable Long id,
         @Parameter(description = "참여를 원하는 유저 id") @RequestBody ParticipationRequestDto requestDto) {
         participationService.participate(id, requestDto);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "모각코 참여자 정보 수정", description = "특정 모각코 참여자의 정보를 변경합니다. 참여자의 출발 위치를 수정할 때 주로 사용합니다.")
+    @ApiResponses(
+        @ApiResponse(responseCode = "200", description = "참여자 정보 수정 성공")
+    )
+    @PatchMapping("/mogakko/map/{id}/participate")
+    public ResponseEntity<Void> update(
+        @Parameter(description = "모각코 id", example = "1") @PathVariable(name = "id") Long mogakkoId,
+        @Parameter(description = "정보 변경을 원하는 참여자 정보") @RequestBody ParticipationRequestDto requestDto) {
+        participationService.update(mogakkoId, requestDto);
 
         return ResponseEntity.ok().build();
     }
