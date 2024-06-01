@@ -12,10 +12,10 @@ import org.prgms.locomocoserver.global.common.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Location extends BaseEntity { // TODO: 밸류 타입화
     @Column(name = "latitude", columnDefinition = "decimal(13, 10)", nullable = false)
-    protected double latitude;
+    protected Double latitude;
 
     @Column(name = "longitude", columnDefinition = "decimal(13, 10)", nullable = false)
-    protected double longitude;
+    protected Double longitude;
 
     @Column(name = "address")
     protected String address;
@@ -23,7 +23,7 @@ public abstract class Location extends BaseEntity { // TODO: 밸류 타입화
     @Column(name = "city")
     protected String city;
 
-    protected Location(double latitude, double longitude, String address, String city) {
+    protected Location(Double latitude, Double longitude, String address, String city) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
