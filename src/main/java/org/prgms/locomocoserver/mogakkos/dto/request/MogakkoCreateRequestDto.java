@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation.MogakkoLocationBuilder;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 
@@ -31,7 +32,13 @@ public record MogakkoCreateRequestDto(@Schema(description = "작성자 id", exam
     }
 
     public MogakkoLocation toLocation() {
-        return MogakkoLocation.builder()
+        MogakkoLocationBuilder builder = MogakkoLocation.builder();
+
+        if (location == null) {
+            return builder.build();
+        }
+
+        return builder
             .address(location.address())
             .latitude(location.latitude())
             .longitude(location.longitude())
