@@ -41,6 +41,7 @@ public class DeviceKeyService {
             default:
                 throw new IllegalArgumentException("Device Type Error: " + request.deviceType());
         }
+        deviceKeyMongoRepository.save(deviceKey);
         return DeviceKeyDto.of(deviceKey);
     }
 }
