@@ -62,7 +62,7 @@ class DeviceKeyServiceTest {
         // given
         DeviceKey deviceKey = deviceKeyMongoRepository.save(DeviceKey.builder()
                 .userId("2").desktop("desktop test").pad("pad test").phone("phone test").build());
-        DeviceKeyUpdateRequest request = new DeviceKeyUpdateRequest("phone", "update");
+        DeviceKeyUpdateRequest request = new DeviceKeyUpdateRequest("2", "phone", "update");
 
         // when
         DeviceKeyDto deviceKeyDto = deviceKeyService.updateDeviceKey("2", request);
