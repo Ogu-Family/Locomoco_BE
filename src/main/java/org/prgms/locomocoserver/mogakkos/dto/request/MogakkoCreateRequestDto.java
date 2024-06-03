@@ -3,8 +3,9 @@ package org.prgms.locomocoserver.mogakkos.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.prgms.locomocoserver.location.domain.Location;
-import org.prgms.locomocoserver.location.dto.LocationInfoDto;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation.MogakkoLocationBuilder;
+import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 
 public record MogakkoCreateRequestDto(@Schema(description = "작성자 id", example = "1") Long creatorId,
@@ -30,8 +31,14 @@ public record MogakkoCreateRequestDto(@Schema(description = "작성자 id", exam
             .build();
     }
 
-    public Location toLocation() {
-        return Location.builder()
+    public MogakkoLocation toLocation() {
+        MogakkoLocationBuilder builder = MogakkoLocation.builder();
+
+        if (location == null) {
+            return builder.build();
+        }
+
+        return builder
             .address(location.address())
             .latitude(location.latitude())
             .longitude(location.longitude())

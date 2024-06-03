@@ -16,6 +16,7 @@ import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,11 +45,20 @@ public class MogakkoParticipationService {
 
         validateIfDeadlineIsPast(mogakko);
 
-        Participant participant = Participant.builder().mogakko(mogakko).user(user).build();
+        Participant participant = Participant.builder().mogakko(mogakko).user(user).latitude(
+            requestDto.latitude()).longitude(requestDto.longitude()).build();
         mogakko.addParticipant(participant);
         participantRepository.save(participant);
 
         chatRoomService.enterChatRoom(new ChatEnterRequestDto(mogakko.getChatRoom().getId(), user));
+    }
+
+    @Transactional
+    public void update(Long mogakkoId, ParticipationRequestDto requestDto) {
+        Participant participant = participantRepository.findByMogakkoIdAndUserId(mogakkoId,
+            requestDto.userId()).orElseThrow(() -> new RuntimeException("해당하는 참여자가 존재하지 않습니다.")); // TODO: 참가 에러 반환
+
+        participant.updateLocation(requestDto.latitude(), requestDto.longitude());
     }
 
     public void cancel(Long mogakkoId, Long userId) {

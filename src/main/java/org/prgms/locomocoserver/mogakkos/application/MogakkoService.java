@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
-import org.prgms.locomocoserver.location.domain.Location;
-import org.prgms.locomocoserver.location.domain.LocationRepository;
-import org.prgms.locomocoserver.location.dto.LocationInfoDto;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
+import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.searchpolicy.SearchPolicy;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
@@ -47,7 +47,7 @@ public class MogakkoService {
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final LocationRepository locationRepository;
+    private final MogakkoLocationRepository mogakkoLocationRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
     private final ChatRoomService chatRoomService;
     private final MogakkoParticipationService mogakkoParticipationService;
@@ -57,13 +57,13 @@ public class MogakkoService {
         User creator = userService.getById(requestDto.creatorId());
         Mogakko mogakko = createMogakkoBy(requestDto);
 
-        Location location = requestDto.toLocation();
-        location.updateMogakko(mogakko);
+        MogakkoLocation mogakkoLocation = requestDto.toLocation();
+        mogakkoLocation.updateMogakko(mogakko);
 
         mogakko.updateCreator(creator);
 
         Mogakko savedMogakko = mogakkoRepository.save(mogakko);
-        locationRepository.save(location);
+        mogakkoLocationRepository.save(mogakkoLocation);
 
         ChatRoom chatRoom = chatRoomService.createChatRoom(
             new ChatCreateRequestDto(savedMogakko, creator));
@@ -86,11 +86,11 @@ public class MogakkoService {
             .orElseGet(() -> User.builder().nickname("(알 수 없음)").build());
         List<User> participants = userRepository.findAllParticipantsByMogakko(foundMogakko);
         List<MogakkoTag> mogakkoTags = mogakkoTagRepository.findAllByMogakko(foundMogakko);
-        Location foundLocation = locationRepository.findByMogakkoAndDeletedAtIsNull(foundMogakko)
+        MogakkoLocation foundMogakkoLocation = mogakkoLocationRepository.findByMogakkoAndDeletedAtIsNull(foundMogakko)
             .orElseThrow(RuntimeException::new); // TODO: 장소 예외 반환
 
         return getMogakkoDetailResponseDto(creator, participants, mogakkoTags, foundMogakko,
-            foundLocation);
+            foundMogakkoLocation);
     }
 
     @Transactional(readOnly = true)
@@ -103,14 +103,14 @@ public class MogakkoService {
 
         searchedMogakkos = search(tagIds, cursor, searchVal, pageSize, searchPolicy);
 
-        List<Location> locations = locationRepository.findAllByMogakkos(searchedMogakkos);
+        List<MogakkoLocation> mogakkoLocations = mogakkoLocationRepository.findAllByMogakkos(searchedMogakkos);
         Map<Long, Long> mogakkoLocationMap = new HashMap<>();
-        locations.forEach(location -> mogakkoLocationMap.put(location.getMogakko().getId(), location.getId()));
+        mogakkoLocations.forEach(location -> mogakkoLocationMap.put(location.getMogakko().getId(), location.getId()));
 
         return searchedMogakkos.stream().map(mogakko -> {
-            Location location = locationRepository.findById(mogakkoLocationMap.get(mogakko.getId()))
+            MogakkoLocation mogakkoLocation = mogakkoLocationRepository.findById(mogakkoLocationMap.get(mogakko.getId()))
                 .orElseThrow(RuntimeException::new); // TODO: 장소 에러 반환
-            return MogakkoSimpleInfoResponseDto.create(mogakko, location);
+            return MogakkoSimpleInfoResponseDto.create(mogakko, mogakkoLocation);
         }).toList();
     }
 
@@ -169,7 +169,7 @@ public class MogakkoService {
 
     private static MogakkoDetailResponseDto getMogakkoDetailResponseDto(User creator,
         List<User> participants, List<MogakkoTag> mogakkoTags, Mogakko foundMogakko,
-        Location foundLocation) {
+        MogakkoLocation foundMogakkoLocation) {
         UserBriefInfoDto creatorInfoDto = UserBriefInfoDto.of(creator);
         List<MogakkoParticipantDto> mogakkoParticipantDtos = participants.stream()
             .map(MogakkoParticipantDto::create)
@@ -177,7 +177,7 @@ public class MogakkoService {
         List<Long> tagIds = mogakkoTags.stream().map(mogakkoTag -> mogakkoTag.getTag().getId())
             .toList();
         MogakkoInfoDto mogakkoInfoDto = MogakkoInfoDto.create(foundMogakko,
-            LocationInfoDto.create(foundLocation), tagIds);
+            LocationInfoDto.create(foundMogakkoLocation), tagIds);
 
         return new MogakkoDetailResponseDto(creatorInfoDto, mogakkoParticipantDtos, mogakkoInfoDto);
     }
@@ -225,10 +225,10 @@ public class MogakkoService {
     }
 
     private void updateMogakkoLocation(Mogakko mogakko, LocationInfoDto locationInfoDto) {
-        Location location = locationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
+        MogakkoLocation mogakkoLocation = mogakkoLocationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
                 .orElseThrow(RuntimeException::new); // TODO: 적절한 예외 반환 (유저 혹은 장소)
 
-        location.updateInfo(locationInfoDto.latitude(),
+        mogakkoLocation.updateInfo(locationInfoDto.latitude(),
                 locationInfoDto.longitude(),
                 locationInfoDto.address(),
                 locationInfoDto.city());

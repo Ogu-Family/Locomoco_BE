@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.mogakkos.domain.participants;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +27,12 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "latitude", columnDefinition = "decimal(13, 10)")
+    private Double latitude;
+
+    @Column(name = "longitude", columnDefinition = "decimal(13, 10)")
+    private Double longitude;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -35,13 +42,11 @@ public class Participant {
     private Mogakko mogakko;
 
     @Builder
-    public Participant(User user, Mogakko mogakko) {
+    public Participant(Double latitude, Double longitude, User user, Mogakko mogakko) {
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.user = user;
         this.mogakko = mogakko;
-    }
-
-    public void updateUser(User user) {
-        this.user = user;
     }
 
     public void updateMogakko(Mogakko mogakko) {
@@ -51,5 +56,10 @@ public class Participant {
 
         this.mogakko = mogakko;
         mogakko.getParticipants().add(this);
+    }
+
+    public void updateLocation(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }
