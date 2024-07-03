@@ -100,6 +100,10 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         Query query = new Query().with(Sort.by(Sort.Direction.DESC, "_id")).limit(1);
         ChatMessageMongo lastMessage = mongoTemplate.findOne(query, ChatMessageMongo.class, collectionName);
 
+        if(lastMessage == null) {
+            throw new ChatException(ChatErrorType.CHAT_MESSAGE_NOT_FOUND, "채팅방 마지막 메시지를 조회할 수 없습니다. 채팅방번호 : " + roomId);
+        }
+
         return ChatMessageDto.of(roomId, lastMessage);
     }
 
