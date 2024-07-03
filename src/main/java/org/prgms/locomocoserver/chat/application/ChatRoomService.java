@@ -1,7 +1,10 @@
 package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
-import org.prgms.locomocoserver.chat.domain.*;
+import org.prgms.locomocoserver.chat.domain.ChatParticipant;
+import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
+import org.prgms.locomocoserver.chat.domain.ChatRoom;
+import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
@@ -10,11 +13,11 @@ import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.user.domain.User;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +76,11 @@ public class ChatRoomService {
         List<ChatRoom> chatRooms = chatRoomRepository.findByParticipantsId(userId, cursor, pageSize);
 
         List<ChatRoomDto> chatRoomDtos = chatRooms.stream()
-                .map(chatRoom -> ChatRoomDto.of(chatRoom, chatMessagePolicy.getLastChatMessage(chatRoom.getId())))
+                .map(chatRoom -> {
+                    ChatMessageDto lastMessageDto = chatMessagePolicy.getLastChatMessage(chatRoom.getId());
+                    return (lastMessageDto != null) ? ChatRoomDto.of(chatRoom, lastMessageDto) : null;
+                })
+                .filter(Objects::nonNull) // null인 경우 제외
                 .toList();
         return chatRoomDtos;
     }
