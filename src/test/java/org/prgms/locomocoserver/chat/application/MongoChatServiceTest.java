@@ -116,7 +116,7 @@ class MongoChatServiceTest {
         List<ChatMessageDto> chatMessageMongoList = mongoChatMessageService.getAllChatMessages(roomId, "null", 10);
         assertThat(chatMessageMongoList.size()).isEqualTo(2);
 
-        String cursor = chatMessageMongoList.get(0).chatMessageId();
+        String cursor = chatMessageMongoList.get(1).chatMessageId();
         List<ChatMessageDto> chatMessageMongoList2 = mongoChatMessageService.getAllChatMessages(roomId, cursor, 10);
 
         // then
