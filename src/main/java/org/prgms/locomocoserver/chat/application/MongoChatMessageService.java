@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongo;
@@ -69,12 +70,13 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         String collectionName = getChatRoomName(roomId);
         Query query = new Query();
 
-        if (cursorValue != "null") {
-            query.addCriteria(Criteria.where("_id").gt(cursorValue));
+        if (!"null".equals(cursorValue)) {
+            ObjectId cursorObjectId = new ObjectId(cursorValue);
+            query.addCriteria(Criteria.where("_id").gt(cursorObjectId));
         }
 
-        query.with(Sort.by(Sort.Direction.DESC, "_id")).limit(pageSize);
 
+        query.with(Sort.by(Sort.Direction.DESC, "_id")).limit(pageSize);
         List<ChatMessageMongo> chatMessages = mongoTemplate.find(query, ChatMessageMongo.class, collectionName);
 
         List<ChatMessageDto> chatMessageDtos = chatMessages.stream()
@@ -98,7 +100,7 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         Query query = new Query().with(Sort.by(Sort.Direction.DESC, "_id")).limit(1);
         ChatMessageMongo lastMessage = mongoTemplate.findOne(query, ChatMessageMongo.class, collectionName);
 
-        return ChatMessageDto.of(roomId, lastMessage);
+        return (lastMessage == null) ? null : ChatMessageDto.of(roomId, lastMessage);
     }
 
     public String getChatRoomName(Long roomId) {

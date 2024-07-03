@@ -114,8 +114,12 @@ class MongoChatServiceTest {
 
         // when
         List<ChatMessageDto> chatMessageMongoList = mongoChatMessageService.getAllChatMessages(roomId, "null", 10);
+        assertThat(chatMessageMongoList.size()).isEqualTo(2);
+
+        String cursor = chatMessageMongoList.get(0).chatMessageId();
+        List<ChatMessageDto> chatMessageMongoList2 = mongoChatMessageService.getAllChatMessages(roomId, cursor, 10);
 
         // then
-        assertThat(chatMessageMongoList.size()).isEqualTo(2);
+        assertThat(chatMessageMongoList2.size()).isEqualTo(1);
     }
 }
