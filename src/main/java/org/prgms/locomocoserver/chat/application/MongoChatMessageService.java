@@ -72,7 +72,7 @@ public class MongoChatMessageService implements ChatMessagePolicy {
 
         if (!"null".equals(cursorValue)) {
             ObjectId cursorObjectId = new ObjectId(cursorValue);
-            query.addCriteria(Criteria.where("_id").gt(cursorObjectId));
+            query.addCriteria(Criteria.where("_id").lt(cursorObjectId));
         }
 
 
