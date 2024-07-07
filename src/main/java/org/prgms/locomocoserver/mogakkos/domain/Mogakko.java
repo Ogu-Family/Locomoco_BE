@@ -117,10 +117,6 @@ public class Mogakko extends BaseEntity {
         participant.updateMogakko(this);
     }
 
-    public void addInquiry(Inquiry inquiry) {
-        inquiry.updateMogakko(this);
-    }
-
     public void updateCreator(User creator) {
         this.creator = creator;
     }
@@ -131,10 +127,6 @@ public class Mogakko extends BaseEntity {
 
     public boolean isSameCreatorId(Long creatorId) {
         return this.creator.getId().equals(creatorId);
-    }
-
-    public void increaseViews() {
-        this.views++;
     }
 
     public void updateInfo(String title, String content, LocalDateTime startTime, LocalDateTime endTime,

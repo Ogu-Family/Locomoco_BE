@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,18 +47,5 @@ public class Inquiry extends BaseEntity {
 
     public void updateInfo(String content) {
         this.content = content;
-    }
-
-    public void updateUser(User user) {
-        this.user = user;
-    }
-
-    public void updateMogakko(Mogakko mogakko) {
-        if (Objects.nonNull(mogakko)) {
-            mogakko.getInquiries().remove(this);
-        }
-
-        this.mogakko = mogakko;
-        mogakko.getInquiries().add(this);
     }
 }
