@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class InquiryService {
+    private static final int PAGE_SIZE = 20;
+
     private final InquiryRepository inquiryRepository;
     private final MogakkoRepository mogakkoRepository;
     private final UserRepository userRepository;
@@ -54,13 +56,13 @@ public class InquiryService {
         List<Inquiry> foundInquries;
 
         if (mogakkoId == null && userId == null) { // querydsl 도입 시 동적 쿼리로 리팩터링
-            foundInquries = inquiryRepository.findAll(cursor);
+            foundInquries = inquiryRepository.findAll(cursor, PAGE_SIZE);
         } else if (mogakkoId == null) {
-            foundInquries = inquiryRepository.findAllByUser(cursor, userId);
+            foundInquries = inquiryRepository.findAllByUser(cursor, userId, PAGE_SIZE);
         } else if (userId == null) {
-            foundInquries = inquiryRepository.findAllByMogakko(cursor, mogakkoId);
+            foundInquries = inquiryRepository.findAllByMogakko(cursor, mogakkoId, PAGE_SIZE);
         } else {
-            foundInquries = inquiryRepository.findAllByMogakkoAndUser(cursor, mogakkoId, userId);
+            foundInquries = inquiryRepository.findAllByMogakkoAndUser(cursor, mogakkoId, userId, PAGE_SIZE);
         }
 
         return foundInquries.stream().map(
@@ -70,7 +72,7 @@ public class InquiryService {
     @Transactional
     public void delete(Long id, Long userId) {
         Inquiry inquiry = inquiryRepository.findByIdAndDeletedAtIsNull(id)
-            .orElseThrow(RuntimeException::new); // TODO: 문의 예외 반환
+            .orElseThrow(() -> new RuntimeException("삭제할 문의를 찾을 수 없습니다.")); // TODO: 문의 예외 반환
 
         validateUser(userId, inquiry);
 
@@ -81,7 +83,7 @@ public class InquiryService {
         boolean isSameUser = foundInquiry.getUser().getId().equals(inquiryUserId);
 
         if (!isSameUser) {
-            throw new RuntimeException(); // TODO: 유저 예외 반환
+            throw new RuntimeException("문의를 작성한 유저가 아닙니다."); // TODO: 문의 예외 반환
         }
     }
 }
