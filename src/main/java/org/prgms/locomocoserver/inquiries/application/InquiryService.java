@@ -72,7 +72,7 @@ public class InquiryService {
     @Transactional
     public void delete(Long id, Long userId) {
         Inquiry inquiry = inquiryRepository.findByIdAndDeletedAtIsNull(id)
-            .orElseThrow(RuntimeException::new); // TODO: 문의 예외 반환
+            .orElseThrow(() -> new RuntimeException("삭제할 문의를 찾을 수 없습니다.")); // TODO: 문의 예외 반환
 
         validateUser(userId, inquiry);
 
@@ -83,7 +83,7 @@ public class InquiryService {
         boolean isSameUser = foundInquiry.getUser().getId().equals(inquiryUserId);
 
         if (!isSameUser) {
-            throw new RuntimeException(); // TODO: 유저 예외 반환
+            throw new RuntimeException("문의를 작성한 유저가 아닙니다."); // TODO: 문의 예외 반환
         }
     }
 }
