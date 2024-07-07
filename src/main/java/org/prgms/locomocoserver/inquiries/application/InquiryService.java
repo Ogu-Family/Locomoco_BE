@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class InquiryService {
+    private static final int PAGE_SIZE = 20;
+
     private final InquiryRepository inquiryRepository;
     private final MogakkoRepository mogakkoRepository;
     private final UserRepository userRepository;
@@ -54,13 +56,13 @@ public class InquiryService {
         List<Inquiry> foundInquries;
 
         if (mogakkoId == null && userId == null) { // querydsl 도입 시 동적 쿼리로 리팩터링
-            foundInquries = inquiryRepository.findAll(cursor);
+            foundInquries = inquiryRepository.findAll(cursor, PAGE_SIZE);
         } else if (mogakkoId == null) {
-            foundInquries = inquiryRepository.findAllByUser(cursor, userId);
+            foundInquries = inquiryRepository.findAllByUser(cursor, userId, PAGE_SIZE);
         } else if (userId == null) {
-            foundInquries = inquiryRepository.findAllByMogakko(cursor, mogakkoId);
+            foundInquries = inquiryRepository.findAllByMogakko(cursor, mogakkoId, PAGE_SIZE);
         } else {
-            foundInquries = inquiryRepository.findAllByMogakkoAndUser(cursor, mogakkoId, userId);
+            foundInquries = inquiryRepository.findAllByMogakkoAndUser(cursor, mogakkoId, userId, PAGE_SIZE);
         }
 
         return foundInquries.stream().map(
