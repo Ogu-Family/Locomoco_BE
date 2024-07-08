@@ -36,8 +36,6 @@ class MongoChatServiceTest {
     @Autowired
     ImageRepository imageRepository;
     @Autowired
-    TagRepository tagRepository;
-    @Autowired
     CategoryRepository categoryRepository;
     @Autowired
     ChatRoomRepository chatRoomRepository;
@@ -54,14 +52,11 @@ class MongoChatServiceTest {
         mongoTemplate.getDb().drop();
         userRepository.deleteAll();
         imageRepository.deleteAll();
-        tagRepository.deleteAll();
         categoryRepository.deleteAll();
         chatRoomRepository.deleteAll();
 
         User sender = testFactory.createUser();
-        categoryRepository.save(sender.getJobTag().getCategory());
         imageRepository.save(sender.getProfileImage());
-        tagRepository.save(sender.getJobTag());
         creator = userRepository.save(sender);
 
         Mogakko mogakko = mogakkoRepository.save(testFactory.createMogakko(creator));

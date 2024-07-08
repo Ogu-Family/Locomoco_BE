@@ -25,7 +25,7 @@ public class TestFactory {
                 .gender(Gender.MALE)
                 .temperature(36.5).email("test@example.com")
                 .profileImage(createImage())
-                .jobTag(createTag("DEVELOPER", "JOB", CategoryType.USER, CategoryInputType.RADIOGROUP))
+                .jobTag(null)
                 .provider(Provider.KAKAO.name())
                 .build();
     }
