@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +42,7 @@ class MidpointRecommendServiceTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @Disabled("실제 요청을 하는 테스트라서 disable 합니다.")
     @DisplayName("중간 지점을 제대로 가져올 수 있다.")
     void success_recommend_midpoint_given_healthy_args_within_5_km() throws Exception {
         // given
