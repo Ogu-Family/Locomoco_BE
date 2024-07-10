@@ -18,11 +18,9 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.prgms.locomocoserver.categories.domain.Category;
 import org.prgms.locomocoserver.categories.domain.CategoryInputType;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
@@ -59,8 +57,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @TestInstance(Lifecycle.PER_CLASS)
-@TestMethodOrder(OrderAnnotation.class)
 class MogakkoServiceTest {
+    static final long CURSOR = Long.MAX_VALUE;
+    static final int PAGE_SIZE = 10;
 
     @Autowired
     private MogakkoService mogakkoService;
@@ -177,12 +176,12 @@ class MogakkoServiceTest {
         // then
         Optional<Mogakko> mogakkoOptional = mogakkoRepository.findByIdAndDeletedAtIsNull(
             responseDto.id());
-        assertThat(mogakkoOptional.isPresent()).isTrue();
+        assertThat(mogakkoOptional).isPresent();
 
         Mogakko createdMogakko = mogakkoOptional.get();
         assertThat(createdMogakko.getTitle()).isEqualTo("제목");
         assertThat(createdMogakko.getMaxParticipants()).isEqualTo(Mogakko.DEFAULT_MAX_PARTICIPANTS);
-        assertThat(createdMogakko.getViews()).isEqualTo(0);
+        assertThat(createdMogakko.getViews()).isZero();
         assertThat(createdMogakko.getCreator().getId()).isEqualTo(savedCreator.getId());
         assertThat(createdMogakko.getChatRoom()).isNotNull();
 
@@ -224,7 +223,7 @@ class MogakkoServiceTest {
         assertThat(responseDto.id()).isEqualTo(testMogakko.getId());
 
         Optional<Mogakko> mogakkoOptional = mogakkoRepository.findById(testMogakko.getId());
-        assertThat(mogakkoOptional.isPresent()).isTrue();
+        assertThat(mogakkoOptional).isPresent();
 
         Mogakko updatedMogakko = mogakkoOptional.get();
         List<MogakkoTag> updatedMogakkoTags = mogakkoTagRepository.findAllByMogakko(updatedMogakko);
@@ -236,7 +235,7 @@ class MogakkoServiceTest {
         assertThat(updatedMogakkoTags).hasSize(tagIds.size());
 
         Optional<MogakkoLocation> locationOptional = mogakkoLocationRepository.findByMogakko(updatedMogakko);
-        assertThat(locationOptional.isPresent()).isTrue();
+        assertThat(locationOptional).isPresent();
         MogakkoLocation updatedMogakkoLocation = locationOptional.get();
         assertThat(updatedMogakkoLocation.getAddress()).isEqualTo(updateLocation.address());
         assertThat(updatedMogakkoLocation.getCity()).isEqualTo(updateLocation.city());
@@ -270,7 +269,6 @@ class MogakkoServiceTest {
     @DisplayName("입력된 필터링 인자들에 대해 정상적으로 전체 검색을 수행한다")
     void success_find_all_by_filter_given_normal_args() {
         // given
-        long cursor = Long.MAX_VALUE;
         String normalSearchVal = "제곧";
         String abnormalSearchVal = "noContent";
         SearchType searchType = SearchType.TOTAL;
@@ -279,11 +277,11 @@ class MogakkoServiceTest {
 
         // when
         List<MogakkoSimpleInfoResponseDto> filtered = mogakkoService.findAllByFilter(havingTagIds,
-            cursor, normalSearchVal, searchType, 10);
+            CURSOR, normalSearchVal, searchType, PAGE_SIZE);
         List<MogakkoSimpleInfoResponseDto> filteredWithoutTagIds = mogakkoService.findAllByFilter(Collections.emptyList(),
-            cursor, normalSearchVal, searchType, 10);
+            CURSOR, normalSearchVal, searchType, PAGE_SIZE);
         List<MogakkoSimpleInfoResponseDto> emptyFiltered = mogakkoService.findAllByFilter(Collections.emptyList(),
-            cursor, abnormalSearchVal, searchType, 10);
+            CURSOR, abnormalSearchVal, searchType, PAGE_SIZE);
 
         // then
         assertThat(filtered).hasSize(1);
@@ -311,10 +309,11 @@ class MogakkoServiceTest {
         MogakkoCreateResponseDto saved = mogakkoService.save(createRequestDto);
 
         // when
-        mogakkoService.delete(saved.id());
+        Long id = saved.id();
+        mogakkoService.delete(id);
 
         // then
-        assertThatThrownBy(() -> mogakkoService.getByIdNotDeleted(saved.id()))
+        assertThatThrownBy(() -> mogakkoService.getByIdNotDeleted(id))
             .isInstanceOf(MogakkoException.class)
             .hasFieldOrPropertyWithValue("errorType", MogakkoErrorType.NOT_FOUND);
     }
@@ -385,7 +384,29 @@ class MogakkoServiceTest {
             testMogakko.getMaxParticipants(), testMogakko.getContent(), new ArrayList<>(tagIds));
 
         // when, then
-        assertThatThrownBy(() -> mogakkoService.update(requestDto, testMogakko.getId())).isInstanceOf(
+        Long id = testMogakko.getId();
+        assertThatThrownBy(() -> mogakkoService.update(requestDto, id)).isInstanceOf(
             MogakkoException.class).hasFieldOrPropertyWithValue("errorType", MogakkoErrorType.PROCESS_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("장소 기반 검색으로 모각코를 가져올 수 있다.")
+    void success_find_all_by_filter_given_location() {
+        // given
+        String normalSearchVal = "심곡본";
+        String abnormalSearchVal = "심본";
+        SearchType searchType = SearchType.LOCATION;
+        List<Long> havingTagIds = mogakkoTagRepository.findAllByMogakko(testMogakko).stream()
+            .map(mt -> mt.getTag().getId()).toList();
+
+        // when
+        List<MogakkoSimpleInfoResponseDto> normalResult = mogakkoService.findAllByFilter(
+            havingTagIds, CURSOR, normalSearchVal, searchType, PAGE_SIZE);
+        List<MogakkoSimpleInfoResponseDto> abnormalResult = mogakkoService.findAllByFilter(
+            havingTagIds, CURSOR, abnormalSearchVal, searchType, PAGE_SIZE);
+
+        // then
+        assertThat(normalResult).hasSize(1);
+        assertThat(abnormalResult).isEmpty();
     }
 }
