@@ -198,7 +198,7 @@ class MogakkoServiceTest {
         assertThat(responseDto.creatorInfo()).isNotNull();
         assertThat(responseDto.creatorInfo().nickname()).isEqualTo("생성자");
         assertThat(responseDto.participants()).hasSize(1);
-        assertThat(responseDto.MogakkoInfo().title()).isEqualTo("title");
+        assertThat(responseDto.mogakkoInfo().title()).isEqualTo("title");
     }
 
     @Test
