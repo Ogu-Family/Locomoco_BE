@@ -18,32 +18,32 @@ import java.time.LocalDateTime;
 @Configuration
 public class TestFactory {
 
-    public User createUser() {
+    public static User createUser() {
         return User.builder()
                 .nickname("test")
                 .birth(LocalDate.now())
                 .gender(Gender.MALE)
                 .temperature(36.5).email("test@example.com")
                 .profileImage(createImage())
-                .jobTag(createTag("DEVELOPER", "JOB", CategoryType.USER, CategoryInputType.RADIOGROUP))
+                .jobTag(null)
                 .provider(Provider.KAKAO.name())
                 .build();
     }
 
-    public Image createImage() {
+    public static Image createImage() {
         return Image.builder()
                 .key("image key")
                 .path("image url").build();
     }
 
-    public Tag createTag(String tagName, String categoryName, CategoryType categoryType, CategoryInputType categoryInputType) {
+    public static Tag createTag(String tagName, String categoryName, CategoryType categoryType, CategoryInputType categoryInputType) {
         return Tag.builder()
                 .category(createCategory(categoryName, categoryType, categoryInputType))
                 .name(tagName)
                 .build();
     }
 
-    public Category createCategory(String name, CategoryType categoryType, CategoryInputType categoryInputType) {
+    public static Category createCategory(String name, CategoryType categoryType, CategoryInputType categoryInputType) {
         return Category.builder()
                 .name(name)
                 .categoryType(categoryType)
@@ -51,7 +51,7 @@ public class TestFactory {
                 .build();
     }
 
-    public ChatRoom createChatRoom(User creator, Mogakko mogakko) {
+    public static ChatRoom createChatRoom(User creator, Mogakko mogakko) {
         return ChatRoom.builder()
                 .creator(creator)
                 .mogakko(mogakko)
@@ -60,7 +60,7 @@ public class TestFactory {
                 .build();
     }
 
-    public Mogakko createMogakko(User creator) {
+    public static Mogakko createMogakko(User creator) {
         return Mogakko.builder()
                 .creator(creator)
                 .title("test mogakko")

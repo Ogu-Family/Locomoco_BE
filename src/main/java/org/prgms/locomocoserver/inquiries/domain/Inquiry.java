@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +22,7 @@ import org.prgms.locomocoserver.user.domain.User;
 @Table(name = "inquiries")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Inquiry extends BaseEntity {
+    private static final int MAXIMUM_CONTENT_LENGTH = 200;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,25 +41,22 @@ public class Inquiry extends BaseEntity {
 
     @Builder
     public Inquiry(String content, User user, Mogakko mogakko) {
+        validateInfo(content);
+
         this.content = content;
         this.user = user;
         this.mogakko = mogakko;
     }
 
     public void updateInfo(String content) {
+        validateInfo(content);
+
         this.content = content;
     }
 
-    public void updateUser(User user) {
-        this.user = user;
-    }
-
-    public void updateMogakko(Mogakko mogakko) {
-        if (Objects.nonNull(mogakko)) {
-            mogakko.getInquiries().remove(this);
+    private static void validateInfo(String content) {
+        if (content.length() > MAXIMUM_CONTENT_LENGTH) {
+            throw new RuntimeException("문의 내용은 " + MAXIMUM_CONTENT_LENGTH + "자를 초과할 수 없습니다."); // TODO: 문의 예외 반환
         }
-
-        this.mogakko = mogakko;
-        mogakko.getInquiries().add(this);
     }
 }
