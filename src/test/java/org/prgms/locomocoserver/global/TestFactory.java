@@ -69,6 +69,7 @@ public class TestFactory {
                 .startTime(LocalDateTime.now().plusDays(3))
                 .endTime(LocalDateTime.now().plusDays(3).plusHours(2))
                 .deadline(LocalDateTime.now().plusDays(1))
+                .maxParticipants(5)
                 .likeCount(0)
                 .build();
     }
