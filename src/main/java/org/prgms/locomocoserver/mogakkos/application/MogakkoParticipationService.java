@@ -38,12 +38,13 @@ public class MogakkoParticipationService {
         return new ParticipationCheckingDto(false);
     }
 
+    @Transactional
     public void participate(Long mogakkoId, ParticipationRequestDto requestDto) {
         Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
             .orElseThrow(() -> new MogakkoException(MogakkoErrorType.NOT_FOUND));
         User user = userService.getById(requestDto.userId());
 
-        validateIfDeadlineIsPast(mogakko);
+        validateParticipation(mogakko, requestDto.userId());
 
         Participant participant = Participant.builder().mogakko(mogakko).user(user).latitude(
             requestDto.latitude()).longitude(requestDto.longitude()).build();
@@ -74,15 +75,19 @@ public class MogakkoParticipationService {
         chatRoomService.leave(mogakko.getChatRoom(), userId);
     }
 
-    private void validateIfDeadlineIsPast(Mogakko mogakko) {
+    private void validateParticipation(Mogakko mogakko, long participantId) {
         if (mogakko.getDeadline().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("신청 데드 라인이 지났습니다."); // TODO: 적절한 예외 처리
+            throw new RuntimeException("신청 데드 라인이 지났습니다."); // TODO: 참여 예외 반환
+        }
+
+        if (participantRepository.findByMogakkoIdAndUserId(mogakko.getId(), participantId).isPresent()){
+            throw new RuntimeException("이미 참여한 유저입니다."); // TODO: 참여 예외 반환
         }
     }
 
     private void validateIfEndTimeIsPast(Mogakko mogakko) {
         if (mogakko.getEndTime().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("이미 종료된 모각코입니다."); // TODO: 적절한 예외 처리
+            throw new RuntimeException("이미 종료된 모각코입니다."); // TODO: 참여 예외 반환
         }
     }
 }
