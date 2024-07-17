@@ -19,7 +19,7 @@ import org.prgms.locomocoserver.user.domain.User;
 
 @Entity
 @Getter
-@Table(name = "mogakko")
+@Table(name = "replies")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reply extends BaseEntity {
 
