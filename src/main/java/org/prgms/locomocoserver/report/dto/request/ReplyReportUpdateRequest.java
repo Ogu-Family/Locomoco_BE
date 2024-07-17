@@ -1,4 +1,9 @@
 package org.prgms.locomocoserver.report.dto.request;
 
-public record ReplyReportUpdateRequest() {
+import jakarta.validation.constraints.NotBlank;
+
+public record ReplyReportUpdateRequest(
+        @NotBlank
+        String content
+) {
 }
