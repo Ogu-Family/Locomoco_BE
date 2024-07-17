@@ -16,6 +16,8 @@ import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ReplyReportService {
@@ -36,9 +38,26 @@ public class ReplyReportService {
     @Transactional
     public ReplyReportDto update(Long id, ReplyReportUpdateRequest request) {
         ReplyReport replyReport = getById(id);
+
+        if(!replyReport.getReporter().getId().equals(request.reporterId())) {
+            throw new ReportException(ReportErrorType.AUTH_NOT_ALLOWED);
+        }
         replyReport.updateContent(request.content());
 
         return ReplyReportDto.of(replyReport);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReplyReportDto> getAllReplyReports(Long cursor, int pageSize) {
+        return replyReportRepository.findAllByDeletedAtIsNull(cursor, pageSize).stream()
+                .map(replyReport -> ReplyReportDto.of(replyReport))
+                .toList();
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        ReplyReport replyReport = getById(id);
+        replyReport.delete();
     }
 
     private ReplyReport getById(Long id) {
