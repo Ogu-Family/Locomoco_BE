@@ -28,7 +28,7 @@ public class ReplyReportService {
 
     public ReplyReportDto create(ReplyReportCreateRequest request) {
         User reporter = userService.getById(request.userId());
-        Reply reply = replyRepository.findByIdAndDeletedAtIsNotNull(request.replyId())
+        Reply reply = replyRepository.findByIdAndDeletedAtIsNull(request.replyId())
                 .orElseThrow(() -> new ReportException(ReportErrorType.REPLY_NOT_FOUND));
         ReplyReport replyReport = replyReportRepository.save(request.toEntity(reporter, reply, request.content()));
 
@@ -60,8 +60,9 @@ public class ReplyReportService {
         replyReport.delete();
     }
 
-    private ReplyReport getById(Long id) {
-        return replyReportRepository.findById(id)
+    @Transactional(readOnly = true)
+    public ReplyReport getById(Long id) {
+        return replyReportRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new ReportException(ReportErrorType.REPORT_NOT_FOUND));
     }
 }
