@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.replies.domain.Reply;
 import org.prgms.locomocoserver.user.domain.User;
@@ -25,7 +26,7 @@ public class ReplyReport extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reply_id")
-    Reply reply;
+    private Reply reply;
 
     @Column(name = "content")
     private String content;
