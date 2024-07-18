@@ -33,7 +33,7 @@ public class ImageService {
         return upload(file, dirName + LocalDate.now().getYear());
     }
 
-    private Image upload(File file, String dirName) {
+    public Image upload(File file, String dirName) {
         String key = randomFileName(file, dirName);
         String path = putS3(file, key);
         removeFile(file);
@@ -63,7 +63,7 @@ public class ImageService {
         file.delete();
     }
 
-    public File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
+    private File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
         // 확장자 추출
         String originalFilename = multipartFile.getOriginalFilename();
         String extension = "";
