@@ -37,5 +37,6 @@ public class Report extends BaseEntity {
 
     public void updateContent(String content) {
         this.content = content;
+        this.updateUpdatedAt();
     }
 }
