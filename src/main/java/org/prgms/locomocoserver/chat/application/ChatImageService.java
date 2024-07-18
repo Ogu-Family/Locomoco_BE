@@ -62,7 +62,7 @@ public class ChatImageService {
     }
 
     private byte[] decodeBase64StringToByteArray(String base64String) {
-        return Base64.getDecoder().decode(base64String.split(",")[1]);
+        return Base64.getDecoder().decode(base64String);
     }
 
     private File createTempImageFile(byte[] imageBytes) throws IOException {
