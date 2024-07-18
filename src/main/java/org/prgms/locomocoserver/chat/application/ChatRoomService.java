@@ -66,6 +66,11 @@ public class ChatRoomService {
     }
 
     @Transactional
+    public ChatMessageDto saveChatMessageWithImage(Long roomId, List<String> imageUrls, ChatMessageRequestDto requestDto) {
+        return chatMessagePolicy.saveChatMessageWithImage(roomId, imageUrls, requestDto);
+    }
+
+    @Transactional
     public ChatMessageDto saveEnterMessage(ChatEnterRequestDto requestDto) {
         return chatMessagePolicy.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant());
     }
