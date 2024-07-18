@@ -89,7 +89,7 @@ class MongoChatServiceTest {
         Long senderId = creator.getId();
 
         // when
-        mongoChatMessageService.saveChatMessage(roomId, new ChatMessageRequestDto(roomId, senderId, "message"));
+        mongoChatMessageService.saveChatMessage(roomId, new ChatMessageRequestDto(roomId, senderId, "message", null));
         boolean collectionExists = mongoTemplate.collectionExists("chat_messages_" + roomId);
         String collectionName = mongoChatMessageService.getChatRoomName(roomId);
         long messageCount = mongoTemplate.getCollection(collectionName).countDocuments();
