@@ -48,7 +48,7 @@ public class ChatImageService {
             File tempFile = createTempImageFile(imageBytes);
 
             // 이미지 서비스를 통해 업로드
-            Image image = imageService.upload(tempFile, "/upload/" + roomId);
+            Image image = imageService.upload(tempFile, "upload/" + roomId);
 
             // 임시 파일 삭제
             tempFile.delete();
