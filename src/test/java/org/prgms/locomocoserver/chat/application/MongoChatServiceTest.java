@@ -20,6 +20,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
@@ -34,6 +39,9 @@ class MongoChatServiceTest {
     MongoChatMessageService mongoChatMessageService;
     @Autowired
     ChatImageService chatImageService;
+    @Autowired
+    ImageService imageService;
+
     @Autowired
     MongoTemplate mongoTemplate;
     @Autowired
@@ -94,18 +102,7 @@ class MongoChatServiceTest {
         Long roomId = chatRoom.getId();
         Long senderId = creator.getId();
 
-        byte[] byteCode = new byte[]{
-                (byte)0x89, (byte)0x50, (byte)0x4E, (byte)0x47, (byte)0x0D, (byte)0x0A, (byte)0x1A, (byte)0x0A,
-                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x0D, (byte)0x49, (byte)0x48, (byte)0x44, (byte)0x52,
-                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x0A, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x0A,
-                (byte)0x08, (byte)0x02, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x02, (byte)0x50, (byte)0x58,
-                (byte)0xEA, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x15, (byte)0x49, (byte)0x44, (byte)0x41,
-                (byte)0x54, (byte)0x78, (byte)0x9C, (byte)0x63, (byte)0xFC, (byte)0xFF, (byte)0xFF, (byte)0x3F,
-                (byte)0x03, (byte)0x6E, (byte)0xC0, (byte)0x84, (byte)0x47, (byte)0x6E, (byte)0x04, (byte)0x4B,
-                (byte)0x03, (byte)0x00, (byte)0xA5, (byte)0xE3, (byte)0x03, (byte)0x11, (byte)0x7D, (byte)0x92,
-                (byte)0xA6, (byte)0x6A, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x49, (byte)0x45,
-                (byte)0x4E, (byte)0x44, (byte)0xAE, (byte)0x42, (byte)0x60, (byte)0x82
-        };
+        byte[] byteCode = imageToByteArray("src/test/java/org/prgms/locomocoserver/chat/application/스누피4.jpeg");
         String imageBase64 = Base64.getEncoder().encodeToString(byteCode);
         ChatMessageRequestDto requestDto = new ChatMessageRequestDto(roomId, senderId, "message", List.of(imageBase64));
 
@@ -144,5 +141,28 @@ class MongoChatServiceTest {
 
         // then
         assertThat(chatMessageMongoList2.size()).isEqualTo(1);
+    }
+
+    private byte[] imageToByteArray(String imagePath) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            // 이미지 파일을 읽어 BufferedImage로 변환
+            BufferedImage image = ImageIO.read(new File(imagePath));
+
+            // BufferedImage를 바이트 배열로 변환
+            ImageIO.write(image, "jpeg", baos);
+            baos.flush();
+
+            return baos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                baos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
