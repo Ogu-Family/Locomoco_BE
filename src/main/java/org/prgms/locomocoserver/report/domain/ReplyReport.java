@@ -1,44 +1,28 @@
 package org.prgms.locomocoserver.report.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.replies.domain.Reply;
 import org.prgms.locomocoserver.user.domain.User;
 
 @Entity
 @Getter
+@SuperBuilder
 @Table(name = "reply_reports")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReplyReport extends BaseEntity {
+public class ReplyReport extends Report {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reporter_id")
-    private User reporter;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "reply_id")
     private Reply reply;
 
-    @Column(name = "content")
-    private String content;
-
-    @Builder
     public ReplyReport(User reporter, Reply reply, String content) {
-        this.reporter = reporter;
         this.reply = reply;
-        this.content = content;
-    }
-
-    public void updateContent(String content) {
-        this.content = content;
     }
 }
