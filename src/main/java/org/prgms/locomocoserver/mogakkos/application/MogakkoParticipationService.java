@@ -41,7 +41,7 @@ public class MogakkoParticipationService {
 
     @Transactional
     public void participate(Long mogakkoId, ParticipationRequestDto requestDto) {
-        Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
+        Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNullForUpdate(mogakkoId)
             .orElseThrow(() -> new MogakkoException(MogakkoErrorType.NOT_FOUND));
         User user = userService.getById(requestDto.userId());
 

@@ -1,10 +1,12 @@
 package org.prgms.locomocoserver.mogakkos.domain;
 
+import jakarta.persistence.LockModeType;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +14,10 @@ import org.springframework.data.repository.query.Param;
 public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
 
     Optional<Mogakko> findByIdAndDeletedAtIsNull(Long id);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT m FROM Mogakko m WHERE m.id = :id AND m.deletedAt IS NULL")
+    Optional<Mogakko> findByIdAndDeletedAtIsNullForUpdate(Long id); // 이 코드는 추후 따로 클래스 분리를 할 수도 있음
 
     @Query(value = "SELECT m.* FROM mogakko m "
         + "JOIN locations l ON (m.id < :cursor AND m.deadline > :now AND m.deleted_at IS NULL AND l.mogakko_id = m.id) "
