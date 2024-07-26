@@ -6,6 +6,6 @@ import org.prgms.locomocoserver.user.dto.response.UserBriefInfoDto;
 
 public record MogakkoDetailResponseDto(@Schema(description = "생성자 정보") UserBriefInfoDto creatorInfo,
                                        @Schema(description = "참여자 목록") List<MogakkoParticipantDto> participants,
-                                       @Schema(description = "모각코 정보") MogakkoInfoDto MogakkoInfo) {
+                                       @Schema(description = "모각코 정보") MogakkoInfoDto mogakkoInfo) {
 
 }

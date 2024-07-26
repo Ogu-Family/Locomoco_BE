@@ -7,14 +7,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.global.common.dto.Results;
-import org.prgms.locomocoserver.mogakkos.application.MogakkoLikeService;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.application.SearchType;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoLikeDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
 import org.springframework.http.HttpStatus;
@@ -23,14 +21,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Mogakko controller", description = "모각코 컨트롤러")
+@Tag(name = "Mogakko Controller", description = "모각코 컨트롤러")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class MogakkoController {
-
     private final MogakkoService mogakkoService;
-    private final MogakkoLikeService mogakkoLikeService;
 
     @GetMapping("/mogakko/map")
     @Operation(summary = "모각코 리스트 반환", description = "홈 화면(리스트 화면)에서 필터링된 모각코 리스트를 반환합니다. 종료되었거나 삭제된 모각코는 보이지 않습니다. cursor default value는 실제로는 9223372036854775807입니다.")
@@ -99,31 +95,5 @@ public class MogakkoController {
         mogakkoService.delete(id);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-    }
-
-    @PostMapping("/mogakko/{id}/like")
-    @Operation(summary = "모각코 좋아요", description = "좋아요")
-    @ApiResponses(
-            @ApiResponse(responseCode = "200", description = "모각코 좋아요 성공")
-    )
-    public ResponseEntity<MogakkoLikeDto> like(
-            @Parameter(description = "좋아요 할 모각코 id") @PathVariable Long id,
-            @Parameter(description = "좋아요 요청한 사용자 id") @RequestParam Long userId) {
-        MogakkoLikeDto mogakkoLikeDto = mogakkoLikeService.like(id, userId);
-
-        return ResponseEntity.ok(mogakkoLikeDto);
-    }
-
-    @DeleteMapping("/mogakko/{id}/like")
-    @Operation(summary = "모각코 좋아요 취소", description = "좋아요 취소")
-    @ApiResponses(
-            @ApiResponse(responseCode = "200", description = "좋아요 취소 성공")
-    )
-    public ResponseEntity<MogakkoLikeDto> likeCancel(
-            @Parameter(description = "좋아요 취소 할 모각코 id") @PathVariable Long id,
-            @Parameter(description = "좋아요 취소 요청한 사용자 id") @RequestParam Long userId) {
-        MogakkoLikeDto mogakkoLikeDto = mogakkoLikeService.likeCancel(id, userId);
-
-        return ResponseEntity.ok(mogakkoLikeDto);
     }
 }
