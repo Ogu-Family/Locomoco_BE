@@ -27,12 +27,11 @@ import org.springframework.web.client.RestTemplate;
 @ExtendWith(MockitoExtension.class)
 class MidpointRecommendServiceTest {
     private static final String CAFE = "CE7";
-    private static final String SUBWAY = "SW8";
 
     @InjectMocks
     private MidpointRecommendService midpointRecommendService;
     @Mock
-    private  FindRoadFactory findRoadFactory;
+    private FindRoadFactory findRoadFactory;
     @Mock
     private KakaoMapSearch kakaoMapSearch;
     @Mock

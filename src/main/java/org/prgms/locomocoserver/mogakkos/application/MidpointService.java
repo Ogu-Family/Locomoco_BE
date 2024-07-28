@@ -34,7 +34,7 @@ public class MidpointService {
         List<MogakkoLocation> participantsLoc = participants.stream().map(
             p -> {
                 if (p.getLongitude() == null || p.getLatitude() == null) {
-                    throw new RuntimeException("id:" + p.getUser().getId() + " 참가자의 출발 위치가 존재하지 않습니다.");
+                    throw new RuntimeException("id:" + p.getUser().getId() + " 참가자의 출발 위치가 존재하지 않습니다."); // TODO: 중간 지점 예외 반환
                 }
 
                 return MogakkoLocation.builder().latitude(p.getLatitude()).longitude(p.getLongitude())
