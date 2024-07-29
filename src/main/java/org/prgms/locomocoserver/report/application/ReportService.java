@@ -2,7 +2,8 @@ package org.prgms.locomocoserver.report.application;
 
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.report.domain.Report;
-import org.prgms.locomocoserver.report.domain.ReportRepository;
+import org.prgms.locomocoserver.report.domain.UserReport;
+import org.prgms.locomocoserver.report.domain.UserReportRepository;
 import org.prgms.locomocoserver.report.dto.ReportDto;
 import org.prgms.locomocoserver.report.dto.request.ReportCreateRequest;
 import org.prgms.locomocoserver.report.dto.request.ReportUpdateRequest;
@@ -20,23 +21,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportService {
 
-    private final ReportRepository reportRepository;
+    private final UserReportRepository userReportRepository;
     private final UserService userService;
     private final UserRepository userRepository;
 
     public ReportDto create(ReportCreateRequest request) {
         User reporter = userService.getById(request.reporterId());
         User reported = userService.getById(request.reportedId());
-        Report report = reportRepository.save(request.toEntity(reporter));
+        Report report = userReportRepository.save(request.toEntity(reporter, reported));
 
         return ReportDto.of(report, reported);
     }
 
     @Transactional
     public ReportDto update(Long id, ReportUpdateRequest request) {
-        Report report = getById(id);
+        UserReport report = getById(id);
         report.updateContent(request.content());
-        User reported = userService.getById(report.getReportedId());
+        User reported = userService.getById(report.getReportedUser().getId());
 
         return ReportDto.of(report, reported);
     }
@@ -44,9 +45,9 @@ public class ReportService {
     @Transactional(readOnly = true)
     public List<ReportDto> getAllReports(Long cursor, int pageSize) {
         if (cursor == null) cursor = 0L;
-        return reportRepository.findAllByDeletedAtIsNull(cursor, pageSize).stream()
+        return userReportRepository.findAllByDeletedAtIsNull(cursor, pageSize).stream()
               .map(report -> {
-                  User reported = userRepository.findById(report.getReportedId())
+                  User reported = userRepository.findById(report.getReportedUser().getId())
                           .orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND));
                   return ReportDto.of(report, reported);
               })
@@ -54,12 +55,12 @@ public class ReportService {
     }
 
     public void delete(Long id) {
-        Report report = getById(id);
-        reportRepository.delete(report);
+        UserReport report = getById(id);
+        userReportRepository.delete(report);
     }
 
-    private Report getById(Long id) {
-        return reportRepository.findByIdAndDeletedAtIsNull(id)
+    private UserReport getById(Long id) {
+        return userReportRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("Report Not Found [id]: " + id));
     }
 }
