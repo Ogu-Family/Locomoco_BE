@@ -163,10 +163,14 @@ class MogakkoServiceTest {
                 LocalDate.EPOCH).gender(Gender.MALE).temperature(36.5).provider("github").build());
 
         LocalDateTime startTime = LocalDateTime.now();
+        String city = "개봉동";
+        String hCity = "행정동";
+        String address = "주소";
+
         MogakkoCreateRequestDto mogakkoCreateRequestDto = new MogakkoCreateRequestDto(
             savedCreator.getId(),
             "제목",
-            new LocationInfoDto("주소", 20.4892, 125.2387342, "개봉동", "행정동"),
+            new LocationInfoDto(address, 20.4892, 125.2387342, city, hCity),
             startTime,
             startTime.plusHours(2),
             startTime.plusHours(1),
@@ -190,6 +194,16 @@ class MogakkoServiceTest {
         assertThat(createdMogakko.getChatRoom()).isNotNull();
 
         assertThat(mogakkoTagRepository.findAllByMogakko(createdMogakko)).hasSize(3);
+
+        Optional<MogakkoLocation> optionalMogakkoLocation = mogakkoLocationRepository.findByMogakko(
+            createdMogakko);
+        assertThat(optionalMogakkoLocation).isPresent();
+
+        MogakkoLocation mogakkoLocation = optionalMogakkoLocation.get();
+
+        assertThat(mogakkoLocation.getAddressInfo().getAddress()).isEqualTo(address);
+        assertThat(mogakkoLocation.getAddressInfo().getHCity()).isEqualTo(hCity);
+        assertThat(mogakkoLocation.getAddressInfo().getCity()).isEqualTo(city);
     }
 
     @Test
@@ -211,7 +225,8 @@ class MogakkoServiceTest {
     void success_update_mogakko_info_and_tags() {
         // given
         String updateTitle = "바뀐 제목";
-        LocationInfoDto updateLocation = new LocationInfoDto("바뀐 주소", 25.12, 110.2489, "구로동", "구로동의 행정동");
+        String updateAddress = "바뀐 주소";
+        LocationInfoDto updateLocation = new LocationInfoDto(updateAddress, 25.12, 110.2489, "구로동", "구로동의 행정동");
         String updateContent = "바뀐 내용";
 
         MogakkoUpdateRequestDto requestDto = new MogakkoUpdateRequestDto(
@@ -240,9 +255,9 @@ class MogakkoServiceTest {
 
         Optional<MogakkoLocation> locationOptional = mogakkoLocationRepository.findByMogakko(updatedMogakko);
         assertThat(locationOptional).isPresent();
+
         MogakkoLocation updatedMogakkoLocation = locationOptional.get();
-        assertThat(updatedMogakkoLocation.getAddressInfo().getAddress()).isEqualTo(updateLocation.address());
-        assertThat(updatedMogakkoLocation.getAddressInfo().getCity()).isEqualTo(updateLocation.city());
+        assertThat(updatedMogakkoLocation.getAddressInfo().getAddress()).isEqualTo(updateAddress);
         assertThat(updatedMogakkoLocation.getLatitude()).isEqualTo(updateLocation.latitude());
         assertThat(updatedMogakkoLocation.getLongitude()).isEqualTo(updateLocation.longitude());
     }
