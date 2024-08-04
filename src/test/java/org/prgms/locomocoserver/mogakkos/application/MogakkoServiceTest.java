@@ -30,6 +30,7 @@ import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
+import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
@@ -129,8 +130,11 @@ class MogakkoServiceTest {
         participantRepository.save(
             Participant.builder().user(setUpUser2).mogakko(testMogakko).build());
 
-        MogakkoLocation testMogakkoLocation = MogakkoLocation.builder().address("테스트 주소~").latitude(10.31232)
-            .longitude(105.4279823801).city("심곡본동").mogakko(testMogakko).build();
+        AddressInfo addressInfo = AddressInfo.builder().address("테스트 주소~").city("경기도 부천시 심곡본동")
+            .build();
+
+        MogakkoLocation testMogakkoLocation = MogakkoLocation.builder().addressInfo(addressInfo).latitude(10.31232)
+            .longitude(105.4279823801).mogakko(testMogakko).build();
         mogakkoLocationRepository.save(testMogakkoLocation);
 
         tagIds.addAll(List.of(js.getId(), python.getId(), codingTest.getId(), backend.getId()));
@@ -162,7 +166,7 @@ class MogakkoServiceTest {
         MogakkoCreateRequestDto mogakkoCreateRequestDto = new MogakkoCreateRequestDto(
             savedCreator.getId(),
             "제목",
-            new LocationInfoDto("주소", 20.4892, 125.2387342, "개봉동"),
+            new LocationInfoDto("주소", 20.4892, 125.2387342, "개봉동", "행정동"),
             startTime,
             startTime.plusHours(2),
             startTime.plusHours(1),
@@ -207,7 +211,7 @@ class MogakkoServiceTest {
     void success_update_mogakko_info_and_tags() {
         // given
         String updateTitle = "바뀐 제목";
-        LocationInfoDto updateLocation = new LocationInfoDto("바뀐 주소", 25.12, 110.2489, "구로동");
+        LocationInfoDto updateLocation = new LocationInfoDto("바뀐 주소", 25.12, 110.2489, "구로동", "구로동의 행정동");
         String updateContent = "바뀐 내용";
 
         MogakkoUpdateRequestDto requestDto = new MogakkoUpdateRequestDto(
@@ -237,8 +241,8 @@ class MogakkoServiceTest {
         Optional<MogakkoLocation> locationOptional = mogakkoLocationRepository.findByMogakko(updatedMogakko);
         assertThat(locationOptional).isPresent();
         MogakkoLocation updatedMogakkoLocation = locationOptional.get();
-        assertThat(updatedMogakkoLocation.getAddress()).isEqualTo(updateLocation.address());
-        assertThat(updatedMogakkoLocation.getCity()).isEqualTo(updateLocation.city());
+        assertThat(updatedMogakkoLocation.getAddressInfo().getAddress()).isEqualTo(updateLocation.address());
+        assertThat(updatedMogakkoLocation.getAddressInfo().getCity()).isEqualTo(updateLocation.city());
         assertThat(updatedMogakkoLocation.getLatitude()).isEqualTo(updateLocation.latitude());
         assertThat(updatedMogakkoLocation.getLongitude()).isEqualTo(updateLocation.longitude());
     }
@@ -299,7 +303,7 @@ class MogakkoServiceTest {
         MogakkoCreateRequestDto createRequestDto = new MogakkoCreateRequestDto(
             setUpUser2.getId(),
             "곧 삭제될 모각코",
-            new LocationInfoDto("주소1", 10.4892, 115.2387342, "가리봉동"),
+            new LocationInfoDto("주소1", 10.4892, 115.2387342, "가리봉동", "가리봉동의 행정동"),
             startTime,
             startTime.plusHours(2),
             startTime.plusHours(1),
@@ -345,7 +349,7 @@ class MogakkoServiceTest {
         MogakkoCreateRequestDto deletedUserCreateRequestDto = new MogakkoCreateRequestDto(
             setUpUser2.getId(),
             "제목1",
-            new LocationInfoDto("주소1", 10.4892, 115.2387342, "가리봉동"),
+            new LocationInfoDto("주소1", 10.4892, 115.2387342, "가리봉동", "가리봉동의 행정동"),
             startTime,
             startTime.plusHours(2),
             startTime.plusHours(1),
@@ -355,7 +359,7 @@ class MogakkoServiceTest {
         MogakkoCreateRequestDto nonExistentUserCreateRequestDto = new MogakkoCreateRequestDto(
             nonExistentId,
             "제목2",
-            new LocationInfoDto("주소2", 40.492, 117.238, "동동이"),
+            new LocationInfoDto("주소2", 40.492, 117.238, "법동이", "행동이"),
             startTime,
             startTime.plusHours(2),
             startTime.plusHours(1),
@@ -375,7 +379,7 @@ class MogakkoServiceTest {
     void fail_update_mogakko_given_not_same_creator() {
         // given
         String updateTitle = "바뀐 제목";
-        LocationInfoDto updateLocation = new LocationInfoDto("바뀐 주소", 25.12, 110.2489, "구로동");
+        LocationInfoDto updateLocation = new LocationInfoDto("바뀐 주소", 25.12, 110.2489, "구로동", "신로동");
 
         MogakkoUpdateRequestDto requestDto = new MogakkoUpdateRequestDto(
             setUpUser2.getId(), updateTitle, updateLocation,

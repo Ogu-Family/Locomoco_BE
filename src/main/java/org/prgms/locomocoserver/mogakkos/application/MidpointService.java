@@ -46,7 +46,7 @@ public class MidpointService {
         Mogakko mogakko = mogakkoRepository.findById(mogakkoId).orElseThrow(() -> new MogakkoException(
             MogakkoErrorType.NOT_FOUND));
 
-        midpoint.update(recommend.getLatitude(), recommend.getLongitude(), recommend.getAddress(), recommend.getPlaceName(), mogakko);
+        midpoint.update(recommend.getLatitude(), recommend.getLongitude(), recommend.getAddressInfo(), recommend.getPlaceName(), mogakko);
 
         midpointRepository.save(midpoint);
 

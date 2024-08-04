@@ -23,6 +23,7 @@ import org.prgms.locomocoserver.mogakkos.domain.midpoint.Midpoint;
 import org.prgms.locomocoserver.mogakkos.domain.midpoint.MidpointRepository;
 import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
+import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
 import org.prgms.locomocoserver.mogakkos.dto.response.MidpointDto;
 import org.prgms.locomocoserver.user.domain.User;
 
@@ -54,13 +55,15 @@ class MidpointServiceTest {
         Mogakko mogakko = createMogakko(creator);
 
         int participantSize = 2;
+
         String placeName = "카페";
         String address = "서울특별시 강동구 양재대로 1369";
         String city = "서울특별시 강동구 둔촌동";
+        AddressInfo addressInfo = AddressInfo.builder().address(address).city(city).build();
 
         Midpoint midpoint = Midpoint.builder().latitude((creatorLat + userLat) / participantSize)
             .longitude((creatorLon + userLon) / participantSize).mogakko(mogakko).placeName(placeName)
-            .city(city).address(address).build();
+            .addressInfo(addressInfo).build();
 
         Participant participantCreator = Participant.builder().latitude(creatorLat).longitude(creatorLon)
             .mogakko(mogakko).user(creator).build();
