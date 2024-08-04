@@ -102,7 +102,7 @@ class MongoChatServiceTest {
         Long roomId = chatRoom.getId();
         Long senderId = creator.getId();
 
-        byte[] byteCode = imageToByteArray("src/test/java/org/prgms/locomocoserver/chat/application/스누피4.jpeg");
+        byte[] byteCode = imageToByteArray("src/test/resources/스누피4.jpeg");
         String imageBase64 = Base64.getEncoder().encodeToString(byteCode);
         ChatMessageRequestDto requestDto = new ChatMessageRequestDto(roomId, senderId, "message", List.of(imageBase64));
 
