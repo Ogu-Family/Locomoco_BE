@@ -101,6 +101,8 @@ class MongoChatServiceTest {
         // given
         Long roomId = chatRoom.getId();
         Long senderId = creator.getId();
+        String collectionName = mongoChatMessageService.getChatRoomName(roomId);
+        long beforeMessageCount = mongoTemplate.getCollection(collectionName).countDocuments();
 
         byte[] byteCode = imageToByteArray("src/test/resources/스누피4.jpeg");
         String imageBase64 = Base64.getEncoder().encodeToString(byteCode);
@@ -110,7 +112,6 @@ class MongoChatServiceTest {
         List<String> imageUrls = chatImageService.create(requestDto);
         mongoChatMessageService.saveChatMessageWithImage(roomId, imageUrls, requestDto);
 
-        String collectionName = mongoChatMessageService.getChatRoomName(roomId);
         boolean collectionExists = mongoTemplate.collectionExists(collectionName);
         long messageCount = mongoTemplate.getCollection(collectionName).countDocuments();
 
@@ -120,7 +121,7 @@ class MongoChatServiceTest {
 
         // then
         assertThat(collectionExists).isTrue();
-        assertThat(messageCount).isEqualTo(2);
+        assertThat(messageCount).isEqualTo(beforeMessageCount + 1);
         assertThat(lastMessage.getImageUrls().size()).isEqualTo(1);
     }
 
