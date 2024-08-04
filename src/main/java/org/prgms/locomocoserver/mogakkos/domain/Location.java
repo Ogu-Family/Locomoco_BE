@@ -26,6 +26,9 @@ public abstract class Location extends BaseEntity { // TODO: 밸류 타입화
         this.latitude = latitude;
         this.longitude = longitude;
         this.addressInfo = addressInfo;
+
+        if (this.addressInfo == null)
+            this.addressInfo = new AddressInfo(null, null, null);
     }
 
     public double calDistance(Location l) { // km 단위

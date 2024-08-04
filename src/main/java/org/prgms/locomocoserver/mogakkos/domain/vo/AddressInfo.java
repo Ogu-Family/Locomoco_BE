@@ -13,18 +13,26 @@ import lombok.NoArgsConstructor;
 public class AddressInfo {
 
     @Column(name = "address")
-    protected String address;
+    private String address;
 
     @Column(name = "city")
-    protected String city;
+    private String city;
 
     @Column(name = "h_city")
-    protected String hCity;
+    private String hCity;
 
     @Builder
     public AddressInfo(String address, String city, String hCity) {
         this.address = address;
         this.city = city;
         this.hCity = hCity;
+    }
+
+    public AddressInfo update(AddressInfo addressInfo) {
+        String updateAddress = addressInfo.address == null ? this.address : addressInfo.address;
+        String updateCity = addressInfo.city == null ? this.city : addressInfo.city;
+        String updateHCity = addressInfo.hCity == null ? this.hCity : addressInfo.hCity;
+
+        return new AddressInfo(updateAddress, updateCity, updateHCity);
     }
 }

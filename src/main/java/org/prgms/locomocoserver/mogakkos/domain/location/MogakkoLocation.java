@@ -36,10 +36,10 @@ public class MogakkoLocation extends Location {
         this.mogakko = mogakko;
     }
 
-    public void updateInfo(double latitude, double longitude, AddressInfo addressInfo) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.addressInfo = addressInfo;
+    public void updateInfo(Double latitude, Double longitude, AddressInfo addressInfo) {
+        this.latitude = latitude == null ? this.latitude : latitude;
+        this.longitude = longitude == null ? this.longitude : longitude;
+        this.addressInfo = addressInfo == null ? this.addressInfo : this.addressInfo.update(addressInfo);
     }
 
     public void updateMogakko(Mogakko mogakko) {

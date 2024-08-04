@@ -40,11 +40,11 @@ public class Midpoint extends Location {
         this.mogakko = mogakko;
     }
 
-    public void update(double latitude, double longitude, AddressInfo addressInfo, String placeName, Mogakko mogakko) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.addressInfo = addressInfo;
-        this.placeName = placeName;
-        this.mogakko = mogakko;
+    public void updateInfo(Double latitude, Double longitude, AddressInfo addressInfo, String placeName, Mogakko mogakko) {
+        this.latitude = latitude == null ? this.latitude : latitude;
+        this.longitude = longitude == null ? this.longitude : longitude;
+        this.addressInfo = addressInfo == null ? this.addressInfo : this.addressInfo.update(addressInfo);
+        this.placeName = placeName == null ? this.placeName : placeName;
+        this.mogakko = mogakko == null ? this.mogakko : mogakko;
     }
 }
