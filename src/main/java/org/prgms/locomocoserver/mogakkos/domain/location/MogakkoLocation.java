@@ -40,6 +40,7 @@ public class MogakkoLocation extends Location {
         this.latitude = latitude == null ? this.latitude : latitude;
         this.longitude = longitude == null ? this.longitude : longitude;
         this.addressInfo = addressInfo == null ? this.addressInfo : this.addressInfo.update(addressInfo);
+        this.updateUpdatedAt();
     }
 
     public void updateMogakko(Mogakko mogakko) {
