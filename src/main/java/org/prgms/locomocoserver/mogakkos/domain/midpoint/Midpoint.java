@@ -46,5 +46,6 @@ public class Midpoint extends Location {
         this.addressInfo = addressInfo == null ? this.addressInfo : this.addressInfo.update(addressInfo);
         this.placeName = placeName == null ? this.placeName : placeName;
         this.mogakko = mogakko == null ? this.mogakko : mogakko;
+        this.updateUpdatedAt();
     }
 }
