@@ -10,6 +10,7 @@ import java.util.List;
 public interface ChatMessagePolicy {
     ChatMessageDto saveEnterMessage(Long roomId, User sender);
     ChatMessageDto saveChatMessage(Long roomId, ChatMessageRequestDto chatMessageRequestDto);
+    ChatMessageDto saveChatMessageWithImage(Long roomId, List<String> imageUrls, ChatMessageRequestDto chatMessageRequestDto);
     List<ChatMessageDto> getAllChatMessages(Long roomId, String cursor, int pageSize);
     void deleteChatMessages(ChatRoom chatRoom);
     ChatMessageDto getLastChatMessage(Long roomId);

@@ -9,7 +9,6 @@ import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
-import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.context.annotation.Primary;
@@ -60,9 +59,20 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         User participant = userService.getById(message.senderId());
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
-        ChatMessageMongo chatMessageMongo = mongoTemplate.save(message.toChatMessageMongo(participant, chatRoom, false), collectionName);
+        ChatMessageMongo chatMessageMongo = mongoTemplate.save(message.toChatMessageMongo(participant, false, null), collectionName);
 
         return ChatMessageDto.of(roomId, chatMessageMongo);
+    }
+
+    @Override
+    public ChatMessageDto saveChatMessageWithImage(Long roomId, List<String> imageUrls, ChatMessageRequestDto request) {
+        String collectionName = BASE_CHATROOM_NAME + roomId;
+        User participant = userService.getById(request.senderId());
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
+                .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
+        ChatMessageMongo chatMessageMongo = mongoTemplate.save(request.toChatMessageMongo(participant, false, imageUrls), collectionName);
+
+        return ChatMessageDto.of(roomId, imageUrls, chatMessageMongo);
     }
 
     @Transactional(readOnly = true)

@@ -53,6 +53,11 @@ public class MySqlChatMessageService implements ChatMessagePolicy {
     }
 
     @Override
+    public ChatMessageDto saveChatMessageWithImage(Long roomId, List<String> imageUrls, ChatMessageRequestDto chatMessageRequestDto) {
+        return null;
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, String cursorValue, int pageSize) {
         Long cursor = Long.MAX_VALUE;
