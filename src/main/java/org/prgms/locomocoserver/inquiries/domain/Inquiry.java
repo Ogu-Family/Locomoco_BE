@@ -52,6 +52,7 @@ public class Inquiry extends BaseEntity {
         validateInfo(content);
 
         this.content = content;
+        this.updateUpdatedAt();
     }
 
     private static void validateInfo(String content) {

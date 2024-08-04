@@ -53,5 +53,6 @@ public class ChatRoom extends BaseEntity {
         }
 
         this.chatParticipants.add(participant);
+        this.updateUpdatedAt();
     }
 }

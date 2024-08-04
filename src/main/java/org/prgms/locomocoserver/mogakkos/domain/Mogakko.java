@@ -111,6 +111,7 @@ public class Mogakko extends BaseEntity {
 
     public void addMogakkoTag(MogakkoTag mogakkoTag) {
         mogakkoTag.updateMogakko(this);
+        this.updateUpdatedAt();
     }
 
     public void addParticipant(Participant participant) {
@@ -138,6 +139,7 @@ public class Mogakko extends BaseEntity {
         this.deadline = deadline != null ? deadline : this.deadline;
         this.maxParticipants = maxParticipants != null ? maxParticipants : this.maxParticipants;
         validate();
+        this.updateUpdatedAt();
     }
 
     public void updateLikeCount(boolean flag) {
