@@ -117,7 +117,7 @@ class MogakkoServiceTest {
         testMogakko = Mogakko.builder().title("title").content("제곧내").views(20).likeCount(10)
             .startTime(LocalDateTime.now())
             .endTime(LocalDateTime.now().plusHours(2)).deadline(LocalDateTime.now().plusHours(1))
-            .creator(setUpUser1).build();
+            .maxParticipants(10).creator(setUpUser1).build();
 
         mogakkoRepository.save(testMogakko);
         tagRepository.findAll().forEach(tag -> {
@@ -198,7 +198,7 @@ class MogakkoServiceTest {
         assertThat(responseDto.creatorInfo()).isNotNull();
         assertThat(responseDto.creatorInfo().nickname()).isEqualTo("생성자");
         assertThat(responseDto.participants()).hasSize(1);
-        assertThat(responseDto.mogakkoInfo().title()).isEqualTo("title");
+        assertThat(responseDto.mogakkoInfo().title()).isEqualTo(testMogakko.getTitle());
     }
 
     @Test
