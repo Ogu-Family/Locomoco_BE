@@ -19,6 +19,7 @@ import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
+import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
@@ -80,7 +81,10 @@ class ChatRoomServiceTest {
                 .temperature(36.5).provider("kakao").gender(Gender.MALE).build()));
         userRepository.saveAll(dummyUsers);
 
-        MogakkoLocation mogakkoLocation = MogakkoLocation.builder().city("Carry You").address("Martin Garrix")
+        AddressInfo addressInfo = AddressInfo.builder().address("Martin Garrix").city("Carry You")
+            .build();
+
+        MogakkoLocation mogakkoLocation = MogakkoLocation.builder().addressInfo(addressInfo)
             .latitude(10.233214).longitude(23.312314).build();
         MogakkoCreateResponseDto responseDto = mogakkoService.save(
             new MogakkoCreateRequestDto(dummyUsers.get(0).getId(), "title",

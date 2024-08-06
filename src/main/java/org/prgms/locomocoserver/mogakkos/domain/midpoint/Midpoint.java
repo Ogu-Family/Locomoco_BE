@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.mogakkos.domain.Location;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
+import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
 
 @Entity
 @Getter
@@ -31,19 +32,20 @@ public class Midpoint extends Location {
     protected Mogakko mogakko;
 
     @Builder
-    public Midpoint(double latitude, double longitude, String address, String city, Long id, String placeName,
+    public Midpoint(double latitude, double longitude, AddressInfo addressInfo, Long id, String placeName,
         Mogakko mogakko) {
-        super(latitude, longitude, address, city);
+        super(latitude, longitude, addressInfo);
         this.id = id;
         this.placeName = placeName;
         this.mogakko = mogakko;
     }
 
-    public void update(double latitude, double longitude, String address, String placeName, Mogakko mogakko) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.address = address;
-        this.placeName = placeName;
-        this.mogakko = mogakko;
+    public void updateInfo(Double latitude, Double longitude, AddressInfo addressInfo, String placeName, Mogakko mogakko) {
+        this.latitude = latitude == null ? this.latitude : latitude;
+        this.longitude = longitude == null ? this.longitude : longitude;
+        this.addressInfo = addressInfo == null ? this.addressInfo : this.addressInfo.update(addressInfo);
+        this.placeName = placeName == null ? this.placeName : placeName;
+        this.mogakko = mogakko == null ? this.mogakko : mogakko;
+        this.updateUpdatedAt();
     }
 }

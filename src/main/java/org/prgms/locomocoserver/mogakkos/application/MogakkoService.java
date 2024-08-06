@@ -10,6 +10,7 @@ import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
+import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.searchpolicy.SearchPolicy;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
@@ -228,10 +229,12 @@ public class MogakkoService {
         MogakkoLocation mogakkoLocation = mogakkoLocationRepository.findByMogakkoAndDeletedAtIsNull(mogakko)
                 .orElseThrow(RuntimeException::new); // TODO: 적절한 예외 반환 (유저 혹은 장소)
 
+        AddressInfo addressInfo = AddressInfo.builder().address(locationInfoDto.address())
+            .city(locationInfoDto.city()).hCity(
+                locationInfoDto.hCity()).build();
+
         mogakkoLocation.updateInfo(locationInfoDto.latitude(),
-                locationInfoDto.longitude(),
-                locationInfoDto.address(),
-                locationInfoDto.city());
+                locationInfoDto.longitude(), addressInfo);
     }
 
     private void validateFilter(String searchVal) {

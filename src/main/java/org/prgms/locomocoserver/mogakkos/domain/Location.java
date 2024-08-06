@@ -1,11 +1,13 @@
 package org.prgms.locomocoserver.mogakkos.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.prgms.locomocoserver.global.common.BaseEntity;
+import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
 
 @Getter
 @MappedSuperclass
@@ -17,17 +19,16 @@ public abstract class Location extends BaseEntity { // TODO: 밸류 타입화
     @Column(name = "longitude", columnDefinition = "decimal(13, 10)", nullable = false)
     protected Double longitude;
 
-    @Column(name = "address")
-    protected String address;
+    @Embedded
+    protected AddressInfo addressInfo;
 
-    @Column(name = "city")
-    protected String city;
-
-    protected Location(Double latitude, Double longitude, String address, String city) {
+    protected Location(Double latitude, Double longitude, AddressInfo addressInfo) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.address = address;
-        this.city = city;
+        this.addressInfo = addressInfo;
+
+        if (this.addressInfo == null)
+            this.addressInfo = new AddressInfo(null, null, null);
     }
 
     public double calDistance(Location l) { // km 단위
