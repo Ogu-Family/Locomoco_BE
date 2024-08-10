@@ -1,6 +1,5 @@
 package org.prgms.locomocoserver.chat.application;
 
-import com.amazonaws.services.kms.model.UnsupportedOperationException;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.domain.ChatMessage;
 import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
@@ -12,7 +11,6 @@ import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
