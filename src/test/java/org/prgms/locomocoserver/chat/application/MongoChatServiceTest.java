@@ -123,6 +123,7 @@ class MongoChatServiceTest {
         assertThat(collectionExists).isTrue();
         assertThat(messageCount).isEqualTo(beforeMessageCount + 1);
         assertThat(lastMessage.getImageUrls().size()).isEqualTo(1);
+        assertThat(lastMessage.getImageUrls().get(0).contains(".jpeg")).isTrue();
     }
 
     @Test
