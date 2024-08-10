@@ -14,7 +14,7 @@ public class NicknameVo {
     private String nickname;
 
     public NicknameVo(String nickname) {
-        if(isValidNickName(nickname)) throw new UserException(UserErrorType.NICKNAME_TYPE_ERROR);
+        if(!isValidNickName(nickname)) throw new UserException(UserErrorType.NICKNAME_TYPE_ERROR);
         this.nickname = nickname;
     }
 

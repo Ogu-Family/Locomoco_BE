@@ -19,7 +19,7 @@ public class BirthVo {
         if (!isValidBirth(birth)) {
             throw new UserException(UserErrorType.BIRTH_TYPE_ERROR);
         }
-        if(isAtLeast12YearsOld(birth)) {
+        if(!isAtLeast12YearsOld(birth)) {
             throw new UserException(UserErrorType.AGE_NOT_ENOUGH);
         }
         this.birth = birth;
