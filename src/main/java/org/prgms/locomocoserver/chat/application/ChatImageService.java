@@ -23,9 +23,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatImageService {
 
+    private static final byte[] JPEG_HEADER = new byte[]{(byte) 0xFF, (byte) 0xD8};
+    private static final byte[] PNG_HEADER = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47};
+    private static final byte[] HEIC_HEADER = new byte[]{'f', 't', 'y', 'p'};
+
     private final ImageService imageService;
-    private final UserService userService;
-    private final ChatRoomService chatRoomService;
 
     public List<String> create(ChatMessageRequestDto requestDto) {
         List<String> imageByteCodeList = requestDto.imageByteCode();
@@ -74,26 +76,36 @@ public class ChatImageService {
         return tempFile;
     }
 
-    private String getImageExtension(byte[] imageBytes) {
-        String[] formats = {"jpeg", "png", "jpg"};
-        for (String format : formats) {
-            if (startsWith(imageBytes, format)) {
-                return format;
+    public String getImageExtension(byte[] imageBytes) {
+        if (imageBytes.length > 12) {
+            if (startsWithHeader(imageBytes, JPEG_HEADER)) {
+                return "jpeg";
+            } else if (startsWithHeader(imageBytes, PNG_HEADER)) {
+                return "png";
+            } else if (isHeicFormat(imageBytes)) {
+                return "heic";
             }
         }
-        return "jpg"; // 기본값으로 jpg 설정
+        throw new ImageException(ImageErrorType.IMAGE_FORMAT_NOTFOUND);
     }
 
-    private boolean startsWith(byte[] bytes, String prefix) {
-        byte[] prefixBytes = prefix.getBytes();
-        if (prefixBytes.length > bytes.length) {
+    private boolean startsWithHeader(byte[] data, byte[] header) {
+        if (data.length < header.length) {
             return false;
         }
-        for (int i = 0; i < prefixBytes.length; i++) {
-            if (bytes[i] != prefixBytes[i]) {
+
+        for (int i = 0; i < header.length; i++) {
+            if (data[i] != header[i]) {
                 return false;
             }
         }
+
         return true;
+    }
+
+    private boolean isHeicFormat(byte[] data) {
+        // HEIC 파일의 헤더에서 4-7번째 바이트에 'ftyp' 문자열이 있어야 함
+        return startsWithHeader(data, HEIC_HEADER) &&
+                (data[8] == 'h' && data[9] == 'e' && data[10] == 'i' && (data[11] == 'c' || data[11] == 'x'));
     }
 }
