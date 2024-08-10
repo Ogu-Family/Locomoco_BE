@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.chat.application;
 
+import com.amazonaws.services.kms.model.UnsupportedOperationException;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.domain.ChatMessage;
 import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
@@ -54,7 +55,7 @@ public class MySqlChatMessageService implements ChatMessagePolicy {
 
     @Override
     public ChatMessageDto saveChatMessageWithImage(Long roomId, List<String> imageUrls, ChatMessageRequestDto chatMessageRequestDto) {
-        return null;
+        throw new UnsupportedOperationException("사용하지 않는 메서드 입니다.");
     }
 
     @Override
