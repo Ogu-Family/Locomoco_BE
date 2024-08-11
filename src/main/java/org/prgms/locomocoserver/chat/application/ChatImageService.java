@@ -25,7 +25,6 @@ public class ChatImageService {
 
     private static final byte[] JPEG_HEADER = new byte[]{(byte) 0xFF, (byte) 0xD8};
     private static final byte[] PNG_HEADER = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47};
-    private static final byte[] HEIC_HEADER = new byte[]{'f', 't', 'y', 'p'};
 
     private final ImageService imageService;
 
@@ -99,13 +98,15 @@ public class ChatImageService {
                 return false;
             }
         }
-
         return true;
     }
 
     private boolean isHeicFormat(byte[] data) {
         // HEIC 파일의 헤더에서 4-7번째 바이트에 'ftyp' 문자열이 있어야 함
-        return startsWithHeader(data, HEIC_HEADER) &&
-                (data[8] == 'h' && data[9] == 'e' && data[10] == 'i' && (data[11] == 'c' || data[11] == 'x'));
+        if (data.length >= 12) {
+            return (data[4] == 'f' && data[5] == 't' && data[6] == 'y' && data[7] == 'p') &&
+                    (data[8] == 'h' && data[9] == 'e' && data[10] == 'i' && (data[11] == 'c' || data[11] == 'x'));
+        }
+        return false;
     }
 }
