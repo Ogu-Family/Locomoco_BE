@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
+import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 
 public class LocationSearchPolicy implements SearchPolicy {
 
@@ -14,12 +15,10 @@ public class LocationSearchPolicy implements SearchPolicy {
     }
 
     @Override
-    public List<Mogakko> search(Long cursor, String searchVal, int pageSize) {
-        return mogakkoRepository.findAllByCity(cursor, searchVal, pageSize, LocalDateTime.now());
-    }
+    public List<Mogakko> search(String searchVal, List<Long> tagIds, int pageSize,
+        LocalDateTime searchTime, CursorDto cursorDto) {
 
-    @Override
-    public List<Mogakko> search(Long cursor, String searchVal, List<Long> tagIds, int pageSize) {
-        return mogakkoRepository.findAllByCity(tagIds, tagIds.size(), cursor, searchVal, pageSize, LocalDateTime.now());
+        return mogakkoRepository.findAllByCity(tagIds, searchVal, pageSize, searchTime,
+            cursorDto.countCursor(), cursorDto.timeCursor(), cursorDto.idCursor());
     }
 }
