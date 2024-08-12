@@ -91,7 +91,7 @@ public class Mogakko extends BaseEntity {
     public Mogakko(Long id, String title, String content, LocalDateTime startTime,
         LocalDateTime endTime, LocalDateTime deadline, int likeCount, int maxParticipants,
         long views, List<MogakkoTag> mogakkoTags, List<Participant> participants,
-        List<Inquiry> inquiries, User creator, ChatRoom chatRoom) {
+        List<Inquiry> inquiries, User creator, ChatRoom chatRoom) { // TODO: VO로 세분화
         this.id = id;
         this.title = title;
         this.content = content;
@@ -111,6 +111,7 @@ public class Mogakko extends BaseEntity {
 
     public void addMogakkoTag(MogakkoTag mogakkoTag) {
         mogakkoTag.updateMogakko(this);
+        this.updateUpdatedAt();
     }
 
     public void addParticipant(Participant participant) {
@@ -138,6 +139,7 @@ public class Mogakko extends BaseEntity {
         this.deadline = deadline != null ? deadline : this.deadline;
         this.maxParticipants = maxParticipants != null ? maxParticipants : this.maxParticipants;
         validate();
+        this.updateUpdatedAt();
     }
 
     public void updateLikeCount(boolean flag) {
@@ -157,7 +159,7 @@ public class Mogakko extends BaseEntity {
         if (this.startTime.isAfter(this.endTime) || this.deadline.isAfter(this.endTime)) {
             throw generateCreateException("날짜 설정이 잘못되었습니다!");
         }
-        if (this.maxParticipants < 0 || this.maxParticipants > DEFAULT_MAX_PARTICIPANTS) {
+        if (this.maxParticipants <= 0 || this.maxParticipants > DEFAULT_MAX_PARTICIPANTS) {
             throw generateCreateException("최대 인원 수가 잘못되었습니다!");
         }
 

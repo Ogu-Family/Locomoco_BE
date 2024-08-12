@@ -6,9 +6,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.prgms.locomocoserver.global.TestFactory.createMogakko;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -56,10 +56,7 @@ class InquiryServiceTest {
         User user = User.builder().nickname("생성자").email("cho@gmail.com").birth(LocalDate.EPOCH)
             .gender(Gender.MALE).temperature(36.5).provider("github")
             .build();
-        Mogakko mogakko = Mogakko.builder().title("title").content("제곧내").views(20).likeCount(10)
-            .startTime(LocalDateTime.now()).endTime(LocalDateTime.now().plusHours(2))
-            .deadline(LocalDateTime.now().plusHours(1)).creator(user)
-            .build();
+        Mogakko mogakko = createMogakko(user);
         Inquiry inquiry = Inquiry.builder().user(user).mogakko(mogakko).content(content)
             .build();
 
@@ -113,7 +110,7 @@ class InquiryServiceTest {
         long inquiryId = 1L;
         long writerId = 2L;
         User writer = TestFactory.createUser();
-        Mogakko mogakko = TestFactory.createMogakko(writer);
+        Mogakko mogakko = createMogakko(writer);
         Inquiry inquiry = Inquiry.builder().user(writer).mogakko(mogakko).content("content")
             .build();
 
@@ -138,7 +135,7 @@ class InquiryServiceTest {
         long inquiryId = 1L;
         long writerId = 2L;
         User writer = TestFactory.createUser();
-        Mogakko mogakko = TestFactory.createMogakko(writer);
+        Mogakko mogakko = createMogakko(writer);
         Inquiry inquiry = Inquiry.builder().user(writer).mogakko(mogakko).content("content")
             .build();
 
@@ -169,7 +166,7 @@ class InquiryServiceTest {
         String deletedContent = "삭제된 문의";
         User mogakkoWriter = TestFactory.createUser();
         User inquiryWriter = TestFactory.createUser();
-        Mogakko mogakko = TestFactory.createMogakko(mogakkoWriter);
+        Mogakko mogakko = createMogakko(mogakkoWriter);
 
         setId(inquiryWriter, inquiryWriterId);
         setId(mogakko, mogakkoId);
@@ -208,7 +205,7 @@ class InquiryServiceTest {
         String deletedContent = "삭제된 문의";
         User mogakkoWriter = TestFactory.createUser();
         User inquiryWriter = TestFactory.createUser();
-        Mogakko mogakko = TestFactory.createMogakko(mogakkoWriter);
+        Mogakko mogakko = createMogakko(mogakkoWriter);
 
         setId(inquiryWriter, inquiryWriterId);
         setId(mogakko, mogakkoId);
@@ -246,7 +243,7 @@ class InquiryServiceTest {
         String deletedContent = "삭제된 문의";
         User mogakkoWriter = TestFactory.createUser();
         User inquiryWriter = TestFactory.createUser();
-        Mogakko mogakko = TestFactory.createMogakko(mogakkoWriter);
+        Mogakko mogakko = createMogakko(mogakkoWriter);
 
         setId(inquiryWriter, inquiryWriterId);
         setId(mogakko, mogakkoId);
@@ -284,8 +281,8 @@ class InquiryServiceTest {
         String content = "작성된 문의";
         User mogakkoWriter = TestFactory.createUser();
         User inquiryWriter = TestFactory.createUser();
-        Mogakko mogakko1 = TestFactory.createMogakko(mogakkoWriter);
-        Mogakko mogakko2 = TestFactory.createMogakko(mogakkoWriter);
+        Mogakko mogakko1 = createMogakko(mogakkoWriter);
+        Mogakko mogakko2 = createMogakko(mogakkoWriter);
 
         setId(inquiryWriter, inquiryWriterId);
         setId(mogakko1, mogakko1Id);
