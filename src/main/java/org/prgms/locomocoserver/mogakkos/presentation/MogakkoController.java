@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
@@ -44,6 +45,7 @@ public class MogakkoController {
             @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "100") Integer pageSize,
             @Parameter(description = "필터링 태그 id 목록") @RequestParam(required = false) List<Long> tags) {
         searchVal = searchVal.strip();
+        tags = tags == null ? new ArrayList<>() : tags;
 
         List<MogakkoSimpleInfoResponseDto> responseDtos = mogakkoService.findAllByFilter(tags, searchVal, searchType, pageSize, new CursorDto(idCursor, countCursor, timeCursor));
 
