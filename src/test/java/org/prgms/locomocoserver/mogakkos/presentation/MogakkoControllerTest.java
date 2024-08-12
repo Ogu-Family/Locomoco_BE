@@ -61,10 +61,10 @@ class MogakkoControllerTest {
 
         MogakkoSimpleInfoResponseDto responseDto1 = new MogakkoSimpleInfoResponseDto(1L, "임시1",
             200L, 2, LocalDateTime.now(), LocalDateTime.now(), 5, 3,
-            new LocationInfoDto("주소1", 26.2442123d, 128.3422352d, "도시1"), List.copyOf(tags));
+            new LocationInfoDto("주소1", 26.2442123d, 128.3422352d, "도시1", "행정동1"), List.copyOf(tags));
         MogakkoSimpleInfoResponseDto responseDto2 = new MogakkoSimpleInfoResponseDto(2L, "임시2",
             1200L, 22, LocalDateTime.now(), LocalDateTime.now(), 10, 4,
-            new LocationInfoDto("주소2", 26.2642123d, 128.3622352d, "도시1"), List.copyOf(tags));
+            new LocationInfoDto("주소2", 26.2642123d, 128.3622352d, "도시1", "행정동2"), List.copyOf(tags));
 
         when(mogakkoService.findAllByFilter(tags, CURSOR, search, searchType, PAGE_SIZE))
             .thenReturn(List.of(responseDto1, responseDto2));
@@ -94,7 +94,7 @@ class MogakkoControllerTest {
     void success_create_mogakko() throws Exception {
         // given
         MogakkoCreateRequestDto requestDto = new MogakkoCreateRequestDto(1L, "타이틀",
-            new LocationInfoDto("주소1", 27.252453d, 127.5453234d, "도시1"), LocalDateTime.now(),
+            new LocationInfoDto("주소1", 27.252453d, 127.5453234d, "도시1", "행정동1"), LocalDateTime.now(),
             LocalDateTime.now(), LocalDateTime.now(), 10, "내용", List.of(1L, 2L));
 
         when(mogakkoService.save(requestDto)).thenReturn(new MogakkoCreateResponseDto(10L));
@@ -117,7 +117,7 @@ class MogakkoControllerTest {
 
         UserBriefInfoDto creatorInfo = new UserBriefInfoDto(creatorId, "이름1", new ImageDto(2L, "path"));
         List<MogakkoParticipantDto> participants = List.of(new MogakkoParticipantDto(10L, "이름2", null));
-        LocationInfoDto locationInfo = new LocationInfoDto("주소1", 27.2342342d, 126.142332d, "도시1");
+        LocationInfoDto locationInfo = new LocationInfoDto("주소1", 27.2342342d, 126.142332d, "도시1", "행정동1");
         MogakkoInfoDto mogakkoInfo = new MogakkoInfoDto(mogakkoId, "제목1", "내용1", 10, LocalDateTime.now(),
             LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now(),
             locationInfo, 10, 10, List.of(1L, 2L));

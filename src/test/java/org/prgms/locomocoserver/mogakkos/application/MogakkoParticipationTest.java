@@ -76,7 +76,7 @@ class MogakkoParticipationTest {
 
         Long savedMogakkoId = mogakkoService.save(
             new MogakkoCreateRequestDto(testCreator.getId(), testMogakko.getTitle(),
-                new LocationInfoDto("", 127.52d, 27.8621d, null), testMogakko.getStartTime(),
+                new LocationInfoDto("", 127.52d, 27.8621d, null, null), testMogakko.getStartTime(),
                 testMogakko.getEndTime(), testMogakko.getDeadline(),
                 testMogakko.getMaxParticipants(),
                 testMogakko.getContent(), Collections.EMPTY_LIST)).id();

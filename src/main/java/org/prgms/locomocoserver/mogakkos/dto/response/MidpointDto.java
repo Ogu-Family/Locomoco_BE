@@ -11,7 +11,7 @@ public record MidpointDto(@Schema(description = "경도", example = "125.6934845
     public static MidpointDto from(Midpoint midpoint) {
         return new MidpointDto(midpoint.getLongitude(),
             midpoint.getLatitude(),
-            midpoint.getAddress(),
+            midpoint.getAddressInfo().getAddress(),
             midpoint.getPlaceName());
     }
 }
