@@ -20,7 +20,7 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
 
     @Query(value = "SELECT m.* "
         + "FROM mogakko m "
-        + "INNER JOIN locations l ON l.mogakko_id = m.id AND m.deadline > :searchTime "
+        + "JOIN locations l ON l.mogakko_id = m.id AND m.deadline > :searchTime "
             + "AND m.deleted_at IS NULL AND (MATCH(l.city) AGAINST(:city IN BOOLEAN MODE) OR MATCH(l.h_city) AGAINST(:city IN BOOLEAN MODE)) "
         + "LEFT JOIN mogakko_tags mt ON mt.tag_id IN :tagIds AND mt.mogakko_id = m.id "
         + "GROUP BY m.id HAVING (COUNT(mt.id) = :countCursor AND m.created_at <= :timeCursor AND m.id < :cursorId) OR COUNT(mt.id) < :countCursor "
@@ -31,7 +31,7 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
     @Query(value = "SELECT m.* FROM mogakko m "
         + "INNER JOIN users u ON m.deleted_at IS NULL AND m.deadline > :searchTime AND m.creator_id = u.id "
             + "AND (MATCH(m.title) AGAINST(:searchVal IN BOOLEAN MODE) OR MATCH(m.content) AGAINST(:searchVal IN BOOLEAN MODE)) "
-        + "INNER JOIN locations l ON l.mogakko_id = m.id "
+        + "LEFT JOIN locations l ON l.mogakko_id = m.id "
         + "LEFT JOIN mogakko_tags mt ON mt.tag_id IN :tagIds AND mt.mogakko_id = m.id "
         + "GROUP BY m.id HAVING (COUNT(mt.id) = :countCursor AND m.created_at <= :timeCursor AND m.id < :cursorId) OR COUNT(mt.id) < :countCursor "
         + "ORDER BY COUNT(m.id) DESC, m.created_at DESC, m.id DESC "

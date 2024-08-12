@@ -15,12 +15,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.prgms.locomocoserver.categories.domain.Category;
 import org.prgms.locomocoserver.categories.domain.CategoryInputType;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
@@ -58,7 +56,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@TestInstance(Lifecycle.PER_CLASS)
 class MogakkoServiceTest {
     private static final long ID_CURSOR = Long.MAX_VALUE;
     private static final long COUNT_CURSOR = Long.MAX_VALUE;
@@ -92,7 +89,7 @@ class MogakkoServiceTest {
     private Mogakko testMogakko;
     private final List<Long> tagIds = new ArrayList<>();
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
         Category langs = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 언어")
             .categoryInputType(CategoryInputType.CHECKBOX).build();
@@ -144,7 +141,7 @@ class MogakkoServiceTest {
         tagIds.addAll(List.of(js.getId(), python.getId(), codingTest.getId(), backend.getId()));
     }
 
-    @AfterAll
+    @AfterEach
     void tearDown() {
         chatMessageRepository.deleteAll();
         participantRepository.deleteAll();
@@ -298,6 +295,12 @@ class MogakkoServiceTest {
         List<Long> havingTagIds = mogakkoTagRepository.findAllByMogakko(testMogakko).stream()
             .map(mt -> mt.getTag().getId()).toList();
 
+        Mogakko testMogakko2 = Mogakko.builder().title("title2").content("제곧내2").views(20).likeCount(10)
+            .startTime(LocalDateTime.now())
+            .endTime(LocalDateTime.now().plusHours(2)).deadline(LocalDateTime.now().plusHours(1))
+            .maxParticipants(10).creator(setUpUser1).build();
+        mogakkoRepository.save(testMogakko2);
+
         // when
         List<MogakkoSimpleInfoResponseDto> filtered = mogakkoService.findAllByFilter(havingTagIds,
             normalSearchVal, searchType, PAGE_SIZE, TEST_CURSOR_DTO);
@@ -307,10 +310,10 @@ class MogakkoServiceTest {
             abnormalSearchVal, searchType, PAGE_SIZE, TEST_CURSOR_DTO);
 
         // then
-        assertThat(filtered).hasSize(1);
+        assertThat(filtered).hasSize(2);
         assertThat(filtered.get(0).title()).isEqualTo(testMogakko.getTitle());
-        assertThat(filteredWithoutTagIds).hasSize(1);
-        assertThat(filteredWithoutTagIds.get(0).title()).isEqualTo(testMogakko.getTitle());
+        assertThat(filteredWithoutTagIds).hasSize(2);
+        assertThat(filteredWithoutTagIds.get(0).title()).isEqualTo(testMogakko2.getTitle());
         assertThat(emptyFiltered).isEmpty();
     }
 
