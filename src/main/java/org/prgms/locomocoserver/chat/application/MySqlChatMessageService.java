@@ -11,7 +11,6 @@ import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +49,11 @@ public class MySqlChatMessageService implements ChatMessagePolicy {
         chatRoom.updateUpdatedAt();
 
         return ChatMessageDto.of(chatMessage);
+    }
+
+    @Override
+    public ChatMessageDto saveChatMessageWithImage(Long roomId, List<String> imageUrls, ChatMessageRequestDto chatMessageRequestDto) {
+        throw new UnsupportedOperationException("사용하지 않는 메서드 입니다.");
     }
 
     @Override

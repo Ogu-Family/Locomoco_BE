@@ -4,9 +4,11 @@ import org.junit.jupiter.api.*;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongo;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.global.TestFactory;
+import org.prgms.locomocoserver.image.application.ImageService;
 import org.prgms.locomocoserver.image.domain.ImageRepository;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
@@ -18,6 +20,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +37,11 @@ class MongoChatServiceTest {
 
     @Autowired
     MongoChatMessageService mongoChatMessageService;
+    @Autowired
+    ChatImageService chatImageService;
+    @Autowired
+    ImageService imageService;
+
     @Autowired
     MongoTemplate mongoTemplate;
     @Autowired
@@ -50,10 +63,11 @@ class MongoChatServiceTest {
     @BeforeAll
     void setUp() {
         mongoTemplate.getDb().drop();
+        chatRoomRepository.deleteAll();
+        mogakkoRepository.deleteAll();
         userRepository.deleteAll();
         imageRepository.deleteAll();
         categoryRepository.deleteAll();
-        chatRoomRepository.deleteAll();
 
         User sender = testFactory.createUser();
         imageRepository.save(sender.getProfileImage());
@@ -87,16 +101,29 @@ class MongoChatServiceTest {
         // given
         Long roomId = chatRoom.getId();
         Long senderId = creator.getId();
+        String collectionName = mongoChatMessageService.getChatRoomName(roomId);
+        long beforeMessageCount = mongoTemplate.getCollection(collectionName).countDocuments();
+
+        byte[] byteCode = imageToByteArray("src/test/resources/스누피4.jpeg");
+        String imageBase64 = Base64.getEncoder().encodeToString(byteCode);
+        ChatMessageRequestDto requestDto = new ChatMessageRequestDto(roomId, senderId, "message", List.of(imageBase64));
 
         // when
-        mongoChatMessageService.saveChatMessage(roomId, new ChatMessageRequestDto(roomId, senderId, "message"));
-        boolean collectionExists = mongoTemplate.collectionExists("chat_messages_" + roomId);
-        String collectionName = mongoChatMessageService.getChatRoomName(roomId);
+        List<String> imageUrls = chatImageService.create(requestDto);
+        mongoChatMessageService.saveChatMessageWithImage(roomId, imageUrls, requestDto);
+
+        boolean collectionExists = mongoTemplate.collectionExists(collectionName);
         long messageCount = mongoTemplate.getCollection(collectionName).countDocuments();
+
+        List<ChatMessageMongo> messages = mongoTemplate.findAll(ChatMessageMongo.class, collectionName);
+        assertThat(messages).isNotEmpty();
+        ChatMessageMongo lastMessage = messages.get(messages.size() - 1);
 
         // then
         assertThat(collectionExists).isTrue();
-        assertThat(messageCount).isEqualTo(2);
+        assertThat(messageCount).isEqualTo(beforeMessageCount + 1);
+        assertThat(lastMessage.getImageUrls().size()).isEqualTo(1);
+        assertThat(lastMessage.getImageUrls().get(0).contains(".jpeg")).isTrue();
     }
 
     @Test
@@ -116,5 +143,28 @@ class MongoChatServiceTest {
 
         // then
         assertThat(chatMessageMongoList2.size()).isEqualTo(1);
+    }
+
+    private byte[] imageToByteArray(String imagePath) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            // 이미지 파일을 읽어 BufferedImage로 변환
+            BufferedImage image = ImageIO.read(new File(imagePath));
+
+            // BufferedImage를 바이트 배열로 변환
+            ImageIO.write(image, "jpeg", baos);
+            baos.flush();
+
+            return baos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                baos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

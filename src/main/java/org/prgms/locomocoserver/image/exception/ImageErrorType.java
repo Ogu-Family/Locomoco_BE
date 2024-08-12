@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ImageErrorType {
     FILE_WRITE_ERROR(HttpStatus.MULTI_STATUS, "파일 쓰기에 실패했습니다."),
-    IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "이미지가 존재하지 않습니다.")
+    IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "이미지가 존재하지 않습니다."),
+    IMAGE_FORMAT_NOTFOUND(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "이미지 포맷 형식을 찾을 수 없습니다.")
     ;
 
     private final HttpStatus status;
