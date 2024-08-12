@@ -8,11 +8,11 @@ import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TotalSearchPolicy implements SearchPolicy {
+public class TitleAndContentSearchPolicy implements SearchPolicy {
 
     private final MogakkoRepository mogakkoRepository;
 
-    public TotalSearchPolicy(MogakkoRepository mogakkoRepository) {
+    public TitleAndContentSearchPolicy(MogakkoRepository mogakkoRepository) {
         this.mogakkoRepository = mogakkoRepository;
     }
 
