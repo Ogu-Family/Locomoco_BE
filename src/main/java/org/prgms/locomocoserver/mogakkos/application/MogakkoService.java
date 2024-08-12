@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.mogakkos.application;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,16 +9,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
+import org.prgms.locomocoserver.mogakkos.application.searchpolicy.LocationSearchPolicy;
+import org.prgms.locomocoserver.mogakkos.application.searchpolicy.TitleAndContentSearchPolicy;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
 import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
+import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.searchpolicy.SearchPolicy;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository;
-import org.prgms.locomocoserver.mogakkos.dto.SearchRepositoryDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
@@ -43,7 +46,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class MogakkoService {
     private final MogakkoFindDetailService mogakkoFindDetailService;
-    //private final PlatformTransactionManager transactionManager;
     private final MogakkoRepository mogakkoRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
@@ -52,6 +54,8 @@ public class MogakkoService {
     private final MogakkoTagRepository mogakkoTagRepository;
     private final ChatRoomService chatRoomService;
     private final MogakkoParticipationService mogakkoParticipationService;
+    private final LocationSearchPolicy locationSearchPolicy;
+    private final TitleAndContentSearchPolicy titleAndContentSearchPolicy;
 
     @Transactional
     public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) {
@@ -95,14 +99,12 @@ public class MogakkoService {
     }
 
     @Transactional(readOnly = true)
-    public List<MogakkoSimpleInfoResponseDto> findAllByFilter(List<Long> tagIds, Long cursor,
-        String searchVal, SearchType searchType, int pageSize) {
-        SearchPolicy searchPolicy = searchType.getSearchPolicy(new SearchRepositoryDto(mogakkoRepository));
-        List<Mogakko> searchedMogakkos;
+    public List<MogakkoSimpleInfoResponseDto> findAllByFilter(List<Long> tagIds, String searchVal, SearchType searchType, int pageSize, CursorDto cursorDto) {
+        SearchPolicy searchPolicy = getSearchPolicy(searchType);
 
         validateFilter(searchVal);
 
-        searchedMogakkos = search(tagIds, cursor, searchVal, pageSize, searchPolicy);
+        List<Mogakko> searchedMogakkos = search(searchVal, tagIds, pageSize, cursorDto, searchPolicy);
 
         List<MogakkoLocation> mogakkoLocations = mogakkoLocationRepository.findAllByMogakkos(searchedMogakkos);
         Map<Long, Long> mogakkoLocationMap = new HashMap<>();
@@ -149,25 +151,6 @@ public class MogakkoService {
         }
     }
 
-    /*private void increaseViews(Mogakko foundMogakko) {
-        // foundMogakko.increaseViews();
-
-        TransactionStatus status = transactionManager.getTransaction(
-            new DefaultTransactionDefinition());
-
-        try {
-            mogakkoRepository.increaseViews(foundMogakko);
-            transactionManager.commit(status);
-        }
-        catch (Exception e){
-            transactionManager.rollback(status);
-
-            log.error("조회 수 처리 중 에러 발생");
-            throw e;
-        }
-
-    }*/
-
     private static MogakkoDetailResponseDto getMogakkoDetailResponseDto(User creator,
         List<User> participants, List<MogakkoTag> mogakkoTags, Mogakko foundMogakko,
         MogakkoLocation foundMogakkoLocation) {
@@ -181,6 +164,13 @@ public class MogakkoService {
             LocationInfoDto.create(foundMogakkoLocation), tagIds);
 
         return new MogakkoDetailResponseDto(creatorInfoDto, mogakkoParticipantDtos, mogakkoInfoDto);
+    }
+
+    private SearchPolicy getSearchPolicy(SearchType searchType) {
+        return switch (searchType) {
+            case TITLE_CONTENT -> titleAndContentSearchPolicy;
+            case LOCATION -> locationSearchPolicy;
+        };
     }
 
     private void updateMogakkoTags(Mogakko updateMogakko, List<Long> updateTagIds) {
@@ -203,10 +193,10 @@ public class MogakkoService {
         });
 
         tagMap.forEach((tag, status) -> {
-            switch (status) {
-                case DELETE_TAG -> mogakkoTagRepository.deleteByTagAndMogakko(tag, updateMogakko);
-                case INSERT_TAG -> mogakkoTagRepository.save(
-                    MogakkoTag.builder().mogakko(updateMogakko).tag(tag).build());
+            if (status == DELETE_TAG) {
+                mogakkoTagRepository.deleteByTagAndMogakko(tag, updateMogakko);
+            } else if (status == INSERT_TAG) {
+                mogakkoTagRepository.save(MogakkoTag.builder().mogakko(updateMogakko).tag(tag).build());
             }
         });
     }
@@ -243,14 +233,9 @@ public class MogakkoService {
         }
     }
 
-    private List<Mogakko> search(List<Long> tagIds, Long cursor, String searchVal,
-        int pageSize, SearchPolicy searchPolicy) {
-        List<Mogakko> searchedMogakkos;
-        if (tagIds == null || tagIds.isEmpty()) {
-            searchedMogakkos = searchPolicy.search(cursor, searchVal, pageSize);
-        } else {
-            searchedMogakkos = searchPolicy.search(cursor, searchVal, tagIds, pageSize);
-        }
-        return searchedMogakkos;
+    private List<Mogakko> search(String searchVal, List<Long> tagIds, int pageSize,
+        CursorDto cursorDto, SearchPolicy searchPolicy) {
+
+        return searchPolicy.search(searchVal, tagIds, pageSize, LocalDateTime.now(), cursorDto);
     }
 }
