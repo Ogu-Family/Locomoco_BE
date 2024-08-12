@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.mogakkos.application;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
@@ -38,12 +39,13 @@ public class MogakkoParticipationService {
         return new ParticipationCheckingDto(false);
     }
 
+    @Transactional
     public void participate(Long mogakkoId, ParticipationRequestDto requestDto) {
-        Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
+        Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNullForUpdate(mogakkoId)
             .orElseThrow(() -> new MogakkoException(MogakkoErrorType.NOT_FOUND));
         User user = userService.getById(requestDto.userId());
 
-        validateIfDeadlineIsPast(mogakko);
+        validateParticipation(mogakko, requestDto.userId());
 
         Participant participant = Participant.builder().mogakko(mogakko).user(user).latitude(
             requestDto.latitude()).longitude(requestDto.longitude()).build();
@@ -65,7 +67,7 @@ public class MogakkoParticipationService {
         Mogakko mogakko = mogakkoRepository.findByIdAndDeletedAtIsNull(mogakkoId)
             .orElseThrow(() -> new MogakkoException(MogakkoErrorType.NOT_FOUND));
 
-        validateIfEndTimeIsPast(mogakko);
+        validateCancel(mogakko, userId);
 
         Participant participant = participantRepository.findByMogakkoIdAndUserId(mogakkoId, userId)
             .orElseThrow(RuntimeException::new);// TODO: 참여 예외 반환
@@ -74,15 +76,27 @@ public class MogakkoParticipationService {
         chatRoomService.leave(mogakko.getChatRoom(), userId);
     }
 
-    private void validateIfDeadlineIsPast(Mogakko mogakko) {
+    private void validateParticipation(Mogakko mogakko, long participantId) {
         if (mogakko.getDeadline().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("신청 데드 라인이 지났습니다."); // TODO: 적절한 예외 처리
+            throw new RuntimeException("신청 데드 라인이 지났습니다."); // TODO: 참여 예외 반환
+        }
+
+        if (participantRepository.findByMogakkoIdAndUserId(mogakko.getId(), participantId).isPresent()){
+            throw new RuntimeException("이미 참여한 유저입니다."); // TODO: 참여 예외 반환
+        }
+
+        if (mogakko.getParticipants().size() >= mogakko.getMaxParticipants()) {
+            throw new RuntimeException("해당 모각코 정원이 다 차서 들어갈 수 없습니다.");
         }
     }
 
-    private void validateIfEndTimeIsPast(Mogakko mogakko) {
+    private void validateCancel(Mogakko mogakko, Long userId) {
         if (mogakko.getEndTime().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("이미 종료된 모각코입니다."); // TODO: 적절한 예외 처리
+            throw new RuntimeException("이미 종료된 모각코입니다."); // TODO: 참여 예외 반환
+        }
+
+        if (Objects.equals(mogakko.getCreator().getId(), userId)) {
+            throw new RuntimeException("모각코 생성자가 참여를 취소할 수 없습니다.");
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.user.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.prgms.locomocoserver.global.TestFactory.createMogakko;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,9 +40,7 @@ class UserRepositoryTest {
 
         userRepository.saveAll(List.of(user1, user2));
 
-        Mogakko mogakko = Mogakko.builder().title("title").content("content").startTime(
-                startTime).endTime(startTime.plusHours(2)).deadline(startTime.plusHours(1))
-            .likeCount(0).views(0).creator(user1).build();
+        Mogakko mogakko = createMogakko(user1);
 
         Participant participant1 = participantRepository.save(
             Participant.builder().user(user1).build());
