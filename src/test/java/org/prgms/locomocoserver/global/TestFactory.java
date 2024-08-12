@@ -21,7 +21,7 @@ public class TestFactory {
     public static User createUser() {
         return User.builder()
                 .nickname("test")
-                .birth(LocalDate.now())
+                .birth(LocalDate.now().minusYears(20))
                 .gender(Gender.MALE)
                 .temperature(36.5).email("test@example.com")
                 .profileImage(createImage())
