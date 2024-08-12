@@ -107,12 +107,11 @@ public class MogakkoService {
         List<Mogakko> searchedMogakkos = search(searchVal, tagIds, pageSize, cursorDto, searchPolicy);
 
         List<MogakkoLocation> mogakkoLocations = mogakkoLocationRepository.findAllByMogakkos(searchedMogakkos);
-        Map<Long, Long> mogakkoLocationMap = new HashMap<>();
-        mogakkoLocations.forEach(location -> mogakkoLocationMap.put(location.getMogakko().getId(), location.getId()));
+        Map<Long, MogakkoLocation> mogakkoLocationMap = new HashMap<>();
+        mogakkoLocations.forEach(location -> mogakkoLocationMap.put(location.getMogakko().getId(), location));
 
         return searchedMogakkos.stream().map(mogakko -> {
-            MogakkoLocation mogakkoLocation = mogakkoLocationRepository.findById(mogakkoLocationMap.get(mogakko.getId()))
-                .orElseThrow(RuntimeException::new); // TODO: 장소 에러 반환
+            MogakkoLocation mogakkoLocation = mogakkoLocationMap.getOrDefault(mogakko.getId(), null);
             return MogakkoSimpleInfoResponseDto.create(mogakko, mogakkoLocation);
         }).toList();
     }
