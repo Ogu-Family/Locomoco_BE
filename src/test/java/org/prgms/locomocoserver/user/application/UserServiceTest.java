@@ -67,7 +67,7 @@ class UserServiceTest {
 
         // when
         String initName = "kimino";
-        LocalDate initBirth = LocalDate.of(2017, 1, 4);
+        LocalDate initBirth = LocalDate.of(2000, 1, 4);
         userService.insertInitInfo(user.getId(),
             new UserInitInfoRequestDto(initName, initBirth,
                 Gender.FEMALE.name(), engineer.getId()), null);
