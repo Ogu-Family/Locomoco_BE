@@ -11,6 +11,10 @@ public record LocationInfoDto(@Schema(description = "주소", example = "경기�
                               @Schema(description = "행정동 정보", example = "경기도 부천시 소사구 소사본동") String hCity) {
 
     public static LocationInfoDto create(MogakkoLocation mogakkoLocation) {
+        if (mogakkoLocation == null) {
+            return null;
+        }
+
         AddressInfo locationAddressInfo = mogakkoLocation.getAddressInfo();
 
         return new LocationInfoDto(locationAddressInfo.getAddress(),
