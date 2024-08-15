@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation.MogakkoLocationBuilder;
+import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 
@@ -38,11 +39,13 @@ public record MogakkoCreateRequestDto(@Schema(description = "작성자 id", exam
             return builder.build();
         }
 
+        AddressInfo addressInfo = AddressInfo.builder().address(location.address())
+            .city(location.city()).hCity(location.hCity()).build();
+
         return builder
-            .address(location.address())
+            .addressInfo(addressInfo)
             .latitude(location.latitude())
             .longitude(location.longitude())
-            .city(location.city())
             .build();
     }
 }

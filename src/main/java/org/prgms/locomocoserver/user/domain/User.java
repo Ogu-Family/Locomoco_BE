@@ -25,6 +25,8 @@ import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
+import org.prgms.locomocoserver.user.vo.BirthVo;
+import org.prgms.locomocoserver.user.vo.NicknameVo;
 
 @Entity
 @Getter
@@ -83,14 +85,16 @@ public class User extends BaseEntity {
     }
 
     public void setInitInfo(String nickname, LocalDate birth, Gender gender, Tag jobTag) {
-        this.nickname = nickname;
-        this.birth = birth;
+        this.nickname = new NicknameVo(nickname).getNickname();
+        this.birth = new BirthVo(birth).getBirth();
         this.gender = gender;
         this.jobTag = jobTag;
+        this.updateUpdatedAt();
     }
 
     public void updateProfileImage(Image profileImage) {
         this.profileImage = profileImage;
+        this.updateUpdatedAt();
     }
 
     public void updateUserInfo(String nickname, LocalDate birth, Gender gender, Tag jobTag) {
@@ -98,5 +102,6 @@ public class User extends BaseEntity {
         this.birth = birth != null ? birth : this.birth;
         this.gender = gender != null ? gender : this.gender;
         this.jobTag = jobTag != null ? jobTag : this.jobTag;
+        this.updateUpdatedAt();
     }
 }

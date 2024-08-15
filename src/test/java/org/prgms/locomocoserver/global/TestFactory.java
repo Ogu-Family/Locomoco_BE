@@ -21,7 +21,7 @@ public class TestFactory {
     public static User createUser() {
         return User.builder()
                 .nickname("test")
-                .birth(LocalDate.now())
+                .birth(LocalDate.now().minusYears(20))
                 .gender(Gender.MALE)
                 .temperature(36.5).email("test@example.com")
                 .profileImage(createImage())
@@ -69,6 +69,7 @@ public class TestFactory {
                 .startTime(LocalDateTime.now().plusDays(3))
                 .endTime(LocalDateTime.now().plusDays(3).plusHours(2))
                 .deadline(LocalDateTime.now().plusDays(1))
+                .maxParticipants(5)
                 .likeCount(0)
                 .build();
     }
