@@ -5,7 +5,9 @@ import org.prgms.locomocoserver.categories.domain.CategoryInputType;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.image.domain.Image;
+import org.prgms.locomocoserver.inquiries.domain.Inquiry;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
+import org.prgms.locomocoserver.replies.domain.Reply;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
@@ -71,6 +73,22 @@ public class TestFactory {
                 .deadline(LocalDateTime.now().plusDays(1))
                 .maxParticipants(5)
                 .likeCount(0)
+                .build();
+    }
+
+    public static Inquiry createInquiry(User user, Mogakko mogakko) {
+        return Inquiry.builder()
+                .user(user)
+                .content("test inqury content")
+                .mogakko(mogakko)
+                .build();
+    }
+
+    public static Reply createReply(User user, Inquiry inquiry) {
+        return Reply.builder()
+                .user(user)
+                .inquiry(inquiry)
+                .content("test reply content")
                 .build();
     }
 }
