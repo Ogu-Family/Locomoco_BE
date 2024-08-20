@@ -3,9 +3,13 @@ package org.prgms.locomocoserver.user.presentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.prgms.locomocoserver.global.annotation.Authenticated;
+import org.prgms.locomocoserver.global.annotation.GetUser;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.user.application.DeviceKeyService;
 import org.prgms.locomocoserver.user.application.UserService;
+import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.dto.request.DeviceKeyUpdateRequest;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
@@ -21,6 +25,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "User Controller", description = "사용자 컨트롤러")
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -52,8 +57,10 @@ public class UserController {
     }
 
     @Operation(summary = "마이페이지 정보", description = "사용자 마이페이지 정보를 반환합니다.")
+    @Authenticated()
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserMyPageDto> getUserInfo(@PathVariable Long userId) {
+    public ResponseEntity<UserMyPageDto> getUserInfo(@PathVariable Long userId, @GetUser User user) {
+        log.debug("getUserInfo : {}", user.getNickname());
         UserMyPageDto myPageDto = userService.getUserInfo(userId);
 
         return ResponseEntity.ok(myPageDto);
