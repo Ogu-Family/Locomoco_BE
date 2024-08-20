@@ -43,7 +43,7 @@ import org.springframework.util.MultiValueMap;
 class MogakkoControllerTest {
     private static final long ID_CURSOR = Long.MAX_VALUE;
     private static final long COUNT_CURSOR = Long.MAX_VALUE;
-    private static final LocalDateTime TIME_CURSOR = LocalDateTime.of(9999, 12, 31, 23, 59);
+    private static final LocalDateTime TIME_CURSOR = LocalDateTime.of(9990, 12, 31, 23, 59);
     private static final CursorDto TEST_CURSOR_DTO = new CursorDto(ID_CURSOR, COUNT_CURSOR, TIME_CURSOR);
     private static final int PAGE_SIZE = 20;
     private static final String API_VERSION = "/api/v1";
