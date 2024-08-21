@@ -15,12 +15,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.prgms.locomocoserver.categories.domain.Category;
 import org.prgms.locomocoserver.categories.domain.CategoryInputType;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
@@ -31,6 +29,7 @@ import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
 import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
+import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
@@ -57,9 +56,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@TestInstance(Lifecycle.PER_CLASS)
 class MogakkoServiceTest {
-    static final long CURSOR = Long.MAX_VALUE;
+    private static final long ID_CURSOR = Long.MAX_VALUE;
+    private static final long COUNT_CURSOR = Long.MAX_VALUE;
+    private static final LocalDateTime TIME_CURSOR = LocalDateTime.of(9990, 12, 31, 23, 59);
+    private static final CursorDto TEST_CURSOR_DTO = new CursorDto(ID_CURSOR, COUNT_CURSOR, TIME_CURSOR);
     static final int PAGE_SIZE = 10;
 
     @Autowired
@@ -88,7 +89,7 @@ class MogakkoServiceTest {
     private Mogakko testMogakko;
     private final List<Long> tagIds = new ArrayList<>();
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
         Category langs = Category.builder().categoryType(CategoryType.MOGAKKO).name("개발 언어")
             .categoryInputType(CategoryInputType.CHECKBOX).build();
@@ -140,7 +141,7 @@ class MogakkoServiceTest {
         tagIds.addAll(List.of(js.getId(), python.getId(), codingTest.getId(), backend.getId()));
     }
 
-    @AfterAll
+    @AfterEach
     void tearDown() {
         chatMessageRepository.deleteAll();
         participantRepository.deleteAll();
@@ -285,28 +286,34 @@ class MogakkoServiceTest {
     }
 
     @Test
-    @DisplayName("입력된 필터링 인자들에 대해 정상적으로 전체 검색을 수행한다")
+    @DisplayName("입력된 필터링 인자들에 대해 정상적으로 제목 + 내용 검색을 수행한다")
     void success_find_all_by_filter_given_normal_args() {
         // given
         String normalSearchVal = "제곧";
         String abnormalSearchVal = "noContent";
-        SearchType searchType = SearchType.TOTAL;
+        SearchType searchType = SearchType.TITLE_CONTENT;
         List<Long> havingTagIds = mogakkoTagRepository.findAllByMogakko(testMogakko).stream()
             .map(mt -> mt.getTag().getId()).toList();
 
+        Mogakko testMogakko2 = Mogakko.builder().title("title2").content("제곧내2").views(20).likeCount(10)
+            .startTime(LocalDateTime.now())
+            .endTime(LocalDateTime.now().plusHours(2)).deadline(LocalDateTime.now().plusHours(1))
+            .maxParticipants(10).creator(setUpUser1).build();
+        mogakkoRepository.save(testMogakko2);
+
         // when
         List<MogakkoSimpleInfoResponseDto> filtered = mogakkoService.findAllByFilter(havingTagIds,
-            CURSOR, normalSearchVal, searchType, PAGE_SIZE);
+            normalSearchVal, searchType, PAGE_SIZE, TEST_CURSOR_DTO);
         List<MogakkoSimpleInfoResponseDto> filteredWithoutTagIds = mogakkoService.findAllByFilter(Collections.emptyList(),
-            CURSOR, normalSearchVal, searchType, PAGE_SIZE);
+            normalSearchVal, searchType, PAGE_SIZE, TEST_CURSOR_DTO);
         List<MogakkoSimpleInfoResponseDto> emptyFiltered = mogakkoService.findAllByFilter(Collections.emptyList(),
-            CURSOR, abnormalSearchVal, searchType, PAGE_SIZE);
+            abnormalSearchVal, searchType, PAGE_SIZE, TEST_CURSOR_DTO);
 
         // then
-        assertThat(filtered).hasSize(1);
+        assertThat(filtered).hasSize(2);
         assertThat(filtered.get(0).title()).isEqualTo(testMogakko.getTitle());
-        assertThat(filteredWithoutTagIds).hasSize(1);
-        assertThat(filteredWithoutTagIds.get(0).title()).isEqualTo(testMogakko.getTitle());
+        assertThat(filteredWithoutTagIds).hasSize(2);
+        assertThat(filteredWithoutTagIds.get(0).title()).isEqualTo(testMogakko2.getTitle());
         assertThat(emptyFiltered).isEmpty();
     }
 
@@ -345,8 +352,8 @@ class MogakkoServiceTest {
 
         // when, then
         assertThatThrownBy(
-            () -> mogakkoService.findAllByFilter(null, Long.MAX_VALUE, search, SearchType.TOTAL,
-                10))
+            () -> mogakkoService.findAllByFilter(null, search, SearchType.TITLE_CONTENT,
+                10, TEST_CURSOR_DTO))
             .isInstanceOf(MogakkoException.class)
             .hasFieldOrPropertyWithValue("errorType", MogakkoErrorType.TOO_LITTLE_INPUT);
     }
@@ -420,9 +427,9 @@ class MogakkoServiceTest {
 
         // when
         List<MogakkoSimpleInfoResponseDto> normalResult = mogakkoService.findAllByFilter(
-            havingTagIds, CURSOR, normalSearchVal, searchType, PAGE_SIZE);
+            havingTagIds, normalSearchVal, searchType, PAGE_SIZE, TEST_CURSOR_DTO);
         List<MogakkoSimpleInfoResponseDto> abnormalResult = mogakkoService.findAllByFilter(
-            havingTagIds, CURSOR, abnormalSearchVal, searchType, PAGE_SIZE);
+            havingTagIds, abnormalSearchVal, searchType, PAGE_SIZE, TEST_CURSOR_DTO);
 
         // then
         assertThat(normalResult).hasSize(1);

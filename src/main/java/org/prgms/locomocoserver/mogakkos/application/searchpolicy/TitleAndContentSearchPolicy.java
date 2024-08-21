@@ -8,19 +8,18 @@ import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LocationSearchPolicy implements SearchPolicy {
+public class TitleAndContentSearchPolicy implements SearchPolicy {
 
     private final MogakkoRepository mogakkoRepository;
 
-    public LocationSearchPolicy(MogakkoRepository mogakkoRepository) {
+    public TitleAndContentSearchPolicy(MogakkoRepository mogakkoRepository) {
         this.mogakkoRepository = mogakkoRepository;
     }
 
     @Override
-    public List<Mogakko> search(String searchVal, List<Long> tagIds, int pageSize,
-        LocalDateTime searchTime, CursorDto cursorDto) {
+    public List<Mogakko> search(String searchVal, List<Long> tagIds, int pageSize, LocalDateTime searchTime, CursorDto cursorDto) {
 
-        return mogakkoRepository.findAllByCity(tagIds, searchVal, pageSize, searchTime,
+        return mogakkoRepository.findAllByTitleAndContent(searchVal, tagIds, pageSize, searchTime,
             cursorDto.countCursor(), cursorDto.timeCursor(), cursorDto.idCursor());
     }
 }

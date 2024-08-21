@@ -18,6 +18,7 @@ import org.prgms.locomocoserver.global.filter.ExceptionHandlerFilter;
 import org.prgms.locomocoserver.image.dto.ImageDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.application.SearchType;
+import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
@@ -40,7 +41,10 @@ import org.springframework.util.MultiValueMap;
 
 @WebMvcTest(controllers = MogakkoController.class, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = { CorsFilter.class, AuthenticationFilter.class, ExceptionHandlerFilter.class, GlobalExceptionHandler.class }))
 class MogakkoControllerTest {
-    private static final long CURSOR = Long.MAX_VALUE;
+    private static final long ID_CURSOR = Long.MAX_VALUE;
+    private static final long COUNT_CURSOR = Long.MAX_VALUE;
+    private static final LocalDateTime TIME_CURSOR = LocalDateTime.of(9990, 12, 31, 23, 59);
+    private static final CursorDto TEST_CURSOR_DTO = new CursorDto(ID_CURSOR, COUNT_CURSOR, TIME_CURSOR);
     private static final int PAGE_SIZE = 20;
     private static final String API_VERSION = "/api/v1";
 
@@ -56,7 +60,7 @@ class MogakkoControllerTest {
     void success_find_all_mogakkos() throws Exception {
         // given
         String search = "ISD";
-        SearchType searchType = SearchType.TOTAL;
+        SearchType searchType = SearchType.TITLE_CONTENT;
         List<Long> tags = List.of(1L, 2L);
 
         MogakkoSimpleInfoResponseDto responseDto1 = new MogakkoSimpleInfoResponseDto(1L, "임시1",
@@ -66,11 +70,13 @@ class MogakkoControllerTest {
             1200L, 22, LocalDateTime.now(), LocalDateTime.now(), 10, 4,
             new LocationInfoDto("주소2", 26.2642123d, 128.3622352d, "도시1", "행정동2"), List.copyOf(tags));
 
-        when(mogakkoService.findAllByFilter(tags, CURSOR, search, searchType, PAGE_SIZE))
+        when(mogakkoService.findAllByFilter(tags, search, searchType, PAGE_SIZE, TEST_CURSOR_DTO))
             .thenReturn(List.of(responseDto1, responseDto2));
 
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.add("cursor", String.valueOf(CURSOR));
+        paramMap.add("idCursor", String.valueOf(ID_CURSOR));
+        paramMap.add("timeCursor", String.valueOf(TIME_CURSOR));
+        paramMap.add("countCursor", String.valueOf(COUNT_CURSOR));
         paramMap.add("search", search);
         paramMap.add("searchType", searchType.name());
         paramMap.add("pageSize", String.valueOf(PAGE_SIZE));
