@@ -1,7 +1,5 @@
 package org.prgms.locomocoserver.global.config;
 
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.global.annotation.GetUser;
 import org.prgms.locomocoserver.global.context.UserContext;
@@ -17,7 +15,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
