@@ -6,10 +6,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.prgms.locomocoserver.global.context.UserContext;
 import org.prgms.locomocoserver.global.exception.AuthException;
 import org.prgms.locomocoserver.global.exception.ErrorCode;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
 import org.prgms.locomocoserver.user.application.RefreshTokenService;
+import org.prgms.locomocoserver.user.application.TokenService;
+import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.enums.Provider;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
 import org.springframework.stereotype.Component;
@@ -33,10 +36,12 @@ public class AuthenticationFilter implements Filter {
     ));
     private static final List<String> authRequired = List.of(
             "GET:/api/v1/chats/rooms/\\d+",
-            "PATCH:/api/v1/mogakko/map/\\d+"
+            "PATCH:/api/v1/mogakko/map/\\d+",
+            "GET:/api/v1/users/\\d+"
     );
 
     private final AuthenticationService authenticationService;
+    private final TokenService tokenService;
     private final RefreshTokenService refreshTokenService;
     private final ObjectMapper objectMapper;
 
@@ -53,7 +58,6 @@ public class AuthenticationFilter implements Filter {
 
         if (isAuthRequired((httpRequest))) {
             handleAuthentication(httpRequest, httpResponse);
-            return;
         }
 
         chain.doFilter(request, response);
@@ -95,12 +99,11 @@ public class AuthenticationFilter implements Filter {
         boolean isValidToken = authenticationService.authenticateUser(providerValue, accessToken);
 
         if (isValidToken) {
-            return;
-        }
-
-        if (Provider.KAKAO.name().equals(providerValue)) { // kakao 자동 토큰 재발급
+            User user = tokenService.getUserFromToken(accessToken.substring(7), providerValue);
+            UserContext.setUser(user);
+        } else if (Provider.KAKAO.name().equals(providerValue)) {
             processTokenRefresh(response, accessToken);
-        } else { // github refresh 토큰 없음
+        } else {
             log.error("Authentication failed (AuthFilter): {}", ErrorCode.INVALID_TOKEN.getMessage());
             throw new AuthException(ErrorCode.INVALID_TOKEN);
         }
