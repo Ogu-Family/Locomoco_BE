@@ -20,9 +20,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @RequiredArgsConstructor
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final HttpServletRequest httpServletRequest;
-
-
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         // 파라미터가 @GetUser 어노테이션이 붙어 있고, 타입이 User인 경우
