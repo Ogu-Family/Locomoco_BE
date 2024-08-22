@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.prgms.locomocoserver.global.annotation.Authenticated;
 import org.prgms.locomocoserver.global.annotation.GetUser;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.user.application.DeviceKeyService;
@@ -57,10 +56,9 @@ public class UserController {
     }
 
     @Operation(summary = "마이페이지 정보", description = "사용자 마이페이지 정보를 반환합니다.")
-    @Authenticated()
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserMyPageDto> getUserInfo(@PathVariable Long userId, @GetUser User user) {
-        log.debug("getUserInfo : {}", user.getNickname());
+        log.info("getUserInfo : {}", user.getEmail());
         UserMyPageDto myPageDto = userService.getUserInfo(userId);
 
         return ResponseEntity.ok(myPageDto);
@@ -125,5 +123,5 @@ public class UserController {
         UserInfoDto userInfoDto = userService.deleteProfileImage(userId);
         return ResponseEntity.ok(userInfoDto);
     }
-    
+
 }
