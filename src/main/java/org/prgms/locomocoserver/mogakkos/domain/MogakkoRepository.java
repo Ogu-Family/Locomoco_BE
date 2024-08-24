@@ -32,7 +32,7 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
         + "LEFT JOIN locations l ON l.mogakko_id = m.id "
         + "LEFT JOIN mogakko_tags mt ON mt.tag_id IN :tagIds AND mt.mogakko_id = m.id "
         + "WHERE m.deleted_at IS NULL AND m.deadline > :searchTime "
-        + "       AND (MATCH(m.title) AGAINST(:searchVal IN BOOLEAN MODE) OR MATCH(m.content) AGAINST(:searchVal IN BOOLEAN MODE)) "
+        + "       AND (:searchVal = '' OR MATCH(m.title) AGAINST(:searchVal IN BOOLEAN MODE) OR MATCH(m.content) AGAINST(:searchVal IN BOOLEAN MODE)) "
         + "GROUP BY m.id HAVING (COUNT(mt.id) = :countCursor AND m.created_at <= :timeCursor AND m.id < :cursorId) OR COUNT(mt.id) < :countCursor "
         + "ORDER BY COUNT(m.id) DESC, m.created_at DESC, m.id DESC "
         + "LIMIT :pageSize", nativeQuery = true)

@@ -318,6 +318,21 @@ class MogakkoServiceTest {
     }
 
     @Test
+    @DisplayName("검색 값이 빈 값에 대해 모든 모각코 리스트를 출력한다.")
+    void success_find_all_by_filter_given_empty_search_value() {
+        // given
+        String searchVal = "";
+        SearchType searchType = SearchType.TITLE_CONTENT;
+
+        // when
+        List<MogakkoSimpleInfoResponseDto> allByFilter = mogakkoService.findAllByFilter(new ArrayList<>(), searchVal, searchType, PAGE_SIZE, TEST_CURSOR_DTO);
+
+        // then
+        assertThat(allByFilter).isNotEmpty();
+        assertThat(allByFilter.get(0).title()).isEqualTo(testMogakko.getTitle());
+    }
+
+    @Test
     @DisplayName("모각코를 삭제할 수 있다")
     void success_delete_given_normal_id() {
         // given
