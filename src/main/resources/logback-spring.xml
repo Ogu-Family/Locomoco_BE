@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss, Asia/Seoul} %-5level %logger{36} - %msg%n" />
+
+  <!-- 콘솔 로그 설정 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 롤링 파일 로그 설정 -->
+  <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>./logs/locomoco-server.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>./logs/locomoco-server-%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 루트 로거 설정 -->
+  <root level="info">
+    <appender-ref ref="ROLLING_FILE" />
+    <appender-ref ref="CONSOLE" />
+  </root>
+
+</configuration>

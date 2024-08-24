@@ -30,10 +30,11 @@ public record ChatMessageRequestDto(
     }
 
     public ChatMessageMongo toChatMessageMongo(User sender, boolean isNotice, List<String> imageUrls) {
+        String profileImage = sender.getProfileImage() == null ? null : sender.getProfileImage().getPath();
         return ChatMessageMongo.builder()
                 .senderId(senderId.toString())
                 .senderNickname(sender.getNickname())
-                .senderImage(sender.getProfileImage().getPath())
+                .senderImage(profileImage)
                 .message(message)
                 .imageUrls(imageUrls)
                 .isNotice(isNotice)
