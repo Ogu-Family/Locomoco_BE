@@ -41,10 +41,7 @@ import org.springframework.util.MultiValueMap;
 
 @WebMvcTest(controllers = MogakkoController.class, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = { CorsFilter.class, AuthenticationFilter.class, ExceptionHandlerFilter.class, GlobalExceptionHandler.class }))
 class MogakkoControllerTest {
-    private static final long ID_CURSOR = Long.MAX_VALUE;
-    private static final long COUNT_CURSOR = Long.MAX_VALUE;
-    private static final LocalDateTime TIME_CURSOR = LocalDateTime.of(9990, 12, 31, 23, 59);
-    private static final CursorDto TEST_CURSOR_DTO = new CursorDto(ID_CURSOR, COUNT_CURSOR, TIME_CURSOR);
+    private static final long OFFSET = 0L;
     private static final int PAGE_SIZE = 20;
     private static final String API_VERSION = "/api/v1";
 
@@ -70,13 +67,11 @@ class MogakkoControllerTest {
             1200L, 22, LocalDateTime.now(), LocalDateTime.now(), 10, 4,
             new LocationInfoDto("주소2", 26.2642123d, 128.3622352d, "도시1", "행정동2"), List.copyOf(tags));
 
-        when(mogakkoService.findAllByFilter(tags, search, searchType, PAGE_SIZE, TEST_CURSOR_DTO))
+        when(mogakkoService.findAllByFilter(tags, search, searchType, PAGE_SIZE, OFFSET))
             .thenReturn(List.of(responseDto1, responseDto2));
 
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.add("idCursor", String.valueOf(ID_CURSOR));
-        paramMap.add("timeCursor", String.valueOf(TIME_CURSOR));
-        paramMap.add("countCursor", String.valueOf(COUNT_CURSOR));
+        paramMap.add("offset", String.valueOf(OFFSET));
         paramMap.add("search", search);
         paramMap.add("searchType", searchType.name());
         paramMap.add("pageSize", String.valueOf(PAGE_SIZE));

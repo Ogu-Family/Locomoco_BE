@@ -99,12 +99,12 @@ public class MogakkoService {
     }
 
     @Transactional(readOnly = true)
-    public List<MogakkoSimpleInfoResponseDto> findAllByFilter(List<Long> tagIds, String searchVal, SearchType searchType, int pageSize, CursorDto cursorDto) {
+    public List<MogakkoSimpleInfoResponseDto> findAllByFilter(List<Long> tagIds, String searchVal, SearchType searchType, int pageSize, Long offset) {
         SearchPolicy searchPolicy = getSearchPolicy(searchType);
 
         validateFilter(searchVal);
 
-        List<Mogakko> searchedMogakkos = search(searchVal, tagIds, pageSize, cursorDto, searchPolicy);
+        List<Mogakko> searchedMogakkos = search(searchVal, tagIds, pageSize, offset, searchPolicy);
 
         List<MogakkoLocation> mogakkoLocations = mogakkoLocationRepository.findAllByMogakkos(searchedMogakkos);
         Map<Long, MogakkoLocation> mogakkoLocationMap = new HashMap<>();
@@ -233,8 +233,8 @@ public class MogakkoService {
     }
 
     private List<Mogakko> search(String searchVal, List<Long> tagIds, int pageSize,
-        CursorDto cursorDto, SearchPolicy searchPolicy) {
+        Long offset, SearchPolicy searchPolicy) {
 
-        return searchPolicy.search(searchVal, tagIds, pageSize, LocalDateTime.now(), cursorDto);
+        return searchPolicy.search(searchVal, tagIds, pageSize, LocalDateTime.now(), offset);
     }
 }

@@ -17,9 +17,8 @@ public class TitleAndContentSearchPolicy implements SearchPolicy {
     }
 
     @Override
-    public List<Mogakko> search(String searchVal, List<Long> tagIds, int pageSize, LocalDateTime searchTime, CursorDto cursorDto) {
+    public List<Mogakko> search(String searchVal, List<Long> tagIds, int pageSize, LocalDateTime searchTime, Long offset) {
 
-        return mogakkoRepository.findAllByTitleAndContent(searchVal, tagIds, pageSize, searchTime,
-            cursorDto.countCursor(), cursorDto.timeCursor(), cursorDto.idCursor());
+        return mogakkoRepository.findAllByTitleAndContent(searchVal, tagIds, pageSize, searchTime, offset);
     }
 }
