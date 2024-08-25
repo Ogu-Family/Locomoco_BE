@@ -56,8 +56,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 class MogakkoServiceTest {
-    private static final long OFFSET = 0L;
-    static final int PAGE_SIZE = 10;
+    private static final long GLOBAL_OFFSET = 0L;
+    static final int GLOBAL_PAGE_SIZE = 10;
 
     @Autowired
     private MogakkoService mogakkoService;
@@ -285,6 +285,7 @@ class MogakkoServiceTest {
     @DisplayName("입력된 필터링 인자들에 대해 정상적으로 제목 + 내용 검색을 수행한다")
     void success_find_all_by_filter_given_normal_args() {
         // given
+        int pageSize = 1;
         String normalSearchVal = "제곧";
         String abnormalSearchVal = "noContent";
         SearchType searchType = SearchType.TITLE_CONTENT;
@@ -298,16 +299,20 @@ class MogakkoServiceTest {
         mogakkoRepository.save(testMogakko2);
 
         // when
-        List<MogakkoSimpleInfoResponseDto> filtered = mogakkoService.findAllByFilter(havingTagIds,
-            normalSearchVal, searchType, PAGE_SIZE, OFFSET);
+        List<MogakkoSimpleInfoResponseDto> filtered1Page = mogakkoService.findAllByFilter(havingTagIds,
+            normalSearchVal, searchType, pageSize, GLOBAL_OFFSET);
+        List<MogakkoSimpleInfoResponseDto> filtered2Page = mogakkoService.findAllByFilter(havingTagIds,
+            normalSearchVal, searchType, pageSize, GLOBAL_OFFSET + 1);
         List<MogakkoSimpleInfoResponseDto> filteredWithoutTagIds = mogakkoService.findAllByFilter(Collections.emptyList(),
-            normalSearchVal, searchType, PAGE_SIZE, OFFSET);
+            normalSearchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
         List<MogakkoSimpleInfoResponseDto> emptyFiltered = mogakkoService.findAllByFilter(Collections.emptyList(),
-            abnormalSearchVal, searchType, PAGE_SIZE, OFFSET);
+            abnormalSearchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
 
         // then
-        assertThat(filtered).hasSize(2);
-        assertThat(filtered.get(0).title()).isEqualTo(testMogakko.getTitle());
+        assertThat(filtered1Page).hasSize(1);
+        assertThat(filtered1Page.get(0).title()).isEqualTo(testMogakko.getTitle());
+        assertThat(filtered2Page).hasSize(1);
+        assertThat(filtered2Page.get(0).title()).isEqualTo(testMogakko2.getTitle());
         assertThat(filteredWithoutTagIds).hasSize(2);
         assertThat(filteredWithoutTagIds.get(0).title()).isEqualTo(testMogakko2.getTitle());
         assertThat(emptyFiltered).isEmpty();
@@ -321,7 +326,7 @@ class MogakkoServiceTest {
         SearchType searchType = SearchType.TITLE_CONTENT;
 
         // when
-        List<MogakkoSimpleInfoResponseDto> allByFilter = mogakkoService.findAllByFilter(new ArrayList<>(), searchVal, searchType, PAGE_SIZE, OFFSET);
+        List<MogakkoSimpleInfoResponseDto> allByFilter = mogakkoService.findAllByFilter(new ArrayList<>(), searchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
 
         // then
         assertThat(allByFilter).isNotEmpty();
@@ -364,7 +369,7 @@ class MogakkoServiceTest {
         // when, then
         assertThatThrownBy(
             () -> mogakkoService.findAllByFilter(null, search, SearchType.TITLE_CONTENT,
-                10, OFFSET))
+                10, GLOBAL_OFFSET))
             .isInstanceOf(MogakkoException.class)
             .hasFieldOrPropertyWithValue("errorType", MogakkoErrorType.TOO_LITTLE_INPUT);
     }
@@ -439,11 +444,11 @@ class MogakkoServiceTest {
 
         // when
         List<MogakkoSimpleInfoResponseDto> normalCityResult = mogakkoService.findAllByFilter(
-                havingTagIds, normalCitySearchVal, searchType, PAGE_SIZE, OFFSET);
+                havingTagIds, normalCitySearchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
         List<MogakkoSimpleInfoResponseDto> normalHCityResult = mogakkoService.findAllByFilter(
-                new ArrayList<>(), normalHCitySearchVal, searchType, PAGE_SIZE, OFFSET);
+                new ArrayList<>(), normalHCitySearchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
         List<MogakkoSimpleInfoResponseDto> abnormalResult = mogakkoService.findAllByFilter(
-                havingTagIds, abnormalSearchVal, searchType, PAGE_SIZE, OFFSET);
+                havingTagIds, abnormalSearchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
 
         // then
         assertThat(normalCityResult).hasSize(1);
