@@ -5,13 +5,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.application.SearchType;
-import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;

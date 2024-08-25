@@ -18,7 +18,6 @@ import org.prgms.locomocoserver.global.filter.ExceptionHandlerFilter;
 import org.prgms.locomocoserver.image.dto.ImageDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.application.SearchType;
-import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;

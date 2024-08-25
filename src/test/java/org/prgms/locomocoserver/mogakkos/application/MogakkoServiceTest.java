@@ -29,7 +29,6 @@ import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
 import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
-import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;

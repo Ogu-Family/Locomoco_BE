@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
-import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 import org.springframework.stereotype.Component;
 
 @Component
