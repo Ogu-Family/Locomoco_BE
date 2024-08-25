@@ -50,7 +50,7 @@ public class RefreshTokenService {
 
     private RefreshToken getByAccessToken(String accessToken) {
         return refreshTokenRepository.findByAccessToken(accessToken)
-               .orElseThrow(() -> new UserException(UserErrorType.ACCESSTOKEN_NOT_FOUND));
+               .orElseThrow(() -> new AuthException(ErrorCode.ACCESSTOKEN_EXPIRED));
     }
 
     private TokenResponseDto refreshKakaoAccessToken(String refreshToken) {
