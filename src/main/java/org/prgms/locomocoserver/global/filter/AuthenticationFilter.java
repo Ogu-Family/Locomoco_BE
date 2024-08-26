@@ -47,6 +47,8 @@ public class AuthenticationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        log.info("Authentication Filter Started");
+
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         UserContext.clear();
@@ -58,6 +60,7 @@ public class AuthenticationFilter implements Filter {
         }
 
         if (isAuthRequired(httpRequest)) {
+            log.info("Authentication Required for {}", httpRequest.getRequestURI());
             handleAuthentication(httpRequest, httpResponse);
         }
 
