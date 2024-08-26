@@ -21,22 +21,22 @@ public interface MogakkoRepository extends JpaRepository<Mogakko, Long> {
     @Query(value = "SELECT m.* "
         + "FROM mogakko m "
         + "JOIN locations l ON l.mogakko_id = m.id AND m.deadline > :searchTime "
-            + "AND m.deleted_at IS NULL AND (MATCH(l.city) AGAINST(:city IN BOOLEAN MODE) OR MATCH(l.h_city) AGAINST(:city IN BOOLEAN MODE)) "
+            + "AND m.deleted_at IS NULL AND (l.city LIKE CONCAT(:city, '%') OR l.h_city LIKE CONCAT(:city, '%')) "
         + "LEFT JOIN mogakko_tags mt ON mt.tag_id IN :tagIds AND mt.mogakko_id = m.id "
-        + "GROUP BY m.id HAVING (COUNT(mt.id) = :countCursor AND m.created_at <= :timeCursor AND m.id < :cursorId) OR COUNT(mt.id) < :countCursor "
+        + "GROUP BY m.id "
         + "ORDER BY COUNT(mt.id) DESC, m.created_at DESC "
-        + "LIMIT :pageSize", nativeQuery = true)
-    List<Mogakko> findAllByCity(Iterable<Long> tagIds, String city, int pageSize, LocalDateTime searchTime, Long countCursor, LocalDateTime timeCursor, Long cursorId); // 장소
+        + "LIMIT :pageSize OFFSET :offset", nativeQuery = true)
+    List<Mogakko> findAllByCity(Iterable<Long> tagIds, String city, int pageSize, LocalDateTime searchTime, Long offset); // 장소
 
     @Query(value = "SELECT m.* FROM mogakko m "
         + "LEFT JOIN locations l ON l.mogakko_id = m.id "
         + "LEFT JOIN mogakko_tags mt ON mt.tag_id IN :tagIds AND mt.mogakko_id = m.id "
         + "WHERE m.deleted_at IS NULL AND m.deadline > :searchTime "
         + "       AND (:searchVal = '' OR MATCH(m.title) AGAINST(:searchVal IN BOOLEAN MODE) OR MATCH(m.content) AGAINST(:searchVal IN BOOLEAN MODE)) "
-        + "GROUP BY m.id HAVING (COUNT(mt.id) = :countCursor AND m.created_at <= :timeCursor AND m.id < :cursorId) OR COUNT(mt.id) < :countCursor "
-        + "ORDER BY COUNT(m.id) DESC, m.created_at DESC, m.id DESC "
-        + "LIMIT :pageSize", nativeQuery = true)
-    List<Mogakko> findAllByTitleAndContent(String searchVal, List<Long> tagIds, int pageSize, LocalDateTime searchTime, Long countCursor, LocalDateTime timeCursor, Long cursorId); // 제목 + 내용
+        + "GROUP BY m.id "
+        + "ORDER BY COUNT(mt.id) DESC, m.created_at DESC, m.id DESC "
+        + "LIMIT :pageSize OFFSET :offset", nativeQuery = true)
+    List<Mogakko> findAllByTitleAndContent(String searchVal, List<Long> tagIds, int pageSize, LocalDateTime searchTime, Long offset); // 제목 + 내용
 
     @Query(value = "SELECT m.* FROM mogakko m "
         + "JOIN users u ON m.deleted_at IS NULL AND m.deadline > :searchTime "
