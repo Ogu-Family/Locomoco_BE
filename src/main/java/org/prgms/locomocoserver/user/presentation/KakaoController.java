@@ -105,7 +105,7 @@ public class KakaoController {
         return objectMapper.readValue(response.getBody(), TokenResponseDto.class);
     }
 
-    private KakaoUserInfoResponseDto loadUserInfo(String accessToken) throws JsonProcessingException {
+    public KakaoUserInfoResponseDto loadUserInfo(String accessToken) throws JsonProcessingException {
         // Kakao API 엔드포인트 URL
         String apiUrl = "https://kapi.kakao.com/v2/user/me";
 

@@ -5,13 +5,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.application.SearchType;
-import org.prgms.locomocoserver.mogakkos.dto.CursorDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
@@ -37,9 +36,7 @@ public class MogakkoController {
             @ApiResponse(responseCode = "200", description = "모각코 목록 반환 성공")
     )
     public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
-            @Parameter(description = "id 커서") @RequestParam(required = false, defaultValue = "9223372036854775807") Long idCursor,
-            @Parameter(description = "생성 시간 커서") @RequestParam(required = false, defaultValue = "9999-12-31T23:59:59") LocalDateTime timeCursor,
-            @Parameter(description = "필터 태그 카운트 커서") @RequestParam(required = false, defaultValue = "9223372036854775807") Long countCursor,
+            @Parameter(description = "검색 오프셋") @RequestParam(required = false, defaultValue = "0") Long offset,
             @Parameter(description = "검색 값") @RequestParam(name = "search", required = false, defaultValue = "") String searchVal,
             @Parameter(description = "검색 타입") @RequestParam SearchType searchType,
             @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "100") Integer pageSize,
@@ -47,7 +44,7 @@ public class MogakkoController {
         searchVal = searchVal.strip();
         tags = tags == null ? new ArrayList<>() : tags;
 
-        List<MogakkoSimpleInfoResponseDto> responseDtos = mogakkoService.findAllByFilter(tags, searchVal, searchType, pageSize, new CursorDto(idCursor, countCursor, timeCursor));
+        List<MogakkoSimpleInfoResponseDto> responseDtos = mogakkoService.findAllByFilter(tags, searchVal, searchType, pageSize, offset);
 
         Results<MogakkoSimpleInfoResponseDto> results = new Results<>(responseDtos);
 

@@ -81,7 +81,7 @@ public class GithubController {
         return response.getBody();
     }
 
-    private GithubUserInfoResponseDto loadUserInfo(String accessToken) throws JsonProcessingException {
+    public GithubUserInfoResponseDto loadUserInfo(String accessToken) throws JsonProcessingException {
         String apiUrl = "https://api.github.com/user/emails";
 
         HttpHeaders headers = new HttpHeaders();
