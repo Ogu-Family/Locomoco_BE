@@ -49,22 +49,20 @@ public class AuthenticationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
+        UserContext.clear();
 
-        try {
-            // Preflight 처리
-            if (isPreflightRequest(httpRequest)) {
-                handleCorsPreflight(httpRequest, httpResponse);
-                return;
-            }
-
-            if (isAuthRequired(httpRequest)) {
-                handleAuthentication(httpRequest, httpResponse);
-            }
-
-            chain.doFilter(request, response);
-        } finally {
-            UserContext.clear();
+        // Preflight 처리
+        if (isPreflightRequest(httpRequest)) {
+            handleCorsPreflight(httpRequest, httpResponse);
+            return;
         }
+
+        if (isAuthRequired(httpRequest)) {
+            handleAuthentication(httpRequest, httpResponse);
+        }
+
+        chain.doFilter(request, response);
+
     }
 
     private boolean isPreflightRequest(HttpServletRequest request) {
@@ -105,6 +103,7 @@ public class AuthenticationFilter implements Filter {
         if (isValidToken) {
             User user = tokenService.getUserFromToken(accessToken.substring(7), providerValue);
             UserContext.setUser(user);
+            log.info("User Context: {}", user.getEmail());
         } else if (Provider.KAKAO.name().equals(providerValue)) {
             processTokenRefresh(response, accessToken);
         } else {
