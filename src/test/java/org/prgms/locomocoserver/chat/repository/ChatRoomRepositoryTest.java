@@ -1,9 +1,7 @@
 package org.prgms.locomocoserver.chat.repository;
 
 import org.hibernate.LazyInitializationException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
@@ -11,7 +9,6 @@ import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.querydsl.ChatRoomCustomRepository;
 import org.prgms.locomocoserver.global.TestFactory;
-import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.image.domain.ImageRepository;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
@@ -19,13 +16,13 @@ import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ChatRoomRepositoryTest {
 
     @Autowired
@@ -58,6 +55,15 @@ public class ChatRoomRepositoryTest {
 
         ChatParticipant participant = TestFactory.createChatParticipant(user, chatRoom);
         chatRoom1.addChatParticipant(chatParticipantRepository.save(participant));
+    }
+
+    @AfterAll
+    void tearDown() {
+        chatParticipantRepository.deleteAll();
+        chatRoomRepository.deleteAll();
+        mogakkoRepository.deleteAll();
+        userRepository.deleteAll();
+        imageRepository.deleteAll();
     }
 
     @Test
