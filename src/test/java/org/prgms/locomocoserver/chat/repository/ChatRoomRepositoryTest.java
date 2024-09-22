@@ -80,7 +80,7 @@ public class ChatRoomRepositoryTest {
         chatRoom1.addChatParticipant(chatParticipant);
 
         // when
-        List<ChatRoom> chatRooms = chatRoomRepository.findByParticipantsId(user1.getId(), Long.parseLong("100", 10), 10);
+        List<ChatRoom> chatRooms = chatRoomRepository.findByParticipantsId(user1.getId(), Long.MAX_VALUE, 10);
         // fetch join X, Transaction X, Lazy Loading
         assertThrows(LazyInitializationException.class, () -> {
             ChatRoomDto.of(chatRooms.get(0), null);
@@ -92,12 +92,12 @@ public class ChatRoomRepositoryTest {
     }
 
     @Test
-    @DisplayName("QueyrDSL 활용")
+    @DisplayName("QueryDSL 활용")
     void findByParticipantsWithQueryDSL() {
         // given
 
         // when
-        List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(user1.getId(), Long.parseLong("100", 10), 10);
+        List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(user1.getId(), Long.MAX_VALUE, 10);
         ChatRoomDto.of(chatRooms.get(0), null);
 
         // then
