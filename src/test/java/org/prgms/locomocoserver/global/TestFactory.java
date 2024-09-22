@@ -3,6 +3,7 @@ package org.prgms.locomocoserver.global;
 import org.prgms.locomocoserver.categories.domain.Category;
 import org.prgms.locomocoserver.categories.domain.CategoryInputType;
 import org.prgms.locomocoserver.categories.domain.CategoryType;
+import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Configuration
 public class TestFactory {
@@ -56,7 +58,7 @@ public class TestFactory {
                 .creator(creator)
                 .mogakko(mogakko)
                 .name("test chat room")
-                .chatParticipants(null)
+                .chatParticipants(new ArrayList<>())
                 .build();
     }
 
@@ -71,6 +73,13 @@ public class TestFactory {
                 .deadline(LocalDateTime.now().plusDays(1))
                 .maxParticipants(5)
                 .likeCount(0)
+                .build();
+    }
+
+    public static ChatParticipant createChatParticipant(User user, ChatRoom chatRoom) {
+        return ChatParticipant.builder()
+                .user(user)
+                .chatRoom(chatRoom)
                 .build();
     }
 }

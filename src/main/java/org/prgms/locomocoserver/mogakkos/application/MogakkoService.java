@@ -36,6 +36,7 @@ import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
+import org.prgms.locomocoserver.user.domain.querydsl.UserCustomRepository;
 import org.prgms.locomocoserver.user.dto.response.UserBriefInfoDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,7 @@ public class MogakkoService {
     private final MogakkoRepository mogakkoRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
+    private final UserCustomRepository userCustomRepository;
     private final UserService userService;
     private final MogakkoLocationRepository mogakkoLocationRepository;
     private final MogakkoTagRepository mogakkoTagRepository;
@@ -88,7 +90,7 @@ public class MogakkoService {
 
         User creator = userRepository.findByIdAndDeletedAtIsNull(foundMogakko.getCreator().getId())
             .orElseGet(() -> User.builder().nickname("(알 수 없음)").build());
-        List<User> participants = userRepository.findAllParticipantsByMogakko(foundMogakko);
+        List<User> participants = userCustomRepository.findAllParticipantsByMogakko(foundMogakko);
         List<MogakkoTag> mogakkoTags = mogakkoTagRepository.findAllByMogakko(foundMogakko);
         MogakkoLocation foundMogakkoLocation = mogakkoLocationRepository.findByMogakkoAndDeletedAtIsNull(foundMogakko)
             .orElseThrow(RuntimeException::new); // TODO: 장소 예외 반환

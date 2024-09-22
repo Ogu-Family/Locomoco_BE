@@ -12,6 +12,7 @@ import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
+import org.prgms.locomocoserver.chat.querydsl.ChatRoomCustomRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ public class ChatRoomService {
 
     private final MongoChatMessageService mongoChatMessageService;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomCustomRepository chatRoomCustomRepository;
     private final ChatParticipantRepository chatParticipantRepository;
 
     private final StompChatService stompChatService;
@@ -78,7 +80,7 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public List<ChatRoomDto> getAllChatRoom(Long userId, Long cursor, int pageSize) {
         if (cursor == null) cursor = Long.MAX_VALUE;
-        List<ChatRoom> chatRooms = chatRoomRepository.findByParticipantsId(userId, cursor, pageSize);
+        List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(userId, cursor, pageSize);
 
         List<ChatRoomDto> chatRoomDtos = chatRooms.stream()
                 .map(chatRoom -> {
