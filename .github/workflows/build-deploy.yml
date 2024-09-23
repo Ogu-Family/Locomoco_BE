@@ -75,4 +75,4 @@ jobs:
             docker stop $(docker ps -a -q) 
             docker rm $(docker ps -a -q) 
             docker pull ${{ secrets.DOCKER_USERNAME }}/locomoco
-            docker run -d -p 8090:8090 -v /home/ubuntu/logs:/logs --name locomoco-server ${{ secrets.DOCKER_USERNAME }}/locomoco
+            docker run -d -p 8090:8090 -v /home/ubuntu/logs:/logs -e TZ=Asia/Seoul --name locomoco-server ${{ secrets.DOCKER_USERNAME }}/locomoco
