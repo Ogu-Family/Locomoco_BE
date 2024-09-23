@@ -217,9 +217,8 @@ public class MogakkoService {
     }
 
     private void validateFilter(SearchParameterDto searchParameterDto) {
-        if (searchParameterDto.totalSearch().length() == INVALID_INPUT_SIZE
-            || searchParameterDto.titleAndContent().length() == INVALID_INPUT_SIZE) {
-            throw new MogakkoException(MogakkoErrorType.TOO_LITTLE_INPUT.appendMessage("2"));
+        if (searchParameterDto.isInvalidInput(INVALID_INPUT_SIZE)) {
+            throw new MogakkoException(MogakkoErrorType.TOO_LITTLE_INPUT.appendMessage(String.valueOf(INVALID_INPUT_SIZE)));
         }
     }
 }
