@@ -39,7 +39,7 @@ public class MogakkoFilterRepository {
             .where(mogakko.deletedAt.isNull(),
                     mogakko.deadline.after(searchConditionDto.searchTime()),
                     tagsIn(searchParameterDto.tagIds()),
-                    matchAgainst(searchParameterDto.totalSearch(), mogakko.title),
+                    matchAgainst(searchParameterDto.titleAndContent(), mogakko.title).or(matchAgainst(searchParameterDto.titleAndContent(), mogakko.content)),
                     nicknameEq(searchParameterDto.nickname()),
                     locationLike(searchParameterDto.location())
                 )
@@ -106,12 +106,12 @@ public class MogakkoFilterRepository {
         return be;
     }
 
-    private BooleanExpression matchAgainst(String keyword, StringPath... fields) {
+    private BooleanExpression matchAgainst(String keyword, StringPath field) {
         if (keyword == null || keyword.isBlank())
-            return null;
+            return Expressions.TRUE;
 
         NumberTemplate<Double> match = Expressions.numberTemplate(Double.class, "FUNCTION('MATCH_AGAINST', {0}, {1})",
-            Expressions.list(fields),
+            field,
             keyword);
         return match.gt(0);
     }

@@ -6,13 +6,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.global.common.dto.Results;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
-import org.prgms.locomocoserver.mogakkos.application.SearchType;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
+import org.prgms.locomocoserver.mogakkos.dto.request.SearchConditionDto;
+import org.prgms.locomocoserver.mogakkos.dto.request.SearchParameterDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
@@ -36,15 +37,18 @@ public class MogakkoController {
             @ApiResponse(responseCode = "200", description = "모각코 목록 반환 성공")
     )
     public ResponseEntity<Results<MogakkoSimpleInfoResponseDto>> findAll(
-            @Parameter(description = "검색 오프셋") @RequestParam(required = false, defaultValue = "0") Long offset,
-            @Parameter(description = "검색 값") @RequestParam(name = "search", required = false, defaultValue = "") String searchVal,
-            @Parameter(description = "검색 타입") @RequestParam SearchType searchType,
-            @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "100") Integer pageSize,
-            @Parameter(description = "필터링 태그 id 목록") @RequestParam(required = false) List<Long> tags) {
-        searchVal = searchVal.strip();
-        tags = tags == null ? new ArrayList<>() : tags;
+            @Parameter(description = "제목+내용 세부 필터링 값") @RequestParam(name = "titleAndContent", required = false, defaultValue = "") String titleAndContent,
+            @Parameter(description = "장소 세부 필터링 값") @RequestParam(name = "location", required = false, defaultValue = "") String location,
+            @Parameter(description = "닉네임 세부 필터링 값") @RequestParam(name = "nickname", required = false, defaultValue = "") String nickname,
+            @Parameter(description = "검색 오프셋") @RequestParam(name = "offset", required = false, defaultValue = "0") Long offset,
+            @Parameter(description = "페이지 크기") @RequestParam(name = "pageSize", defaultValue = "100") Integer pageSize,
+            @Parameter(description = "필터링 태그 id 목록") @RequestParam(name = "tags", required = false) List<Long> tags) {
+        SearchParameterDto searchParameterDto = new SearchParameterDto(titleAndContent,
+            location, nickname, tags);
+        SearchConditionDto searchConditionDto = new SearchConditionDto(LocalDateTime.now(), offset,
+            pageSize);
 
-        List<MogakkoSimpleInfoResponseDto> responseDtos = mogakkoService.findAllByFilter(tags, searchVal, searchType, pageSize, offset);
+        List<MogakkoSimpleInfoResponseDto> responseDtos = mogakkoService.findAll(searchParameterDto, searchConditionDto);
 
         Results<MogakkoSimpleInfoResponseDto> results = new Results<>(responseDtos);
 
