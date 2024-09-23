@@ -1,23 +1,24 @@
 package org.prgms.locomocoserver.mogakkos.application.searchpolicy;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
-import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
+import org.prgms.locomocoserver.mogakkos.domain.MogakkoFilterRepository;
+import org.prgms.locomocoserver.mogakkos.dto.request.SearchConditionDto;
+import org.prgms.locomocoserver.mogakkos.dto.request.SearchParameterDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TitleAndContentSearchPolicy implements SearchPolicy {
 
-    private final MogakkoRepository mogakkoRepository;
+    private final MogakkoFilterRepository mogakkoFilterRepository;
 
-    public TitleAndContentSearchPolicy(MogakkoRepository mogakkoRepository) {
-        this.mogakkoRepository = mogakkoRepository;
+    public TitleAndContentSearchPolicy(MogakkoFilterRepository mogakkoFilterRepository) {
+        this.mogakkoFilterRepository = mogakkoFilterRepository;
     }
 
     @Override
-    public List<Mogakko> search(String searchVal, List<Long> tagIds, int pageSize, LocalDateTime searchTime, Long offset) {
+    public List<Mogakko> search(SearchParameterDto searchParameterDto, SearchConditionDto searchConditionDto) {
 
-        return mogakkoRepository.findAllByTitleAndContent(searchVal, tagIds, pageSize, searchTime, offset);
+        return mogakkoFilterRepository.findAll(searchParameterDto, searchConditionDto);
     }
 }

@@ -1,6 +1,5 @@
 package org.prgms.locomocoserver.mogakkos.application;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +22,8 @@ import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTagRepository
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
+import org.prgms.locomocoserver.mogakkos.dto.request.SearchConditionDto;
+import org.prgms.locomocoserver.mogakkos.dto.request.SearchParameterDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoInfoDto;
@@ -45,6 +46,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class MogakkoService {
+    private static final int INVALID_INPUT_SIZE = 1;
+
     private final MogakkoFindDetailService mogakkoFindDetailService;
     private final MogakkoRepository mogakkoRepository;
     private final TagRepository tagRepository;
@@ -83,10 +86,8 @@ public class MogakkoService {
     public MogakkoDetailResponseDto findDetail(Long id) {
         Mogakko foundMogakko = getByIdNotDeleted(id);
 
-        log.info("views count before increaseViews() : {}", foundMogakko.getViews());
         mogakkoFindDetailService.increaseViews(foundMogakko);
         foundMogakko = getByIdNotDeleted(id);
-        log.info("views count after increaseViews() : {}", foundMogakko.getViews());
 
         User creator = userRepository.findByIdAndDeletedAtIsNull(foundMogakko.getCreator().getId())
             .orElseGet(() -> User.builder().nickname("(알 수 없음)").build());
@@ -100,12 +101,12 @@ public class MogakkoService {
     }
 
     @Transactional(readOnly = true)
-    public List<MogakkoSimpleInfoResponseDto> findAllByFilter(List<Long> tagIds, String searchVal, SearchType searchType, int pageSize, Long offset) {
+    public List<MogakkoSimpleInfoResponseDto> findAll(SearchParameterDto searchParameterDto, SearchConditionDto searchConditionDto, SearchType searchType) {
         SearchPolicy searchPolicy = getSearchPolicy(searchType);
 
-        validateFilter(searchVal);
+        validateFilter(searchParameterDto);
 
-        List<Mogakko> searchedMogakkos = search(searchVal, tagIds, pageSize, offset, searchPolicy);
+        List<Mogakko> searchedMogakkos = search(searchParameterDto, searchConditionDto, searchPolicy);
 
         List<MogakkoLocation> mogakkoLocations = mogakkoLocationRepository.findAllByMogakkos(searchedMogakkos);
         Map<Long, MogakkoLocation> mogakkoLocationMap = new HashMap<>();
@@ -168,7 +169,7 @@ public class MogakkoService {
 
     private SearchPolicy getSearchPolicy(SearchType searchType) {
         return switch (searchType) {
-            case TITLE_CONTENT -> titleAndContentSearchPolicy;
+            case TOTAL -> titleAndContentSearchPolicy;
             case LOCATION -> locationSearchPolicy;
         };
     }
@@ -227,15 +228,16 @@ public class MogakkoService {
                 locationInfoDto.longitude(), addressInfo);
     }
 
-    private void validateFilter(String searchVal) {
-        if (searchVal.length() == 1) {
+    private void validateFilter(SearchParameterDto searchParameterDto) {
+        if (searchParameterDto.totalSearch().length() == INVALID_INPUT_SIZE
+            || searchParameterDto.titleAndContent().length() == INVALID_INPUT_SIZE) {
             throw new MogakkoException(MogakkoErrorType.TOO_LITTLE_INPUT.appendMessage("2"));
         }
     }
 
-    private List<Mogakko> search(String searchVal, List<Long> tagIds, int pageSize,
-        Long offset, SearchPolicy searchPolicy) {
+    private List<Mogakko> search(SearchParameterDto searchParameterDto, SearchConditionDto searchConditionDto,
+        SearchPolicy searchPolicy) {
 
-        return searchPolicy.search(searchVal, tagIds, pageSize, LocalDateTime.now(), offset);
+        return searchPolicy.search(searchParameterDto, searchConditionDto);
     }
 }

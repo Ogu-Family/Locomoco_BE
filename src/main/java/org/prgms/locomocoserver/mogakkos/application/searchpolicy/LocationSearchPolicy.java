@@ -1,9 +1,10 @@
 package org.prgms.locomocoserver.mogakkos.application.searchpolicy;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
+import org.prgms.locomocoserver.mogakkos.dto.request.SearchConditionDto;
+import org.prgms.locomocoserver.mogakkos.dto.request.SearchParameterDto;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,9 +17,12 @@ public class LocationSearchPolicy implements SearchPolicy {
     }
 
     @Override
-    public List<Mogakko> search(String searchVal, List<Long> tagIds, int pageSize,
-        LocalDateTime searchTime, Long offset) {
+    public List<Mogakko> search(SearchParameterDto searchParameterDto, SearchConditionDto searchConditionDto) {
 
-        return mogakkoRepository.findAllByCity(tagIds, searchVal, pageSize, searchTime, offset);
+        return mogakkoRepository.findAllByCity(searchParameterDto.tagIds(),
+            searchParameterDto.totalSearch(),
+            searchConditionDto.pageSize(),
+            searchConditionDto.searchTime(),
+            searchConditionDto.offset());
     }
 }
