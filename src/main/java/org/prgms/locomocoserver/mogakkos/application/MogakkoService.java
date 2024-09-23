@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
-import org.prgms.locomocoserver.mogakkos.application.searchpolicy.LocationSearchPolicy;
-import org.prgms.locomocoserver.mogakkos.application.searchpolicy.TitleAndContentSearchPolicy;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
 import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
@@ -58,8 +56,7 @@ public class MogakkoService {
     private final MogakkoTagRepository mogakkoTagRepository;
     private final ChatRoomService chatRoomService;
     private final MogakkoParticipationService mogakkoParticipationService;
-    private final LocationSearchPolicy locationSearchPolicy;
-    private final TitleAndContentSearchPolicy titleAndContentSearchPolicy;
+    private final SearchPolicy searchPolicy;
 
     @Transactional
     public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) {
@@ -101,12 +98,10 @@ public class MogakkoService {
     }
 
     @Transactional(readOnly = true)
-    public List<MogakkoSimpleInfoResponseDto> findAll(SearchParameterDto searchParameterDto, SearchConditionDto searchConditionDto, SearchType searchType) {
-        SearchPolicy searchPolicy = getSearchPolicy(searchType);
-
+    public List<MogakkoSimpleInfoResponseDto> findAll(SearchParameterDto searchParameterDto, SearchConditionDto searchConditionDto) {
         validateFilter(searchParameterDto);
 
-        List<Mogakko> searchedMogakkos = search(searchParameterDto, searchConditionDto, searchPolicy);
+        List<Mogakko> searchedMogakkos = searchPolicy.search(searchParameterDto, searchConditionDto);
 
         List<MogakkoLocation> mogakkoLocations = mogakkoLocationRepository.findAllByMogakkos(searchedMogakkos);
         Map<Long, MogakkoLocation> mogakkoLocationMap = new HashMap<>();
@@ -165,13 +160,6 @@ public class MogakkoService {
             LocationInfoDto.create(foundMogakkoLocation), tagIds);
 
         return new MogakkoDetailResponseDto(creatorInfoDto, mogakkoParticipantDtos, mogakkoInfoDto);
-    }
-
-    private SearchPolicy getSearchPolicy(SearchType searchType) {
-        return switch (searchType) {
-            case TOTAL -> titleAndContentSearchPolicy;
-            case LOCATION -> locationSearchPolicy;
-        };
     }
 
     private void updateMogakkoTags(Mogakko updateMogakko, List<Long> updateTagIds) {
@@ -233,11 +221,5 @@ public class MogakkoService {
             || searchParameterDto.titleAndContent().length() == INVALID_INPUT_SIZE) {
             throw new MogakkoException(MogakkoErrorType.TOO_LITTLE_INPUT.appendMessage("2"));
         }
-    }
-
-    private List<Mogakko> search(SearchParameterDto searchParameterDto, SearchConditionDto searchConditionDto,
-        SearchPolicy searchPolicy) {
-
-        return searchPolicy.search(searchParameterDto, searchConditionDto);
     }
 }

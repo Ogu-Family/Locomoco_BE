@@ -8,11 +8,11 @@ import org.prgms.locomocoserver.mogakkos.dto.request.SearchParameterDto;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TitleAndContentSearchPolicy implements SearchPolicy {
+public class TotalSearchPolicy implements SearchPolicy {
 
     private final MogakkoFilterRepository mogakkoFilterRepository;
 
-    public TitleAndContentSearchPolicy(MogakkoFilterRepository mogakkoFilterRepository) {
+    public TotalSearchPolicy(MogakkoFilterRepository mogakkoFilterRepository) {
         this.mogakkoFilterRepository = mogakkoFilterRepository;
     }
 
