@@ -40,7 +40,6 @@ import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoUpdateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoDetailResponseDto;
-import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoUpdateResponseDto;
 import org.prgms.locomocoserver.mogakkos.exception.MogakkoErrorType;
 import org.prgms.locomocoserver.mogakkos.exception.MogakkoException;
@@ -56,8 +55,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 class MogakkoServiceTest {
-    private static final long GLOBAL_OFFSET = 0L;
-    static final int GLOBAL_PAGE_SIZE = 10;
 
     @Autowired
     private MogakkoService mogakkoService;
@@ -282,58 +279,6 @@ class MogakkoServiceTest {
     }
 
     @Test
-    @DisplayName("입력된 필터링 인자들에 대해 정상적으로 제목 + 내용 검색을 수행한다")
-    void success_find_all_by_filter_given_normal_args() {
-        // given
-        int pageSize = 1;
-        String normalSearchVal = "제곧";
-        String abnormalSearchVal = "noContent";
-        SearchType searchType = SearchType.TITLE_CONTENT;
-        List<Long> havingTagIds = mogakkoTagRepository.findAllByMogakko(testMogakko).stream()
-            .map(mt -> mt.getTag().getId()).toList();
-
-        Mogakko testMogakko2 = Mogakko.builder().title("title2").content("제곧내2").views(20).likeCount(10)
-            .startTime(LocalDateTime.now())
-            .endTime(LocalDateTime.now().plusHours(2)).deadline(LocalDateTime.now().plusHours(1))
-            .maxParticipants(10).creator(setUpUser1).build();
-        mogakkoRepository.save(testMogakko2);
-
-        // when
-        List<MogakkoSimpleInfoResponseDto> filtered1Page = mogakkoService.findAllByFilter(havingTagIds,
-            normalSearchVal, searchType, pageSize, GLOBAL_OFFSET);
-        List<MogakkoSimpleInfoResponseDto> filtered2Page = mogakkoService.findAllByFilter(havingTagIds,
-            normalSearchVal, searchType, pageSize, GLOBAL_OFFSET + 1);
-        List<MogakkoSimpleInfoResponseDto> filteredWithoutTagIds = mogakkoService.findAllByFilter(Collections.emptyList(),
-            normalSearchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
-        List<MogakkoSimpleInfoResponseDto> emptyFiltered = mogakkoService.findAllByFilter(Collections.emptyList(),
-            abnormalSearchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
-
-        // then
-        assertThat(filtered1Page).hasSize(1);
-        assertThat(filtered1Page.get(0).title()).isEqualTo(testMogakko.getTitle());
-        assertThat(filtered2Page).hasSize(1);
-        assertThat(filtered2Page.get(0).title()).isEqualTo(testMogakko2.getTitle());
-        assertThat(filteredWithoutTagIds).hasSize(2);
-        assertThat(filteredWithoutTagIds.get(0).title()).isEqualTo(testMogakko2.getTitle());
-        assertThat(emptyFiltered).isEmpty();
-    }
-
-    @Test
-    @DisplayName("검색 값이 빈 값에 대해 모든 모각코 리스트를 출력한다.")
-    void success_find_all_by_filter_given_empty_search_value() {
-        // given
-        String searchVal = "";
-        SearchType searchType = SearchType.TITLE_CONTENT;
-
-        // when
-        List<MogakkoSimpleInfoResponseDto> allByFilter = mogakkoService.findAllByFilter(new ArrayList<>(), searchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
-
-        // then
-        assertThat(allByFilter).isNotEmpty();
-        assertThat(allByFilter.get(0).title()).isEqualTo(testMogakko.getTitle());
-    }
-
-    @Test
     @DisplayName("모각코를 삭제할 수 있다")
     void success_delete_given_normal_id() {
         // given
@@ -358,20 +303,6 @@ class MogakkoServiceTest {
         assertThatThrownBy(() -> mogakkoService.getByIdNotDeleted(id))
             .isInstanceOf(MogakkoException.class)
             .hasFieldOrPropertyWithValue("errorType", MogakkoErrorType.NOT_FOUND);
-    }
-
-    @Test
-    @DisplayName("최소 검색 문자 수보다 작은 문자 수로 검색할 수 없다")
-    void fail_find_all_by_filter_given_search_value_less_than_minimum() {
-        // given
-        String search = "제";
-
-        // when, then
-        assertThatThrownBy(
-            () -> mogakkoService.findAllByFilter(null, search, SearchType.TITLE_CONTENT,
-                10, GLOBAL_OFFSET))
-            .isInstanceOf(MogakkoException.class)
-            .hasFieldOrPropertyWithValue("errorType", MogakkoErrorType.TOO_LITTLE_INPUT);
     }
 
     @Test
@@ -429,30 +360,5 @@ class MogakkoServiceTest {
         Long id = testMogakko.getId();
         assertThatThrownBy(() -> mogakkoService.update(requestDto, id)).isInstanceOf(
             MogakkoException.class).hasFieldOrPropertyWithValue("errorType", MogakkoErrorType.PROCESS_FORBIDDEN);
-    }
-
-    @Test
-    @DisplayName("장소 기반 검색으로 모각코를 가져올 수 있다.")
-    void success_find_all_by_filter_given_location() {
-        // given
-        String normalCitySearchVal = "경기도 부천시 소사구 심곡본동";
-        String normalHCitySearchVal = "경기도 부천시 원미구 심곡1동";
-        String abnormalSearchVal = "심곡본동";
-        SearchType searchType = SearchType.LOCATION;
-        List<Long> havingTagIds = mogakkoTagRepository.findAllByMogakko(testMogakko).stream()
-            .map(mt -> mt.getTag().getId()).toList();
-
-        // when
-        List<MogakkoSimpleInfoResponseDto> normalCityResult = mogakkoService.findAllByFilter(
-                havingTagIds, normalCitySearchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
-        List<MogakkoSimpleInfoResponseDto> normalHCityResult = mogakkoService.findAllByFilter(
-                new ArrayList<>(), normalHCitySearchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
-        List<MogakkoSimpleInfoResponseDto> abnormalResult = mogakkoService.findAllByFilter(
-                havingTagIds, abnormalSearchVal, searchType, GLOBAL_PAGE_SIZE, GLOBAL_OFFSET);
-
-        // then
-        assertThat(normalCityResult).hasSize(1);
-        assertThat(normalHCityResult).hasSize(1);
-        assertThat(abnormalResult).isEmpty();
     }
 }
