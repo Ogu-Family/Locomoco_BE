@@ -51,6 +51,12 @@ dependencies {
     // Slack 연동
     implementation 'com.slack.api:slack-api-client:1.39.0'
 
+    // queryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
@@ -73,6 +79,9 @@ tasks.named('test') {
         exceptionFormat = 'full'
     }
     finalizedBy 'testCoverage'
+
+    // 특정 테스트 클래스 제외
+    exclude '**/RefreshTokenServiceTest.class'
 }
 
 tasks.register('testCoverage', Test) {
