@@ -14,6 +14,7 @@ import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.chat.querydsl.ChatRoomCustomRepository;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
+import org.prgms.locomocoserver.user.exception.UserException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -73,6 +74,7 @@ public class MongoChatMessageService implements ChatMessagePolicy {
     public ChatMessageDto saveChatMessageWithImage(Long roomId, List<String> imageUrls, ChatMessageRequestDto request) {
         String collectionName = BASE_CHATROOM_NAME + roomId;
         User participant = userService.getById(request.senderId());
+
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
         ChatMessageMongo chatMessageMongo = mongoTemplate.save(request.toChatMessageMongo(false, imageUrls), collectionName);
@@ -97,7 +99,9 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         Map<Long, ChatUserInfo> userMap = participants.stream()
                 .collect(Collectors.toMap(
                         User::getId,
-                        ChatUserInfo::of
+                        user -> user.isDeleted()
+                                ? new ChatUserInfo(user.getId(), "(정보없음)", null)
+                                : ChatUserInfo.of(user)
                 ));
 
         List<ChatMessageDto> chatMessageDtos = chatMessages.stream()
@@ -120,9 +124,18 @@ public class MongoChatMessageService implements ChatMessagePolicy {
 
         Query query = new Query().with(Sort.by(Sort.Direction.DESC, "_id")).limit(1);
         ChatMessageMongo lastMessage = mongoTemplate.findOne(query, ChatMessageMongo.class, collectionName);
-        User user = userService.getById(Long.valueOf(lastMessage.getId()));
 
-        return (lastMessage == null) ? null : ChatMessageDto.of(roomId, lastMessage, ChatUserInfo.of(user));
+        if (lastMessage == null) return null;
+
+        ChatUserInfo chatUserInfo = null;
+        try {
+            User user = userService.getById(Long.parseLong(lastMessage.getSenderId()));
+            chatUserInfo = ChatUserInfo.of(user);
+        } catch (UserException e) {
+            chatUserInfo = new ChatUserInfo(Long.parseLong(lastMessage.getSenderId()), "(정보없음)", null);
+        }
+
+        return ChatMessageDto.of(roomId, lastMessage, chatUserInfo);
     }
 
     public String getChatRoomName(Long roomId) {
