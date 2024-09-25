@@ -2,7 +2,6 @@ package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongo;
@@ -75,7 +74,7 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         String collectionName = BASE_CHATROOM_NAME + roomId;
         User participant = userService.getById(request.senderId());
 
-        ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
+        chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
         ChatMessageMongo chatMessageMongo = mongoTemplate.save(request.toChatMessageMongo(false, imageUrls), collectionName);
 
@@ -100,12 +99,12 @@ public class MongoChatMessageService implements ChatMessagePolicy {
                 .collect(Collectors.toMap(
                         User::getId,
                         user -> user.isDeleted()
-                                ? new ChatUserInfo(user.getId(), "(정보없음)", null)
+                                ? ChatUserInfo.deletedUser(user.getId())
                                 : ChatUserInfo.of(user)
                 ));
 
         List<ChatMessageDto> chatMessageDtos = chatMessages.stream()
-                .map(chatMessageMongo -> ChatMessageDto.of(roomId, chatMessageMongo, userMap.get(chatMessageMongo.getSenderId())))
+                .map(chatMessageMongo -> ChatMessageDto.of(roomId, chatMessageMongo, userMap.get(Long.parseLong(chatMessageMongo.getSenderId()))))
                 .collect(Collectors.toList());
         Collections.reverse(chatMessageDtos);
 
@@ -132,7 +131,7 @@ public class MongoChatMessageService implements ChatMessagePolicy {
             User user = userService.getById(Long.parseLong(lastMessage.getSenderId()));
             chatUserInfo = ChatUserInfo.of(user);
         } catch (UserException e) {
-            chatUserInfo = new ChatUserInfo(Long.parseLong(lastMessage.getSenderId()), "(정보없음)", null);
+            chatUserInfo = ChatUserInfo.deletedUser(Long.parseLong(lastMessage.getSenderId()));
         }
 
         return ChatMessageDto.of(roomId, lastMessage, chatUserInfo);
