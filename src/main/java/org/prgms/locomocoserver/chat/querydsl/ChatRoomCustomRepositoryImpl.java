@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.QChatParticipant;
 import org.prgms.locomocoserver.chat.domain.QChatRoom;
+import org.prgms.locomocoserver.user.domain.QUser;
+import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,5 +34,18 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                 .limit(pageSize)
                 .fetch();
 
+    }
+
+    @Override
+    public List<User> findParticipantsByRoomId(Long roomId) {
+        QUser user = QUser.user;
+        QChatParticipant chatParticipant = QChatParticipant.chatParticipant;
+
+        return queryFactory
+                .selectFrom(user)
+                .join(chatParticipant).on(chatParticipant.user.id.eq(user.id))
+                .fetchJoin()
+                .where(chatParticipant.chatRoom.id.eq(roomId))
+                .fetch();
     }
 }
