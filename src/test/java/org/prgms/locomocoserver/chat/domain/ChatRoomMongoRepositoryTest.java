@@ -47,8 +47,6 @@ class ChatRoomMongoRepositoryTest {
         // given
         ChatMessageMongo chatMessage = ChatMessageMongo.builder()
                 .message("chat message")
-                .senderNickname("senderNickname")
-                .senderImage("senderImage")
                 .senderId("senderId")
                 .createdAt(LocalDateTime.now()).build();
 
