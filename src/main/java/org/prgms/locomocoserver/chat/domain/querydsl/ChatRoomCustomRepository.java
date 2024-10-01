@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.chat.querydsl;
+package org.prgms.locomocoserver.chat.domain.querydsl;
 
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.user.domain.User;

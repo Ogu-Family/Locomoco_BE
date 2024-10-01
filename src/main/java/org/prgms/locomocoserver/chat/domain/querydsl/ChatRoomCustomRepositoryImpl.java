@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.chat.querydsl;
+package org.prgms.locomocoserver.chat.domain.querydsl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

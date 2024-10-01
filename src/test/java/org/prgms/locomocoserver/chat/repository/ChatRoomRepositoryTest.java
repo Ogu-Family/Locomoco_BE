@@ -7,7 +7,7 @@ import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
-import org.prgms.locomocoserver.chat.querydsl.ChatRoomCustomRepository;
+import org.prgms.locomocoserver.chat.domain.querydsl.ChatRoomCustomRepository;
 import org.prgms.locomocoserver.global.TestFactory;
 import org.prgms.locomocoserver.image.domain.ImageRepository;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
