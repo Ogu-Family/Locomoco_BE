@@ -2,6 +2,8 @@ package org.prgms.locomocoserver.chat.application;
 
 import org.junit.jupiter.api.*;
 import org.prgms.locomocoserver.categories.domain.CategoryRepository;
+import org.prgms.locomocoserver.chat.domain.ChatParticipant;
+import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongo;
@@ -12,7 +14,6 @@ import org.prgms.locomocoserver.image.application.ImageService;
 import org.prgms.locomocoserver.image.domain.ImageRepository;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
-import org.prgms.locomocoserver.tags.domain.TagRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,7 @@ class MongoChatServiceTest {
     @Autowired
     MogakkoRepository mogakkoRepository;
     @Autowired
-    TestFactory testFactory;
+    ChatParticipantRepository chatParticipantRepository;
 
     private User creator;
     private ChatRoom chatRoom;
@@ -63,18 +64,22 @@ class MongoChatServiceTest {
     @BeforeAll
     void setUp() {
         mongoTemplate.getDb().drop();
+        chatParticipantRepository.deleteAll();
         chatRoomRepository.deleteAll();
         mogakkoRepository.deleteAll();
         userRepository.deleteAll();
         imageRepository.deleteAll();
         categoryRepository.deleteAll();
 
-        User sender = testFactory.createUser();
+        User sender = TestFactory.createUser();
         imageRepository.save(sender.getProfileImage());
         creator = userRepository.save(sender);
 
-        Mogakko mogakko = mogakkoRepository.save(testFactory.createMogakko(creator));
-        chatRoom = chatRoomRepository.save(testFactory.createChatRoom(creator, mogakko));
+        Mogakko mogakko = mogakkoRepository.save(TestFactory.createMogakko(creator));
+        chatRoom = chatRoomRepository.save(TestFactory.createChatRoom(creator, mogakko));
+
+        mongoChatMessageService.saveEnterMessage(sender.getId(), sender);
+        chatParticipantRepository.save(TestFactory.createChatParticipant(sender, chatRoom));
     }
 
     @Test
@@ -87,7 +92,7 @@ class MongoChatServiceTest {
 
         // when
         mongoChatMessageService.saveEnterMessage(roomId, creator);
-        boolean collectionExists = mongoTemplate.collectionExists("chat_messages_"+roomId);
+        boolean collectionExists = mongoTemplate.collectionExists("chat_messages_" + roomId);
 
         // then
         assertThat(collectionExists).isTrue();

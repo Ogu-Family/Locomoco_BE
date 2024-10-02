@@ -16,18 +16,14 @@ public class ChatMessageMongo {
     @Id
     private String id;
     private String senderId;
-    private String senderNickname;
-    private String senderImage;
     private String message;
     private List<String> imageUrls;
     private boolean isNotice;
     private LocalDateTime createdAt;
 
     @Builder
-    public ChatMessageMongo(String senderId, String senderNickname, String senderImage, String message, List<String> imageUrls, boolean isNotice, LocalDateTime createdAt) {
+    public ChatMessageMongo(String senderId, String message, List<String> imageUrls, boolean isNotice, LocalDateTime createdAt) {
         this.senderId = senderId;
-        this.senderNickname = senderNickname;
-        this.senderImage = senderImage;
         this.message = message;
         this.imageUrls = imageUrls;
         this.isNotice = isNotice;
