@@ -46,7 +46,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
         return queryFactory
                 .selectFrom(user)
                 .join(chatParticipant).on(chatParticipant.user.id.eq(user.id))
-                .join(user.profileImage, image)
+                .leftJoin(user.profileImage, image)
                 .fetchJoin()
                 .where(chatParticipant.chatRoom.id.eq(roomId))
                 .fetch();
