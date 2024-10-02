@@ -29,12 +29,9 @@ public record ChatMessageRequestDto(
                 .isNotice(isNotice).build();
     }
 
-    public ChatMessageMongo toChatMessageMongo(User sender, boolean isNotice, List<String> imageUrls) {
-        String profileImage = sender.getProfileImage() == null ? null : sender.getProfileImage().getPath();
+    public ChatMessageMongo toChatMessageMongo(boolean isNotice, List<String> imageUrls) {
         return ChatMessageMongo.builder()
                 .senderId(senderId.toString())
-                .senderNickname(sender.getNickname())
-                .senderImage(profileImage)
                 .message(message)
                 .imageUrls(imageUrls)
                 .isNotice(isNotice)

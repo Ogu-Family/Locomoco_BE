@@ -26,16 +26,14 @@ public record ChatMessageDto(
                 sender.getNickname(), profileImagePath, chatMessage.getContent(), null, chatMessage.isNotice(), chatMessage.getCreatedAt());
     }
 
-    public static ChatMessageDto of(Long chatRoomId, ChatMessageMongo chatMessageMongo) {
-        String profileImagePath = chatMessageMongo.getSenderImage() == null ? null : chatMessageMongo.getSenderImage();
+    public static ChatMessageDto of(Long chatRoomId, ChatMessageMongo chatMessageMongo, ChatUserInfo userInfo) {
         return new ChatMessageDto(chatMessageMongo.getId(), chatRoomId.toString(), chatMessageMongo.getSenderId(),
-                chatMessageMongo.getSenderNickname(), profileImagePath, chatMessageMongo.getMessage(), null, chatMessageMongo.isNotice(), chatMessageMongo.getCreatedAt());
+                userInfo.nickname(), userInfo.senderImage(), chatMessageMongo.getMessage(), null, chatMessageMongo.isNotice(), chatMessageMongo.getCreatedAt());
     }
 
-    public static ChatMessageDto of(Long chatRoomId, List<String> imageUrls, ChatMessageMongo chatMessageMongo) {
-        String profileImagePath = chatMessageMongo.getSenderImage() == null? null : chatMessageMongo.getSenderImage();
+    public static ChatMessageDto of(Long chatRoomId, List<String> imageUrls, ChatMessageMongo chatMessageMongo, ChatUserInfo userInfo) {
         return new ChatMessageDto(chatMessageMongo.getId(), chatRoomId.toString(), chatMessageMongo.getSenderId(),
-                chatMessageMongo.getSenderNickname(), profileImagePath, chatMessageMongo.getMessage(), imageUrls, chatMessageMongo.isNotice(), chatMessageMongo.getCreatedAt());
+                userInfo.nickname(), userInfo.senderImage(), chatMessageMongo.getMessage(), imageUrls, chatMessageMongo.isNotice(), chatMessageMongo.getCreatedAt());
     }
 }
 
