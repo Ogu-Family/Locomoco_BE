@@ -66,9 +66,9 @@ public class MogakkoFilterRepository {
         return queryFactory.selectFrom(mogakko)
             .innerJoin(user).on(mogakko.creator.eq(user))
             .innerJoin(mogakkoLocation).on(mogakkoLocation.mogakko.eq(mogakko))
-            .innerJoin(mogakkoTag).on(mogakkoTag.mogakko.eq(mogakko))
-            .innerJoin(tag).on(mogakkoTag.tag.eq(tag))
-            .innerJoin(category).on(tag.category.eq(category));
+            .leftJoin(mogakkoTag).on(mogakkoTag.mogakko.eq(mogakko))
+            .leftJoin(tag).on(mogakkoTag.tag.eq(tag))
+            .leftJoin(category).on(tag.category.eq(category));
     }
 
     private BooleanExpression tagsIn(List<Long> tagIds) {
