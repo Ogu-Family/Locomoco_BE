@@ -155,9 +155,9 @@ class MogakkoServiceFindAllTest {
             s -> mogakkoService.findAll(new SearchParameterDto(null, s, null, null),
                 new SearchConditionDto(SEARCH_TIME, OFFSET, PAGE_SIZE))).toList();
 
+        // then
         List<Integer> expectedSize = List.of(1, 1, 2, 0);
 
-        // then
         for (int idx = 0; idx < dtos.size(); idx++) {
             assertThat(dtos.get(idx)).hasSize(expectedSize.get(idx));
         }
@@ -179,9 +179,9 @@ class MogakkoServiceFindAllTest {
             s -> mogakkoService.findAll(new SearchParameterDto(null, null, s, null),
                 new SearchConditionDto(SEARCH_TIME, OFFSET, PAGE_SIZE))).toList();
 
+        // then
         List<Integer> expectedSize = List.of(2, 0);
 
-        // then
         for (int idx = 0; idx < dtos.size(); idx++) {
             assertThat(dtos.get(idx)).hasSize(expectedSize.get(idx));
         }
@@ -213,11 +213,62 @@ class MogakkoServiceFindAllTest {
             s -> mogakkoService.findAll(new SearchParameterDto(null, null, null, s),
                 new SearchConditionDto(SEARCH_TIME, OFFSET, PAGE_SIZE))).toList();
 
+        // then
         List<Integer> expectedSize = List.of(1, 2, 1, 1, 2);
 
-        // then
         for (int idx = 0; idx < dtos.size(); idx++) {
             assertThat(dtos.get(idx)).hasSize(expectedSize.get(idx));
+        }
+    }
+
+    @Test
+    @DisplayName("복합 조건에 대한 검색을 제대로 수행할 수 있다")
+    void success_find_mogakko_filtered_by_mixed_parameter() throws Exception {
+        // given
+        Mogakko mogakko1 = createMogakko(creator);
+        Mogakko mogakko2 = createMogakko(creator);
+        Mogakko mogakko3 = createMogakko(creator);
+        Mogakko mogakko4 = createMogakko(creator);
+
+        changeMogakkoInfo(mogakko1, "한 음 절 로 이 루 어 진 모 각 코", "");
+        changeMogakkoInfo(mogakko2, "모각코 각코", null);
+        changeMogakkoInfo(mogakko4, "모각코 모여", "안녕");
+
+        mogakkoRepository.saveAll(List.of(mogakko1, mogakko2, mogakko3, mogakko4));
+
+        testLocations.get(1).updateMogakko(mogakko2);
+        testLocations.get(0).updateMogakko(mogakko4);
+        mogakkoLocationRepository.saveAll(testLocations);
+
+        List<MogakkoTag> mogakkoTags = List.of(
+            MogakkoTag.builder().mogakko(mogakko1).tag(testTags.get(0)).build(),
+            MogakkoTag.builder().mogakko(mogakko1).tag(testTags.get(2)).build(),
+            MogakkoTag.builder().mogakko(mogakko2).tag(testTags.get(0)).build(),
+            MogakkoTag.builder().mogakko(mogakko3).tag(testTags.get(0)).build()
+        );
+        mogakkoTagRepository.saveAll(mogakkoTags);
+
+        List<SearchParameterDto> searchParameterDtos = List.of(
+            new SearchParameterDto("모각코", testLocations.get(1).getAddressInfo().getCity(), null,
+                null),
+            new SearchParameterDto("", testLocations.get(0).getAddressInfo().getHCity(),
+                creator.getNickname(), null),
+            new SearchParameterDto(null, "", creator.getNickname(),
+                List.of(testTags.get(0).getId(), testTags.get(1).getId())),
+            new SearchParameterDto("모각코", testLocations.get(0).getAddressInfo().getAddress(), "",
+                List.of(testTags.get(0).getId())),
+            new SearchParameterDto("안녕", "", "", List.of()),
+            new SearchParameterDto("안녕", "", "", List.of(testTags.get(0).getId())));
+
+        // when
+        List<List<MogakkoSimpleInfoResponseDto>> resDtos = searchParameterDtos.stream().map(
+            spd -> mogakkoService.findAll(spd,
+                new SearchConditionDto(SEARCH_TIME, OFFSET, PAGE_SIZE))).toList();
+
+        // then
+        List<Integer> expectedSize = List.of(1, 2, 3, 0, 1, 0);
+        for (int idx = 0; idx < resDtos.size(); idx++) {
+            assertThat(resDtos.get(idx)).hasSize(expectedSize.get(idx));
         }
     }
 
