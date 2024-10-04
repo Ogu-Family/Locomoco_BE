@@ -8,11 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
+import org.prgms.locomocoserver.mogakkos.domain.MogakkoFilterRepository;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
 import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
-import org.prgms.locomocoserver.mogakkos.application.searchpolicy.SearchPolicy;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.mogakkotags.MogakkoTag;
@@ -56,7 +56,7 @@ public class MogakkoService {
     private final MogakkoTagRepository mogakkoTagRepository;
     private final ChatRoomService chatRoomService;
     private final MogakkoParticipationService mogakkoParticipationService;
-    private final SearchPolicy searchPolicy;
+    private final MogakkoFilterRepository mogakkoFilterRepository;
 
     @Transactional
     public MogakkoCreateResponseDto save(MogakkoCreateRequestDto requestDto) {
@@ -101,7 +101,7 @@ public class MogakkoService {
     public List<MogakkoSimpleInfoResponseDto> findAll(SearchParameterDto searchParameterDto, SearchConditionDto searchConditionDto) {
         validateFilter(searchParameterDto);
 
-        List<Mogakko> searchedMogakkos = searchPolicy.search(searchParameterDto, searchConditionDto);
+        List<Mogakko> searchedMogakkos = mogakkoFilterRepository.findAll(searchParameterDto, searchConditionDto);
 
         List<MogakkoLocation> mogakkoLocations = mogakkoLocationRepository.findAllByMogakkos(searchedMogakkos);
         Map<Long, MogakkoLocation> mogakkoLocationMap = new HashMap<>();
