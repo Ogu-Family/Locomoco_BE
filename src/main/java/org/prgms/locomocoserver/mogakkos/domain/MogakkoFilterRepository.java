@@ -65,7 +65,7 @@ public class MogakkoFilterRepository {
     private JPAQuery<Mogakko> joinAll() {
         return queryFactory.selectFrom(mogakko)
             .innerJoin(user).on(mogakko.creator.eq(user))
-            .innerJoin(mogakkoLocation).on(mogakkoLocation.mogakko.eq(mogakko))
+            .leftJoin(mogakkoLocation).on(mogakkoLocation.mogakko.eq(mogakko))
             .leftJoin(mogakkoTag).on(mogakkoTag.mogakko.eq(mogakko))
             .leftJoin(tag).on(mogakkoTag.tag.eq(tag))
             .leftJoin(category).on(tag.category.eq(category));
