@@ -72,6 +72,7 @@ public class MongoChatMessageService implements ChatMessagePolicy {
     }
 
     @Override
+    @Transactional
     public ChatMessageDto saveChatMessageWithImage(Long roomId, List<String> imageUrls, ChatMessageRequestDto request) {
         String collectionName = BASE_CHATROOM_NAME + roomId;
         User participant = userService.getById(request.senderId());
