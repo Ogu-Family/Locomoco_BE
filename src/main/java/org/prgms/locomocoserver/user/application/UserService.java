@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.prgms.locomocoserver.chat.domain.ChatParticipant;
+import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.image.application.ImageService;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.image.exception.ImageErrorType;
@@ -46,6 +48,7 @@ public class UserService {
     private final MogakkoLocationRepository mogakkoLocationRepository;
     private final MogakkoLikeRepository mogakkoLikeRepository;
     private final ParticipantRepository participantRepository;
+    private final ChatParticipantRepository chatParticipantRepository;
     private final TagRepository tagRepository;
     private final DeviceKeyService deviceKeyService;
     private final ImageService imageService;
@@ -97,6 +100,9 @@ public class UserService {
     public UserInfoDto deleteUser(Long userId) {
         User user = getById(userId);
         user.delete();
+
+        participantRepository.deleteAllByUserId(userId);
+        chatParticipantRepository.deleteAllByUserId(userId);
 
         return UserInfoDto.of(user);
     }
