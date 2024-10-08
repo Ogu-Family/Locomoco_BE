@@ -60,9 +60,12 @@ public class MongoChatMessageService implements ChatMessagePolicy {
     public ChatMessageDto saveChatMessage(Long roomId, ChatMessageRequestDto message) {
         String collectionName = BASE_CHATROOM_NAME + roomId;
         User participant = userService.getById(message.senderId());
-        chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
+
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
+
         ChatMessageMongo chatMessageMongo = mongoTemplate.save(message.toChatMessageMongo(false, null), collectionName);
+        chatRoom.updateUpdatedAt();
 
         return ChatMessageDto.of(roomId, chatMessageMongo, ChatUserInfo.of(participant));
     }
@@ -72,9 +75,11 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         String collectionName = BASE_CHATROOM_NAME + roomId;
         User participant = userService.getById(request.senderId());
 
-        chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
+
         ChatMessageMongo chatMessageMongo = mongoTemplate.save(request.toChatMessageMongo(false, imageUrls), collectionName);
+        chatRoom.updateUpdatedAt();
 
         return ChatMessageDto.of(roomId, imageUrls, chatMessageMongo, ChatUserInfo.of(participant));
     }
