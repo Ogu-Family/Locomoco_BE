@@ -31,7 +31,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                         chatParticipant.user.id.eq(userId)
                                 .and(chatRoom.id.lt(cursorId))
                 )
-                .orderBy(chatRoom.id.desc())
+                .orderBy(chatRoom.updatedAt.desc())
                 .limit(pageSize)
                 .fetch();
 
