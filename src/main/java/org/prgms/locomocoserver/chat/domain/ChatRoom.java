@@ -35,7 +35,7 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "creator_id", referencedColumnName = "id", nullable = false)
     private User creator;
 
-    @OneToMany(mappedBy = "chatRoom")
+    @OneToMany(mappedBy = "chatRoom", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     @Builder.Default
     private List<ChatParticipant> chatParticipants = new ArrayList<>();
 
