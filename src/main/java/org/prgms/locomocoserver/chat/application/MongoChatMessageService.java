@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Primary
@@ -120,19 +121,29 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         return participants.stream()
                 .collect(Collectors.toMap(
                         User::getId,
-                        user -> user.isDeleted()
-                                ? ChatUserInfo.deletedUser(user.getId())
-                                : ChatUserInfo.of(user)
+                        user -> ChatUserInfo.of(user)
                 ));
     }
 
     private List<ChatMessageDto> createChatMessageDtos(Long roomId, List<ChatMessageMongo> chatMessages, Map<Long, ChatUserInfo> userMap) {
         List<ChatMessageDto> chatMessageDtos = chatMessages.stream()
-                .map(chatMessageMongo -> ChatMessageDto.of(roomId, chatMessageMongo, userMap.get(Long.parseLong(chatMessageMongo.getSenderId()))))
+                .map(chatMessageMongo -> {
+                    Long senderId = Long.parseLong(chatMessageMongo.getSenderId());
+                    ChatUserInfo userInfo = userMap.get(senderId);
+
+                    // userInfo가 null일 경우 삭제된 사용자 정보 반환
+                    if (userInfo == null) {
+                        userInfo = ChatUserInfo.deletedUser(senderId);
+                    }
+
+                    return ChatMessageDto.of(roomId, chatMessageMongo, userInfo);
+                })
                 .collect(Collectors.toList());
         Collections.reverse(chatMessageDtos);
         return chatMessageDtos;
     }
+
+
 
     private ChatUserInfo getChatUserInfo(String senderId) {
         try {
