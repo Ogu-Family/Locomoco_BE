@@ -30,7 +30,7 @@ public class MogakkoLocation extends Location {
     protected Mogakko mogakko;
 
     @Builder
-    public MogakkoLocation(Double latitude, Double longitude, AddressInfo addressInfo, Mogakko mogakko, Long id) {
+    protected MogakkoLocation(Double latitude, Double longitude, AddressInfo addressInfo, Mogakko mogakko, Long id) {
         super(latitude, longitude, addressInfo);
         this.id = id;
         this.mogakko = mogakko;
