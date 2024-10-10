@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
@@ -88,7 +90,7 @@ public class ChatRoomService {
                     ChatMessageDto lastMessageDto = chatMessagePolicy.getLastChatMessage(chatRoom.getId());
                     ChatParticipant chatParticipant = getChatParticipant(chatRoom, userId);
 
-                    int unReadMsgCnt = chatActivityService.unReadMessageCount(lastMessageDto.chatMessageId(), chatParticipant.getLastReadMessageId());
+                    int unReadMsgCnt = chatActivityService.unReadMessageCount(chatRoom.getId(), chatParticipant.getLastReadMessageId());
                     return ChatRoomDto.of(chatRoom, unReadMsgCnt, lastMessageDto);
                 })
                 .filter(Objects::nonNull) // null인 경우 제외
