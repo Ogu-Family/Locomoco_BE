@@ -9,11 +9,12 @@ public record ChatRoomDto(
         Long mogakkoId,
         String name,
         int participantCnt,
+        int unReadMsgCnt,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         ChatMessageDto lastMessage
 ) {
-    public static ChatRoomDto of(ChatRoom chatRoom, ChatMessageDto lastMessage) {
-        return new ChatRoomDto(chatRoom.getId(), chatRoom.getMogakko().getId(), chatRoom.getName(), chatRoom.getChatParticipants().size(), chatRoom.getCreatedAt(), chatRoom.getUpdatedAt(), lastMessage);
+    public static ChatRoomDto of(ChatRoom chatRoom, int unReadMsgCnt, ChatMessageDto lastMessage) {
+        return new ChatRoomDto(chatRoom.getId(), chatRoom.getMogakko().getId(), chatRoom.getName(), chatRoom.getChatParticipants().size(), unReadMsgCnt, chatRoom.getCreatedAt(), chatRoom.getUpdatedAt(), lastMessage);
     }
 }
