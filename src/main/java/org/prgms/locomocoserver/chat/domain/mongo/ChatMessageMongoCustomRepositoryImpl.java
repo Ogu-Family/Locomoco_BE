@@ -28,7 +28,7 @@ public class ChatMessageMongoCustomRepositoryImpl implements ChatMessageMongoCus
         Query query = new Query().with(Sort.by(Sort.Direction.DESC, "_id")).limit(1);
 
         ChatMessageMongo lastMessage = mongoTemplate.findOne(query, ChatMessageMongo.class, collectionName);
-        return Optional.ofNullable(lastMessage);
+        return Optional.of(lastMessage);
     }
 
     @Override
