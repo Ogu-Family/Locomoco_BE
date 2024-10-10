@@ -83,7 +83,7 @@ public class ChatRoomRepositoryTest {
         List<ChatRoom> chatRooms = chatRoomRepository.findByParticipantsId(user1.getId(), Long.MAX_VALUE, 10);
         // fetch join X, Transaction X, Lazy Loading
         assertThrows(LazyInitializationException.class, () -> {
-            ChatRoomDto.of(chatRooms.get(0), null);
+            ChatRoomDto.of(chatRooms.get(0), 0, null);
         });
 
         // then
@@ -98,7 +98,7 @@ public class ChatRoomRepositoryTest {
 
         // when
         List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(user1.getId(), Long.MAX_VALUE, 10);
-        ChatRoomDto.of(chatRooms.get(0), null);
+        ChatRoomDto.of(chatRooms.get(0), 0,null);
 
         // then
         System.out.println("Participants Num : " + chatRooms.size());

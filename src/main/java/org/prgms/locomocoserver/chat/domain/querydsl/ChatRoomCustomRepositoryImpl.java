@@ -25,8 +25,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
 
         return queryFactory
                 .selectFrom(chatRoom)
-                .join(chatRoom.chatParticipants, chatParticipant)
-                .fetchJoin()
+                .join(chatRoom.chatParticipants, chatParticipant).fetchJoin()
                 .where(
                         chatParticipant.user.id.eq(userId)
                                 .and(chatRoom.id.lt(cursorId))
@@ -34,7 +33,6 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                 .orderBy(chatRoom.updatedAt.desc())
                 .limit(pageSize)
                 .fetch();
-
     }
 
     @Override
