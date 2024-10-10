@@ -1,12 +1,6 @@
 package org.prgms.locomocoserver.chat.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,9 +25,17 @@ public class ChatParticipant {
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
+    @Column(name = "last_read_message_id")
+    private String lastReadMessageId;
+
     @Builder
     public ChatParticipant(User user, ChatRoom chatRoom) {
         this.user = user;
         this.chatRoom = chatRoom;
+        this.lastReadMessageId = null;
+    }
+
+    public void updateLastReadMessageId(String messageId) {
+        this.lastReadMessageId = messageId;
     }
 }
