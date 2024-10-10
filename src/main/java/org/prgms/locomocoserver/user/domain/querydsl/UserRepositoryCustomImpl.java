@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class UserCustomRepositoryImpl implements UserCustomRepository {
+public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -41,7 +41,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 .join(image).on(user.profileImage.id.eq(image.id))
                 .fetchJoin()
                 .where(user.id.eq(userId)
-                        .and(user.deletedAt.isNull())) // deletedAt이 null인 경우 추가
+                        .and(user.deletedAt.isNull()))
                 .fetchOne();
 
         return Optional.ofNullable(result);

@@ -23,6 +23,7 @@ import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.global.TestFactory;
 import org.prgms.locomocoserver.image.domain.ImageRepository;
+import org.prgms.locomocoserver.mogakkos.application.MogakkoLikeService;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoParticipationService;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;

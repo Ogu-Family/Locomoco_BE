@@ -6,7 +6,7 @@ import org.prgms.locomocoserver.user.domain.User;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserCustomRepository {
+public interface UserRepositoryCustom {
     List<User> findAllParticipantsByMogakko(Mogakko mogakko);
     Optional<User> findUserAndImageByUserIdAndDeletedAtIsNull(Long userId);
 }
