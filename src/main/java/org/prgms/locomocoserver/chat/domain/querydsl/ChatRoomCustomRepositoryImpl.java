@@ -25,7 +25,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
 
         return queryFactory
                 .selectFrom(chatRoom)
-                .join(chatRoom.chatParticipants, chatParticipant).fetchJoin()
+                .join(chatRoom.chatParticipants, chatParticipant)
                 .where(
                         chatParticipant.user.id.eq(userId)
                                 .and(chatRoom.id.lt(cursorId))
