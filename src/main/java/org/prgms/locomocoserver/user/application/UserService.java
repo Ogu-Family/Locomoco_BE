@@ -26,6 +26,7 @@ import org.prgms.locomocoserver.user.domain.DeviceKeyRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
+import org.prgms.locomocoserver.user.domain.querydsl.UserRepositoryCustom;
 import org.prgms.locomocoserver.user.dto.OAuthUserInfoDto;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
@@ -44,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserRepositoryCustom userRepositoryCustom;
     private final MogakkoRepository mogakkoRepository;
     private final MogakkoLocationRepository mogakkoLocationRepository;
     private final MogakkoLikeRepository mogakkoLikeRepository;
@@ -191,7 +193,7 @@ public class UserService {
     }
 
     public User getById(Long userId) {
-        return userRepository.findByIdAndDeletedAtIsNull(userId)
+        return userRepositoryCustom.findUserAndImageByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND));
     }
 }
