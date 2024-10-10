@@ -38,7 +38,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         User result = queryFactory
                 .selectFrom(user)
-                .join(image).on(user.profileImage.id.eq(image.id))
+                .leftJoin(user.profileImage, image)
                 .fetchJoin()
                 .where(user.id.eq(userId)
                         .and(user.deletedAt.isNull()))
