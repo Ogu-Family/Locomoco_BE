@@ -2,6 +2,7 @@ package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoCustomRepository;
 import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
 import org.prgms.locomocoserver.chat.dto.request.ChatActivityRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatActivityService {
 
     private final ChatParticipantCustomRepository chatParticipantRepository;
+    private final ChatMessageMongoCustomRepository chatMessageMongoCustomRepository;
 
     @Transactional
     public void updateLastReadMessage(Long chatRoomId, ChatActivityRequestDto requestDto) {
@@ -22,18 +24,11 @@ public class ChatActivityService {
         chatParticipant.updateLastReadMessageId(requestDto.lastReadMessageId());
     }
 
-    public int unReadMessageCount(String lastMsgId, String lastReadMsgId) {
-        if (lastReadMsgId == null || lastMsgId == null || lastMsgId.compareTo(lastReadMsgId) <= 0) {
+    @Transactional(readOnly = true)
+    public int unReadMessageCount(Long roomId, String lastReadMsgId) {
+        if (lastReadMsgId == null) {
             return 0;
         }
-
-        int lastMsgIdNumeric = convertIdToNumeric(lastMsgId);
-        int lastReadMsgIdNumeric = convertIdToNumeric(lastReadMsgId);
-
-        return Math.max(lastMsgIdNumeric - lastReadMsgIdNumeric, 0);
-    }
-
-    private int convertIdToNumeric(String messageId) {
-        return messageId.hashCode();
+        return chatMessageMongoCustomRepository.unReadMessageCount(roomId, lastReadMsgId);
     }
 }

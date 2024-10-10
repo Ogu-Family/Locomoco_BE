@@ -51,6 +51,17 @@ public class ChatMessageMongoCustomRepositoryImpl implements ChatMessageMongoCus
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public int unReadMessageCount(Long roomId, String lastReadMsgId) {
+        ObjectId lastReadMsgObjectId = new ObjectId(lastReadMsgId);
+
+        Query query = new Query()
+                .addCriteria(Criteria.where("_id").gt(lastReadMsgObjectId));
+
+        return (int) mongoTemplate.count(query, ChatMessageMongo.class, getChatRoomName(roomId));
+    }
+
+    @Override
     @Transactional
     public void deleteAllChatMessages(Long roomId) {
         String collectionName = getChatRoomName(roomId);

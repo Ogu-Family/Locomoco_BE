@@ -8,5 +8,7 @@ public interface ChatMessageMongoCustomRepository {
 
     List<ChatMessageMongo> findAllChatMessagesByRoomId(Long roomId, String cursorValue, int pageSize);
 
+    int unReadMessageCount(Long roomId, String lastReadMsgId);
+
     void deleteAllChatMessages(Long roomId);
 }
