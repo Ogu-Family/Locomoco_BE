@@ -21,4 +21,19 @@ public class ChatActivityService {
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHAT_PARTICIPANT_NOT_FOUND));
         chatParticipant.updateLastReadMessageId(requestDto.lastReadMessageId());
     }
+
+    public int unReadMessageCount(String lastMsgId, String lastReadMsgId) {
+        if (lastReadMsgId == null || lastMsgId == null || lastMsgId.compareTo(lastReadMsgId) <= 0) {
+            return 0;
+        }
+
+        int lastMsgIdNumeric = convertIdToNumeric(lastMsgId);
+        int lastReadMsgIdNumeric = convertIdToNumeric(lastReadMsgId);
+
+        return Math.max(lastMsgIdNumeric - lastReadMsgIdNumeric, 0);
+    }
+
+    private int convertIdToNumeric(String messageId) {
+        return messageId.hashCode();
+    }
 }
