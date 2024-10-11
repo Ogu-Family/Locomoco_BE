@@ -12,6 +12,7 @@ import org.prgms.locomocoserver.global.exception.ErrorCode;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
 import org.prgms.locomocoserver.user.application.RefreshTokenService;
 import org.prgms.locomocoserver.user.application.TokenService;
+import org.prgms.locomocoserver.user.domain.RefreshToken;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.enums.Provider;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
@@ -111,25 +112,10 @@ public class AuthenticationFilter implements Filter {
             User user = tokenService.getUserFromToken(accessToken.substring(7), providerValue);
             UserContext.setUser(user);
             log.info("User Context: {}", user.getEmail());
-        } else if (Provider.KAKAO.name().equals(providerValue)) {
-            processTokenRefresh(response, accessToken);
         } else {
             log.error("Authentication failed (AuthFilter): {}", ErrorCode.INVALID_TOKEN.getMessage());
             throw new AuthException(ErrorCode.INVALID_TOKEN);
         }
-    }
-
-    private void processTokenRefresh(HttpServletResponse response, String accessToken) throws IOException {
-        log.info("Refreshing access token");
-
-        TokenResponseDto tokenResponseDto = refreshTokenService.updateAccessToken(accessToken);
-        String jsonResponse = objectMapper.writeValueAsString(tokenResponseDto);
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json");
-        response.getWriter().write(jsonResponse);
-
-        log.info("New access token issued: {}", tokenResponseDto.accessToken());
     }
 
     private boolean isPatternMatch(String pattern, String method, String url) {

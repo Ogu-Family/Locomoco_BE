@@ -44,11 +44,6 @@ public class RefreshTokenService {
         return tokenResponseDto;
     }
 
-    public RefreshToken getByAccessToken(String accessToken) {
-        return refreshTokenRepository.findByAccessToken(accessToken)
-                .orElseThrow(() -> new AuthException(ErrorCode.NO_ACCESS_TOKEN));
-    }
-
     private RefreshToken getByRefreshToken(String refreshToken) {
         return refreshTokenRepository.findById(refreshToken)
                 .orElseThrow(() -> new AuthException(ErrorCode.ACCESSTOKEN_EXPIRED));
