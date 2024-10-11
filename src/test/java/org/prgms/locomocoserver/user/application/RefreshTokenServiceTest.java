@@ -55,7 +55,7 @@ class RefreshTokenServiceTest extends AbstractRedisContainerBaseTest {
         String accessToken = refreshTokenService.saveTokenInfo(tokenResponseDto);
 
         // when
-        refreshTokenService.removeAccessToken(accessToken);
+        refreshTokenService.removeRefreshToken(tokenResponseDto.refreshToken());
 
         // then
         assertEquals(0, refreshTokenRepository.count());
