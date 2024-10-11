@@ -5,13 +5,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.user.domain.User;
 
 @Entity
 @Getter
 @Table(name = "chat_participants")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatParticipant {
+public class ChatParticipant extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
