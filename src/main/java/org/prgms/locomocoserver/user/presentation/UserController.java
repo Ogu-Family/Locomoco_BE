@@ -57,8 +57,8 @@ public class UserController {
 
     @Operation(summary = "마이페이지 정보", description = "사용자 마이페이지 정보를 반환합니다.")
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserMyPageDto> getUserInfo(@PathVariable Long userId) {
-//        log.info("getUserInfo : {}", user.getEmail());
+    public ResponseEntity<UserMyPageDto> getUserInfo(@PathVariable Long userId, @GetUser User user) {
+        log.info("User Controller - 인증 성공 getUserInfo : {}", user.getEmail());
         UserMyPageDto myPageDto = userService.getUserInfo(userId);
 
         return ResponseEntity.ok(myPageDto);
