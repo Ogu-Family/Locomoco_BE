@@ -124,10 +124,8 @@ public class ChatRoomService {
 
     @Transactional
     public void delete(ChatRoom chatRoom) {
-        // 채팅방 참여자 목록 삭제
-        chatParticipantRepository.deleteAllByChatRoom(chatRoom);
-        // 채팅방 메시지 삭제
-        chatMessagePolicy.deleteChatMessages(chatRoom);
+        // 채팅방 참여자 목록 soft delete & 채팅방 메시지 보존
+        chatRoomCustomRepository.softDeleteParticipantsByRoomId(chatRoom.getId());
         // 채팅방 삭제
         chatRoom.delete();
     }
