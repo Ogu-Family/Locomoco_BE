@@ -6,8 +6,6 @@ import org.prgms.locomocoserver.global.exception.ErrorCode;
 import org.prgms.locomocoserver.user.domain.RefreshToken;
 import org.prgms.locomocoserver.user.domain.RefreshTokenRepository;
 import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
-import org.prgms.locomocoserver.user.exception.UserErrorType;
-import org.prgms.locomocoserver.user.exception.UserException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -19,10 +17,9 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
+    private final RefreshTokenRepository refreshTokenRepository;
     @Value("${oauth.kakao.REST_API_KEY}")
     private String kakao_api_key;
-
-    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public String saveTokenInfo(TokenResponseDto tokenResponseDto) {
@@ -31,26 +28,30 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public void removeAccessToken(String accessToken) {
-        RefreshToken refreshToken = getByAccessToken(accessToken);
-        refreshTokenRepository.delete(refreshToken);
+    public void removeRefreshToken(String refreshToken) {
+        refreshTokenRepository.deleteById(refreshToken);
     }
 
     @Transactional
-    public TokenResponseDto updateAccessToken(String accessToken) {
-        RefreshToken refreshToken = getByAccessToken(accessToken);
+    public TokenResponseDto updateAccessToken(String refreshToken) {
+        RefreshToken findToken = getByRefreshToken(refreshToken);
 
-        TokenResponseDto tokenResponseDto = refreshKakaoAccessToken(refreshToken.getRefreshToken());
+        TokenResponseDto tokenResponseDto = refreshKakaoAccessToken(findToken.getRefreshToken());
 
         saveTokenInfo(tokenResponseDto);
-        removeAccessToken(accessToken);
+        removeRefreshToken(refreshToken);
 
         return tokenResponseDto;
     }
 
-    private RefreshToken getByAccessToken(String accessToken) {
+    public RefreshToken getByAccessToken(String accessToken) {
         return refreshTokenRepository.findByAccessToken(accessToken)
-               .orElseThrow(() -> new AuthException(ErrorCode.ACCESSTOKEN_EXPIRED));
+                .orElseThrow(() -> new AuthException(ErrorCode.NO_ACCESS_TOKEN));
+    }
+
+    private RefreshToken getByRefreshToken(String refreshToken) {
+        return refreshTokenRepository.findById(refreshToken)
+                .orElseThrow(() -> new AuthException(ErrorCode.ACCESSTOKEN_EXPIRED));
     }
 
     private TokenResponseDto refreshKakaoAccessToken(String refreshToken) {
