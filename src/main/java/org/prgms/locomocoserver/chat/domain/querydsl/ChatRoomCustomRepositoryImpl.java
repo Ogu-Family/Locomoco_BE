@@ -9,7 +9,9 @@ import org.prgms.locomocoserver.image.domain.QImage;
 import org.prgms.locomocoserver.user.domain.QUser;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -48,5 +50,17 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                 .fetchJoin()
                 .where(chatParticipant.chatRoom.id.eq(roomId).and(user.deletedAt.isNotNull()))
                 .fetch();
+    }
+
+    @Override
+    @Transactional
+    public void softDeleteParticipantsByRoomId(Long roomId) {
+        QChatParticipant chatParticipant = QChatParticipant.chatParticipant;
+
+        queryFactory
+                .update(chatParticipant)
+                .set(chatParticipant.deletedAt, LocalDateTime.now())
+                .where(chatParticipant.chatRoom.id.eq(roomId))
+                .execute();
     }
 }

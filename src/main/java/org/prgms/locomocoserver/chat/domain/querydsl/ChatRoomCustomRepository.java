@@ -8,4 +8,5 @@ import java.util.List;
 public interface ChatRoomCustomRepository {
     List<ChatRoom> findByParticipantsId(Long userId, Long cursorId, int pageSize);
     List<User> findParticipantsByRoomId(Long roomId);
+    void softDeleteParticipantsByRoomId(Long roomId);
 }
