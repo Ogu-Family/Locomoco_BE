@@ -23,15 +23,25 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
         QChatRoom chatRoom = QChatRoom.chatRoom;
         QChatParticipant chatParticipant = QChatParticipant.chatParticipant;
 
-        return queryFactory
-                .selectFrom(chatRoom)
+        // 1단계: chatRoomId만 가져오는 쿼리
+        List<Long> chatRoomIds = queryFactory
+                .select(chatRoom.id)
+                .from(chatRoom)
                 .join(chatRoom.chatParticipants, chatParticipant)
                 .where(
                         chatParticipant.user.id.eq(userId)
                                 .and(chatRoom.id.lt(cursorId))
+                                .and(chatParticipant.deletedAt.isNull())
                 )
                 .orderBy(chatRoom.updatedAt.desc())
                 .limit(pageSize)
+                .fetch();
+
+        // 2단계: 가져온 chatRoomId로 fetch join
+        return queryFactory
+                .selectFrom(chatRoom)
+                .join(chatRoom.chatParticipants, chatParticipant).fetchJoin()
+                .where(chatRoom.id.in(chatRoomIds))
                 .fetch();
     }
 

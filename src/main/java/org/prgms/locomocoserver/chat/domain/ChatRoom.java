@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 import org.prgms.locomocoserver.global.common.BaseEntity;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.user.domain.User;
@@ -37,7 +36,6 @@ public class ChatRoom extends BaseEntity {
     private User creator;
 
     @OneToMany(mappedBy = "chatRoom", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    @BatchSize(size = 30)
     @Builder.Default
     private List<ChatParticipant> chatParticipants = new ArrayList<>();
 

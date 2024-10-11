@@ -144,8 +144,6 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         return chatMessageDtos;
     }
 
-
-
     private ChatUserInfo getChatUserInfo(String senderId) {
         try {
             User user = userService.getById(Long.parseLong(senderId));
