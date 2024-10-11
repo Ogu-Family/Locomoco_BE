@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.global.context.UserContext;
 import org.prgms.locomocoserver.global.exception.AuthException;
 import org.prgms.locomocoserver.global.exception.ErrorCode;
+import org.prgms.locomocoserver.global.property.AuthProperties;
+import org.prgms.locomocoserver.global.property.CorsProperties;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
 import org.prgms.locomocoserver.user.application.RefreshTokenService;
 import org.prgms.locomocoserver.user.application.TokenService;
@@ -29,22 +31,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthenticationFilter implements Filter {
 
-    private static final Set<String> allowedOrigin = new HashSet<>(Arrays.asList(
-            "http://localhost:3000",
-            "https://locomoco.kro.kr",
-            "https://locomoco.shop",
-            "http://localhost:8090"
-    ));
-    private static final List<String> authRequired = List.of(
-            "GET:/api/v1/chats/rooms/\\d+",
-            "PATCH:/api/v1/mogakko/map/\\d+",
-            "GET:/api/v1/users/\\d+"
-    );
-
     private final AuthenticationService authenticationService;
     private final TokenService tokenService;
-    private final RefreshTokenService refreshTokenService;
-    private final ObjectMapper objectMapper;
+    private final CorsProperties corsProperties;
+    private final AuthProperties authProperties;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -81,6 +71,7 @@ public class AuthenticationFilter implements Filter {
         String origin = httpRequest.getHeader("Origin") == null ? "https://locomoco.kro.kr" : httpRequest.getHeader("Origin");
 
         log.info("CORS preflight request from Origin: {}", origin);
+        Set<String> allowedOrigin = corsProperties.getAllowedOrigins();
         if (!allowedOrigin.contains(origin)) return;
 
         httpResponse.setHeader("Access-Control-Allow-Origin", origin);
@@ -93,6 +84,7 @@ public class AuthenticationFilter implements Filter {
     private boolean isAuthRequired(HttpServletRequest request) {
         String method = request.getMethod();
         String url = request.getRequestURI();
+        List<String> authRequired = authProperties.getAuthRequired();
         return authRequired.stream()
                 .anyMatch(pattern -> isPatternMatch(pattern, method, url));
     }
