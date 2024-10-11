@@ -39,6 +39,7 @@ public class AuthenticationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         log.info("Authentication Filter Started");
+        UserContext.clear();
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -55,7 +56,6 @@ public class AuthenticationFilter implements Filter {
                 handleAuthentication(httpRequest, httpResponse);
             }
         } finally {
-            UserContext.clear();
             log.info("Authentication Filter Ended");
         }
 
