@@ -70,8 +70,8 @@ public class KakaoController {
 
     @Operation(summary = "accessToken 재발급", description = "accessToken이 만료되어 재발급합니다.")
     @GetMapping("/users/refresh/kakao")
-    public ResponseEntity<TokenResponseDto> refreshToken(@RequestHeader String accessToken) {
-        TokenResponseDto tokenResponseDto = refreshTokenService.updateAccessToken(accessToken);
+    public ResponseEntity<TokenResponseDto> refreshToken(@RequestHeader String refreshToken) {
+        TokenResponseDto tokenResponseDto = refreshTokenService.updateAccessToken(refreshToken);
         return ResponseEntity.ok(tokenResponseDto);
     }
 
