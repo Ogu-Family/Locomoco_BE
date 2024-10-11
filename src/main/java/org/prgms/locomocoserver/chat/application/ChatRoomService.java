@@ -6,6 +6,7 @@ import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
+import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
 import org.prgms.locomocoserver.chat.domain.querydsl.ChatRoomCustomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
@@ -29,7 +30,7 @@ public class ChatRoomService {
     private final MongoChatMessageService mongoChatMessageService;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomCustomRepository chatRoomCustomRepository;
-    private final ChatParticipantRepository chatParticipantRepository;
+    private final ChatParticipantCustomRepository chatParticipantCustomRepository;
     private final ChatActivityService chatActivityService;
 
     private final StompChatService stompChatService;
@@ -42,8 +43,8 @@ public class ChatRoomService {
         if (!isParticipantExist(chatRoom, requestDto.participant())) {
             ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);
             chatMessagePolicy.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant());
-            ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.participant())
-                    .chatRoom(chatRoom).build());
+            ChatParticipant chatParticipant = chatParticipantCustomRepository.save(ChatParticipant.builder().user(requestDto.participant())
+                    .chatRoom(chatRoom).build()).orElseThrow(() -> new RuntimeException("채팅방 참여에 실패했습니다."));
 
             chatRoom.addChatParticipant(chatParticipant);
             stompChatService.sendToSubscribers(chatMessageDto);
@@ -53,8 +54,8 @@ public class ChatRoomService {
     @Transactional
     public ChatRoom createChatRoom(ChatCreateRequestDto requestDto) {
         ChatRoom chatRoom = requestDto.toChatRoomEntity();
-        ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.creator())
-                .chatRoom(chatRoom).build());
+        ChatParticipant chatParticipant = chatParticipantCustomRepository.save(ChatParticipant.builder().user(requestDto.creator())
+                .chatRoom(chatRoom).build()).orElseThrow(() -> new RuntimeException("채팅방 참여에 실패했습니다."));
 
         chatRoom.addChatParticipant(chatParticipant);
         chatRoomRepository.save(chatRoom); // mysql chat room create
@@ -119,13 +120,13 @@ public class ChatRoomService {
 
     @Transactional
     public void leave(ChatRoom chatRoom, Long userId) {
-        chatParticipantRepository.deleteByChatRoomIdAndUserId(chatRoom.getId(), userId);
+        chatParticipantCustomRepository.deleteByChatRoomIdAndUserId(chatRoom.getId(), userId);
     }
 
     @Transactional
     public void delete(ChatRoom chatRoom) {
         // 채팅방 참여자 목록 soft delete & 채팅방 메시지 보존
-        chatRoomCustomRepository.softDeleteParticipantsByRoomId(chatRoom.getId());
+        chatParticipantCustomRepository.softDeleteParticipantsByRoomId(chatRoom.getId());
         // 채팅방 삭제
         chatRoom.delete();
     }
