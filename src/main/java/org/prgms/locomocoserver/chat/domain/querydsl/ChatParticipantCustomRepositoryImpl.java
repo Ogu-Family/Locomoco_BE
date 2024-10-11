@@ -56,6 +56,18 @@ public class ChatParticipantCustomRepositoryImpl implements ChatParticipantCusto
 
     @Override
     @Transactional
+    public void softDeleteParticipantByUserId(Long userId) {
+        QChatParticipant chatParticipant = QChatParticipant.chatParticipant;
+
+        queryFactory
+                .update(chatParticipant)
+                .set(chatParticipant.deletedAt, LocalDateTime.now())
+                .where(chatParticipant.user.id.eq(userId))
+                .execute();
+    }
+
+    @Override
+    @Transactional
     public void deleteByChatRoomIdAndUserId(Long userId, Long chatRoomId) {
         QChatParticipant chatParticipant = QChatParticipant.chatParticipant;
 
