@@ -22,19 +22,29 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
     public List<ChatRoom> findByParticipantsId(Long userId, Long cursorId, int pageSize) {
         QChatRoom chatRoom = QChatRoom.chatRoom;
         QChatParticipant chatParticipant = QChatParticipant.chatParticipant;
+        QUser user = QUser.user;
 
-        return queryFactory
-                .selectFrom(chatRoom)
+        // 1단계: chatRoomId만 가져오는 쿼리
+        List<Long> chatRoomIds = queryFactory
+                .select(chatRoom.id)
+                .from(chatRoom)
                 .join(chatRoom.chatParticipants, chatParticipant)
-                .fetchJoin()
                 .where(
                         chatParticipant.user.id.eq(userId)
                                 .and(chatRoom.id.lt(cursorId))
+                                .and(chatParticipant.deletedAt.isNull())
                 )
-                .orderBy(chatRoom.id.desc())
+                .orderBy(chatRoom.updatedAt.desc())
                 .limit(pageSize)
                 .fetch();
 
+        // 2단계: 가져온 chatRoomId로 fetch join
+        return queryFactory
+                .selectFrom(chatRoom)
+                .join(chatRoom.chatParticipants, chatParticipant).fetchJoin()
+                .join(chatParticipant.user, user).fetchJoin()
+                .where(chatRoom.id.in(chatRoomIds))
+                .fetch();
     }
 
     @Override
@@ -48,7 +58,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                 .join(chatParticipant).on(chatParticipant.user.id.eq(user.id))
                 .leftJoin(user.profileImage, image)
                 .fetchJoin()
-                .where(chatParticipant.chatRoom.id.eq(roomId))
+                .where(chatParticipant.chatRoom.id.eq(roomId).and(user.deletedAt.isNotNull()))
                 .fetch();
     }
 }

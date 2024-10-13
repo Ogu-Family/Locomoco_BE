@@ -1,21 +1,6 @@
 package org.prgms.locomocoserver.user.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +12,10 @@ import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
 import org.prgms.locomocoserver.user.vo.BirthVo;
 import org.prgms.locomocoserver.user.vo.NicknameVo;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -70,8 +59,8 @@ public class User extends BaseEntity {
     private Tag jobTag;
 
     public User(Long id, String nickname, LocalDate birth, Gender gender, double temperature,
-        String email, String provider, Image profileImage, List<ChatParticipant> chatRooms,
-        Tag jobTag) {
+                String email, String provider, Image profileImage, List<ChatParticipant> chatRooms,
+                Tag jobTag) {
         this.id = id;
         this.nickname = nickname;
         this.birth = birth;

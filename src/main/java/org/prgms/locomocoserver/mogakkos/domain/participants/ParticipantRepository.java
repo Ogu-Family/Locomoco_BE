@@ -19,4 +19,5 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     long countCompleteByUser(User user, LocalDateTime time);
 
     List<Participant> findAllByMogakkoId(long mogakkoId);
+    void deleteAllByUserId(Long userId);
 }

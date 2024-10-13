@@ -28,7 +28,7 @@ public class ChatMessageMongoCustomRepositoryImpl implements ChatMessageMongoCus
         Query query = new Query().with(Sort.by(Sort.Direction.DESC, "_id")).limit(1);
 
         ChatMessageMongo lastMessage = mongoTemplate.findOne(query, ChatMessageMongo.class, collectionName);
-        return Optional.ofNullable(lastMessage);
+        return Optional.of(lastMessage);
     }
 
     @Override
@@ -48,6 +48,17 @@ public class ChatMessageMongoCustomRepositoryImpl implements ChatMessageMongoCus
         } catch (Exception e) {
             throw new ChatException(ChatErrorType.CHAT_MESSAGE_NOT_FOUND, "채팅방에 메시지가 없습니다.");
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int unReadMessageCount(Long roomId, String lastReadMsgId) {
+        ObjectId lastReadMsgObjectId = new ObjectId(lastReadMsgId);
+
+        Query query = new Query()
+                .addCriteria(Criteria.where("_id").gt(lastReadMsgObjectId));
+
+        return (int) mongoTemplate.count(query, ChatMessageMongo.class, getChatRoomName(roomId));
     }
 
     @Override
