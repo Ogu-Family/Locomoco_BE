@@ -14,9 +14,20 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class UserRepositoryCustomImpl implements UserRepositoryCustom {
+public class UserCustomRepositoryImpl implements UserCustomRepository {
 
     private final JPAQueryFactory queryFactory;
+
+    @Override
+    public List<User> findAllById(List<Long> userIds) {
+        QUser user = QUser.user;
+
+        return queryFactory
+                .selectFrom(user)
+                .where(user.id.in(userIds)
+                        .and(user.deletedAt.isNull()))
+                .fetch();
+    }
 
     @Override
     public List<User> findAllParticipantsByMogakko(Mogakko mogakko) {
