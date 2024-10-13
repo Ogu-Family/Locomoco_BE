@@ -34,7 +34,6 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                                 .and(chatRoom.id.lt(cursorId))
                                 .and(chatParticipant.deletedAt.isNull())
                 )
-                .orderBy(chatRoom.updatedAt.desc())
                 .limit(pageSize)
                 .fetch();
 
@@ -44,6 +43,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                 .join(chatRoom.chatParticipants, chatParticipant).fetchJoin()
                 .join(chatParticipant.user, user).fetchJoin()
                 .where(chatRoom.id.in(chatRoomIds))
+                .orderBy(chatRoom.updatedAt.desc())
                 .fetch();
     }
 
