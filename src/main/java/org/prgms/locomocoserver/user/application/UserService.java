@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
 import org.prgms.locomocoserver.image.application.ImageService;
 import org.prgms.locomocoserver.image.domain.Image;
 import org.prgms.locomocoserver.image.exception.ImageErrorType;
@@ -19,11 +20,10 @@ import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantReposito
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoSimpleInfoResponseDto;
 import org.prgms.locomocoserver.tags.domain.Tag;
 import org.prgms.locomocoserver.tags.domain.TagRepository;
-import org.prgms.locomocoserver.user.domain.DeviceKey;
-import org.prgms.locomocoserver.user.domain.DeviceKeyRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.enums.Gender;
+import org.prgms.locomocoserver.user.domain.querydsl.UserCustomRepository;
 import org.prgms.locomocoserver.user.dto.OAuthUserInfoDto;
 import org.prgms.locomocoserver.user.dto.request.UserInitInfoRequestDto;
 import org.prgms.locomocoserver.user.dto.request.UserUpdateRequest;
@@ -42,10 +42,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserCustomRepository userCustomRepository;
     private final MogakkoRepository mogakkoRepository;
     private final MogakkoLocationRepository mogakkoLocationRepository;
     private final MogakkoLikeRepository mogakkoLikeRepository;
     private final ParticipantRepository participantRepository;
+    private final ChatParticipantCustomRepository chatParticipantCustomRepository;
     private final TagRepository tagRepository;
     private final DeviceKeyService deviceKeyService;
     private final ImageService imageService;
@@ -97,6 +99,9 @@ public class UserService {
     public UserInfoDto deleteUser(Long userId) {
         User user = getById(userId);
         user.delete();
+
+        participantRepository.deleteAllByUserId(userId);
+        chatParticipantCustomRepository.softDeleteParticipantByUserId(userId);
 
         return UserInfoDto.of(user);
     }
@@ -185,7 +190,7 @@ public class UserService {
     }
 
     public User getById(Long userId) {
-        return userRepository.findByIdAndDeletedAtIsNull(userId)
+        return userCustomRepository.findUserAndImageByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new UserException(UserErrorType.USER_NOT_FOUND));
     }
 }

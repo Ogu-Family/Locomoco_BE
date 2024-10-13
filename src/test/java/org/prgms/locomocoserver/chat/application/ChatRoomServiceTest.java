@@ -14,9 +14,17 @@ import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
 import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
+import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
+import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
+import org.prgms.locomocoserver.chat.dto.request.ChatActivityRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
+import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
+import org.prgms.locomocoserver.global.TestFactory;
+import org.prgms.locomocoserver.image.domain.ImageRepository;
+import org.prgms.locomocoserver.mogakkos.application.MogakkoLikeService;
+import org.prgms.locomocoserver.mogakkos.application.MogakkoParticipationService;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
 import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
 import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
@@ -26,6 +34,7 @@ import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
+import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
@@ -50,6 +59,12 @@ class ChatRoomServiceTest {
     @Autowired
     private ChatRoomRepository chatRoomRepository;
     @Autowired
+    private MongoChatMessageService mongoChatMessageService;
+    @Autowired
+    private MogakkoParticipationService mogakkoParticipationService;
+    @Autowired
+    private ChatActivityService chatActivityService;
+    @Autowired
     private MogakkoRepository mogakkoRepository;
     @Autowired
     private ChatParticipantRepository chatParticipantRepository;
@@ -59,6 +74,8 @@ class ChatRoomServiceTest {
     private MogakkoLocationRepository mogakkoLocationRepository;
     @Autowired
     private ParticipantRepository participantRepository;
+    @Autowired
+    private ImageRepository imageRepository;
 
     @AfterEach
     void tearDown() {
@@ -69,6 +86,7 @@ class ChatRoomServiceTest {
         chatRoomRepository.deleteAll();
         mogakkoRepository.deleteAll();
         userRepository.deleteAll();
+        imageRepository.deleteAll();
     }
 
     @Test
@@ -109,5 +127,31 @@ class ChatRoomServiceTest {
         assertThat(chatRoom.getChatParticipants()).hasSize(3);
 
         tx.rollback(status);
+    }
+
+    @Test
+    @DisplayName("채팅방의 읽지 않은 메시지 수를 정확하게 반환한다 (읽지 않은 메시지 일부)")
+    void success_get_all_chat_rooms_partial_unread_messages() {
+        // given
+        User user = TestFactory.createUser();
+        User user1 = TestFactory.createUser();
+        imageRepository.saveAll(List.of(user.getProfileImage(), user1.getProfileImage()));
+        userRepository.saveAll(List.of(user, user1));
+        Mogakko mogakko = TestFactory.createMogakko(user);
+        mogakko = mogakkoRepository.save(mogakko);
+        ChatRoom chatRoom1 = TestFactory.createChatRoom(user, mogakko);
+        chatRoomRepository.save(chatRoom1);
+        mogakkoParticipationService.participate(mogakko.getId(), new ParticipationRequestDto(user1.getId(), null, null));
+
+        mongoChatMessageService.createChatRoom(chatRoom1.getId());
+        ChatMessageDto messageDto1 = mongoChatMessageService.saveChatMessage(chatRoom1.getId(), new ChatMessageRequestDto(chatRoom1.getId(), user.getId(), "test1", null));
+        ChatMessageDto messageDto2 = mongoChatMessageService.saveChatMessage(chatRoom1.getId(), new ChatMessageRequestDto(chatRoom1.getId(), user.getId(), "test2", null));
+
+        // when
+        chatActivityService.updateLastReadMessage(chatRoom1.getId(), new ChatActivityRequestDto(user1.getId(), messageDto1.chatMessageId()));
+        List<ChatRoomDto> chatRoomDtos = chatRoomService.getAllChatRoom(user1.getId(), Long.MAX_VALUE, 10);
+
+        // then
+        assertThat(chatRoomDtos.get(0).unReadMsgCnt()).isEqualTo(1);
     }
 }

@@ -1,10 +1,13 @@
 package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
+import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
+import org.prgms.locomocoserver.chat.domain.querydsl.ChatRoomCustomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
@@ -12,7 +15,6 @@ import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
-import org.prgms.locomocoserver.chat.domain.querydsl.ChatRoomCustomRepository;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
@@ -27,7 +30,8 @@ public class ChatRoomService {
     private final MongoChatMessageService mongoChatMessageService;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomCustomRepository chatRoomCustomRepository;
-    private final ChatParticipantRepository chatParticipantRepository;
+    private final ChatParticipantCustomRepository chatParticipantCustomRepository;
+    private final ChatActivityService chatActivityService;
 
     private final StompChatService stompChatService;
     private final ChatMessagePolicy chatMessagePolicy;
@@ -39,8 +43,8 @@ public class ChatRoomService {
         if (!isParticipantExist(chatRoom, requestDto.participant())) {
             ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);
             chatMessagePolicy.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant());
-            ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.participant())
-                    .chatRoom(chatRoom).build());
+            ChatParticipant chatParticipant = chatParticipantCustomRepository.save(ChatParticipant.builder().user(requestDto.participant())
+                    .chatRoom(chatRoom).build()).orElseThrow(() -> new RuntimeException("채팅방 참여에 실패했습니다."));
 
             chatRoom.addChatParticipant(chatParticipant);
             stompChatService.sendToSubscribers(chatMessageDto);
@@ -50,8 +54,8 @@ public class ChatRoomService {
     @Transactional
     public ChatRoom createChatRoom(ChatCreateRequestDto requestDto) {
         ChatRoom chatRoom = requestDto.toChatRoomEntity();
-        ChatParticipant chatParticipant = chatParticipantRepository.save(ChatParticipant.builder().user(requestDto.creator())
-                .chatRoom(chatRoom).build());
+        ChatParticipant chatParticipant = chatParticipantCustomRepository.save(ChatParticipant.builder().user(requestDto.creator())
+                .chatRoom(chatRoom).build()).orElseThrow(() -> new RuntimeException("채팅방 참여에 실패했습니다."));
 
         chatRoom.addChatParticipant(chatParticipant);
         chatRoomRepository.save(chatRoom); // mysql chat room create
@@ -85,7 +89,10 @@ public class ChatRoomService {
         List<ChatRoomDto> chatRoomDtos = chatRooms.stream()
                 .map(chatRoom -> {
                     ChatMessageDto lastMessageDto = chatMessagePolicy.getLastChatMessage(chatRoom.getId());
-                    return (lastMessageDto != null) ? ChatRoomDto.of(chatRoom, lastMessageDto) : null;
+                    ChatParticipant chatParticipant = getChatParticipant(chatRoom, userId);
+
+                    int unReadMsgCnt = chatActivityService.unReadMessageCount(chatRoom.getId(), chatParticipant.getLastReadMessageId());
+                    return ChatRoomDto.of(chatRoom, unReadMsgCnt, lastMessageDto);
                 })
                 .filter(Objects::nonNull) // null인 경우 제외
                 .toList();
@@ -113,15 +120,13 @@ public class ChatRoomService {
 
     @Transactional
     public void leave(ChatRoom chatRoom, Long userId) {
-        chatParticipantRepository.deleteByChatRoomIdAndUserId(chatRoom.getId(), userId);
+        chatParticipantCustomRepository.deleteByChatRoomIdAndUserId(chatRoom.getId(), userId);
     }
 
     @Transactional
     public void delete(ChatRoom chatRoom) {
-        // 채팅방 참여자 목록 삭제
-        chatParticipantRepository.deleteAllByChatRoom(chatRoom);
-        // 채팅방 메시지 삭제
-        chatMessagePolicy.deleteChatMessages(chatRoom);
+        // 채팅방 참여자 목록 soft delete & 채팅방 메시지 보존
+        chatParticipantCustomRepository.softDeleteParticipantsByRoomId(chatRoom.getId());
         // 채팅방 삭제
         chatRoom.delete();
     }
@@ -129,5 +134,12 @@ public class ChatRoomService {
     private boolean isParticipantExist(ChatRoom chatRoom, User user) {
         return chatRoom.getChatParticipants().stream()
                 .anyMatch(chatParticipant -> chatParticipant.getUser().getId().equals(user.getId()));
+    }
+
+    private ChatParticipant getChatParticipant(ChatRoom chatRoom, Long userId) {
+        return chatRoom.getChatParticipants().stream()
+                .filter(p -> p.getUser().getId().equals(userId))
+                .findFirst()
+                .orElse(null);
     }
 }

@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+
     Optional<User> findByEmailAndProviderAndDeletedAtIsNull(String email, String provider);
     Optional<User> findByIdAndDeletedAtIsNull(Long id);
     Optional<User> findByNicknameAndDeletedAtIsNull(String nickname);
