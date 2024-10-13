@@ -2,7 +2,6 @@ package org.prgms.locomocoserver.user.domain;
 
 import java.util.List;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
-import org.prgms.locomocoserver.user.domain.querydsl.UserRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

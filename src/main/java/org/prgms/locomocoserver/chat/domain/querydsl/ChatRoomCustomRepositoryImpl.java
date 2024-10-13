@@ -22,6 +22,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
     public List<ChatRoom> findByParticipantsId(Long userId, Long cursorId, int pageSize) {
         QChatRoom chatRoom = QChatRoom.chatRoom;
         QChatParticipant chatParticipant = QChatParticipant.chatParticipant;
+        QUser user = QUser.user;
 
         // 1단계: chatRoomId만 가져오는 쿼리
         List<Long> chatRoomIds = queryFactory
@@ -41,6 +42,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
         return queryFactory
                 .selectFrom(chatRoom)
                 .join(chatRoom.chatParticipants, chatParticipant).fetchJoin()
+                .join(chatParticipant.user, user).fetchJoin()
                 .where(chatRoom.id.in(chatRoomIds))
                 .fetch();
     }
