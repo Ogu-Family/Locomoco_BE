@@ -16,7 +16,6 @@ import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.exception.UserException;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +30,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MongoChatMessageService implements ChatMessagePolicy {
 
-    private static final String BASE_CHATROOM_NAME = "chat_messages_";
-    private final MongoTemplate mongoTemplate;
     private final ChatMessageMongoRepository chatMessageMongoRepository;
     private final ChatMessageMongoCustomRepository chatMessageMongoCustomRepository;
     private final UserService userService;
@@ -41,26 +38,24 @@ public class MongoChatMessageService implements ChatMessagePolicy {
 
     @Transactional
     public ChatMessageDto saveEnterMessage(Long roomId, User sender) {
-        ChatMessageMongo chatMessageMongo = chatMessageMongoRepository.save(toEnterMessage(sender));
+        ChatMessageMongo chatMessageMongo = chatMessageMongoRepository.save(toEnterMessage(roomId, sender));
 
         return ChatMessageDto.of(roomId, chatMessageMongo, ChatUserInfo.of(sender));
     }
 
     @Transactional
     public ChatMessageDto saveChatMessage(Long roomId, ChatMessageRequestDto message) {
-        String collectionName = BASE_CHATROOM_NAME + roomId;
         User participant = userService.getById(message.senderId());
 
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
 
-        ChatMessageMongo chatMessageMongo = mongoTemplate.save(message.toChatMessageMongo(false, null), collectionName);
+        ChatMessageMongo chatMessageMongo = chatMessageMongoRepository.save(message.toChatMessageMongo(roomId, false, null));
         chatRoom.updateUpdatedAt();
 
         return ChatMessageDto.of(roomId, chatMessageMongo, ChatUserInfo.of(participant));
     }
 
-    @Override
     @Transactional
     public ChatMessageDto saveChatMessageWithImage(Long roomId, List<String> imageUrls, ChatMessageRequestDto request) {
         User participant = userService.getById(request.senderId());
@@ -68,7 +63,7 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
 
-        ChatMessageMongo chatMessageMongo = mongoTemplate.save(request.toChatMessageMongo(false, imageUrls));
+        ChatMessageMongo chatMessageMongo = chatMessageMongoRepository.save(request.toChatMessageMongo(roomId, false, imageUrls));
         chatRoom.updateUpdatedAt();
 
         return ChatMessageDto.of(roomId, imageUrls, chatMessageMongo, ChatUserInfo.of(participant));
@@ -96,12 +91,8 @@ public class MongoChatMessageService implements ChatMessagePolicy {
         return ChatMessageDto.of(roomId, lastMessage, chatUserInfo);
     }
 
-    public String getChatRoomName(Long roomId) {
-        return BASE_CHATROOM_NAME + roomId;
-    }
-
-    private ChatMessageMongo toEnterMessage(User participant) {
-        return ChatMessageMongo.builder().senderId(participant.getId().toString()).createdAt(LocalDateTime.now())
+    private ChatMessageMongo toEnterMessage(Long roomId, User participant) {
+        return ChatMessageMongo.builder().chatRoomId(roomId.toString()).senderId(participant.getId().toString()).createdAt(LocalDateTime.now())
                 .message(participant.getNickname() + "님이 입장하셨습니다.").isNotice(true).build();
     }
 
