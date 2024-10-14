@@ -5,12 +5,13 @@ import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongo;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoCustomRepository;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoRepository;
+import org.prgms.locomocoserver.chat.domain.querydsl.ChatRoomCustomRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatUserInfo;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
-import org.prgms.locomocoserver.chat.domain.querydsl.ChatRoomCustomRepository;
 import org.prgms.locomocoserver.user.application.UserService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.exception.UserException;
@@ -23,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Primary
@@ -33,26 +33,15 @@ public class MongoChatMessageService implements ChatMessagePolicy {
 
     private static final String BASE_CHATROOM_NAME = "chat_messages_";
     private final MongoTemplate mongoTemplate;
+    private final ChatMessageMongoRepository chatMessageMongoRepository;
     private final ChatMessageMongoCustomRepository chatMessageMongoCustomRepository;
     private final UserService userService;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomCustomRepository chatRoomCustomRepository;
 
     @Transactional
-    public ChatRoom createChatRoom(Long roomId) {
-        String collectionName = BASE_CHATROOM_NAME + roomId;
-
-        if (!mongoTemplate.collectionExists(collectionName)) {
-            mongoTemplate.createCollection(collectionName);
-        }
-
-        return chatRoomRepository.findById(roomId).orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
-    }
-
-    @Transactional
     public ChatMessageDto saveEnterMessage(Long roomId, User sender) {
-        String collectionName = BASE_CHATROOM_NAME + roomId;
-        ChatMessageMongo chatMessageMongo = mongoTemplate.save(toEnterMessage(sender), collectionName);
+        ChatMessageMongo chatMessageMongo = chatMessageMongoRepository.save(toEnterMessage(sender));
 
         return ChatMessageDto.of(roomId, chatMessageMongo, ChatUserInfo.of(sender));
     }
@@ -74,13 +63,12 @@ public class MongoChatMessageService implements ChatMessagePolicy {
     @Override
     @Transactional
     public ChatMessageDto saveChatMessageWithImage(Long roomId, List<String> imageUrls, ChatMessageRequestDto request) {
-        String collectionName = BASE_CHATROOM_NAME + roomId;
         User participant = userService.getById(request.senderId());
 
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(roomId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
 
-        ChatMessageMongo chatMessageMongo = mongoTemplate.save(request.toChatMessageMongo(false, imageUrls), collectionName);
+        ChatMessageMongo chatMessageMongo = mongoTemplate.save(request.toChatMessageMongo(false, imageUrls));
         chatRoom.updateUpdatedAt();
 
         return ChatMessageDto.of(roomId, imageUrls, chatMessageMongo, ChatUserInfo.of(participant));
@@ -88,7 +76,7 @@ public class MongoChatMessageService implements ChatMessagePolicy {
 
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, String cursorValue, int pageSize) {
-        List<ChatMessageMongo> chatMessages = chatMessageMongoCustomRepository.findAllChatMessagesByRoomId(roomId, cursorValue, pageSize);
+        List<ChatMessageMongo> chatMessages = chatMessageMongoCustomRepository.findAllChatMessages(roomId, cursorValue, pageSize);
         Map<Long, ChatUserInfo> userMap = getUserMap(roomId);
 
         return createChatMessageDtos(roomId, chatMessages, userMap);
@@ -96,12 +84,12 @@ public class MongoChatMessageService implements ChatMessagePolicy {
 
     @Transactional
     public void deleteChatMessages(ChatRoom chatRoom) {
-        chatMessageMongoCustomRepository.deleteAllChatMessages(chatRoom.getId());
+        chatMessageMongoRepository.deleteByChatRoomId(chatRoom.getId().toString());
     }
 
     @Transactional(readOnly = true)
     public ChatMessageDto getLastChatMessage(Long roomId) {
-        ChatMessageMongo lastMessage = chatMessageMongoCustomRepository.findLatestMessageByRoomId(roomId)
+        ChatMessageMongo lastMessage = chatMessageMongoRepository.findTopByChatRoomIdOrderByCreatedAtDesc(roomId.toString())
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHAT_MESSAGE_NOT_FOUND));
 
         ChatUserInfo chatUserInfo = getChatUserInfo(lastMessage.getSenderId());

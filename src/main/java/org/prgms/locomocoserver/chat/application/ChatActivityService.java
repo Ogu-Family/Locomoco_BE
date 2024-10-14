@@ -2,7 +2,7 @@ package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
-import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoCustomRepository;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoRepository;
 import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
 import org.prgms.locomocoserver.chat.dto.request.ChatActivityRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatActivityService {
 
     private final ChatParticipantCustomRepository chatParticipantRepository;
-    private final ChatMessageMongoCustomRepository chatMessageMongoCustomRepository;
+    private final ChatMessageMongoRepository chatMessageMongoRepository;
 
     @Transactional
     public void updateLastReadMessage(Long chatRoomId, ChatActivityRequestDto requestDto) {
@@ -29,6 +29,6 @@ public class ChatActivityService {
         if (lastReadMsgId == null) {
             return 0;
         }
-        return chatMessageMongoCustomRepository.unReadMessageCount(roomId, lastReadMsgId);
+        return (int) chatMessageMongoRepository.countByChatRoomIdAndIdGreaterThan(roomId.toString(), lastReadMsgId);
     }
 }

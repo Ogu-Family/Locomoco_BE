@@ -59,7 +59,6 @@ public class ChatRoomService {
 
         chatRoom.addChatParticipant(chatParticipant);
         chatRoomRepository.save(chatRoom); // mysql chat room create
-        mongoChatMessageService.createChatRoom(chatRoom.getId()); // mongo chat room create
 
         chatMessagePolicy.saveEnterMessage(chatRoom.getId(), chatParticipant.getUser());
 
