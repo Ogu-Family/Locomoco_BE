@@ -34,6 +34,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                                 .and(chatRoom.id.lt(cursorId))
                                 .and(chatParticipant.deletedAt.isNull())
                 )
+                .orderBy(chatRoom.updatedAt.desc())
                 .limit(pageSize)
                 .fetch();
 
