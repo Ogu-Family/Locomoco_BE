@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.prgms.locomocoserver.chat.domain.*;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatActivityRequestDto;
@@ -60,7 +61,7 @@ class ChatRoomServiceTest {
     @Autowired
     private MongoChatMessageService mongoChatMessageService;
     @Autowired
-    private ChatActivityService chatActivityService;
+    private ChatMessageMongoRepository chatMessageMongoRepository;
     @Autowired
     private MogakkoRepository mogakkoRepository;
     @Autowired
@@ -84,6 +85,7 @@ class ChatRoomServiceTest {
         mogakkoRepository.deleteAll();
         userRepository.deleteAll();
         imageRepository.deleteAll();
+        chatMessageMongoRepository.deleteAll();
     }
 
     @Test
