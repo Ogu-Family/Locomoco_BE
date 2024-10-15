@@ -19,6 +19,7 @@ import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -81,8 +82,8 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatRoomDto> getAllChatRoom(Long userId, Long cursor, int pageSize) {
-        if (cursor == null) cursor = Long.MAX_VALUE;
+    public List<ChatRoomDto> getAllChatRoom(Long userId, String cursor, int pageSize) {
+        if (cursor == null) cursor = LocalDateTime.now().toString();
         List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(userId, cursor, pageSize);
 
         List<ChatRoomDto> chatRoomDtos = chatRooms.stream()
@@ -90,6 +91,7 @@ public class ChatRoomService {
                     ChatMessageDto lastMessageDto = chatMessagePolicy.getLastChatMessage(chatRoom.getId());
                     ChatParticipant chatParticipant = getChatParticipant(chatRoom, userId);
 
+                    log.info(chatRoom.getChatParticipants().get(0).getLastReadMessageId());
                     int unReadMsgCnt = chatActivityService.unReadMessageCount(chatRoom.getId(), chatParticipant.getLastReadMessageId());
                     return ChatRoomDto.of(chatRoom, unReadMsgCnt, lastMessageDto);
                 })

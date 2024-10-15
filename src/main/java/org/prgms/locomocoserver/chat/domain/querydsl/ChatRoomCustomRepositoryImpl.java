@@ -10,6 +10,7 @@ import org.prgms.locomocoserver.user.domain.QUser;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -19,7 +20,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<ChatRoom> findByParticipantsId(Long userId, Long cursorId, int pageSize) {
+    public List<ChatRoom> findByParticipantsId(Long userId, String cursor, int pageSize) {
         QChatRoom chatRoom = QChatRoom.chatRoom;
         QChatParticipant chatParticipant = QChatParticipant.chatParticipant;
         QUser user = QUser.user;
@@ -31,9 +32,10 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                 .join(chatRoom.chatParticipants, chatParticipant)
                 .where(
                         chatParticipant.user.id.eq(userId)
-                                .and(chatRoom.id.lt(cursorId))
+                                .and(chatRoom.updatedAt.lt(LocalDateTime.parse(cursor)))
                                 .and(chatParticipant.deletedAt.isNull())
                 )
+                .orderBy(chatRoom.updatedAt.desc())
                 .limit(pageSize)
                 .fetch();
 
