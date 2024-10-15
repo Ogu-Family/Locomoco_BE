@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoRepository;
 import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
@@ -29,6 +30,6 @@ public class ChatActivityService {
         if (lastReadMsgId == null) {
             return 0;
         }
-        return (int) chatMessageMongoRepository.countByChatRoomIdAndIdGreaterThan(roomId.toString(), lastReadMsgId);
+        return (int) chatMessageMongoRepository.countByChatRoomIdAndIdGreaterThan(roomId.toString(), new ObjectId(lastReadMsgId));
     }
 }

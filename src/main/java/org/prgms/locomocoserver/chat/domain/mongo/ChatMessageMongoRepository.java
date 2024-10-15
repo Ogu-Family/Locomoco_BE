@@ -1,5 +1,6 @@
 package org.prgms.locomocoserver.chat.domain.mongo;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,9 @@ public interface ChatMessageMongoRepository extends MongoRepository<ChatMessageM
 
     Optional<ChatMessageMongo> findTopByChatRoomIdOrderByCreatedAtDesc(String chatRoomId);
 
-    long countByChatRoomIdAndIdGreaterThan(String chatRoomId, String lastReadMsgId);
+    List<ChatMessageMongo> findAllByChatRoomId(String chatRoomId);
+
+    long countByChatRoomIdAndIdGreaterThan(String chatRoomId, ObjectId lastReadMsgId);
 
     void deleteByChatRoomId(String chatRoomId);
 }
