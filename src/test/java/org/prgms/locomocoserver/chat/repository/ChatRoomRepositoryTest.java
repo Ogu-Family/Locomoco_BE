@@ -17,6 +17,7 @@ import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
@@ -51,6 +52,7 @@ public class ChatRoomRepositoryTest {
         mogakkoRepository.save(mogakko);
 
         ChatRoom chatRoom = TestFactory.createChatRoom(user, mogakko);
+        chatRoom.updateUpdatedAt();
         chatRoom1 = chatRoomRepository.save(chatRoom);
 
         ChatParticipant participant = TestFactory.createChatParticipant(user, chatRoom);
@@ -97,7 +99,7 @@ public class ChatRoomRepositoryTest {
         // given
 
         // when
-        List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(user1.getId(), Long.MAX_VALUE, 10);
+        List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(user1.getId(), LocalDateTime.now().toString(), 10);
         ChatRoomDto.of(chatRooms.get(0), 0,null);
 
         // then

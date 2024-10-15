@@ -1,19 +1,9 @@
 package org.prgms.locomocoserver.chat.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.prgms.locomocoserver.chat.domain.ChatMessageRepository;
-import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
-import org.prgms.locomocoserver.chat.domain.ChatRoom;
-import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
+import org.prgms.locomocoserver.chat.domain.*;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatActivityRequestDto;
@@ -23,16 +13,16 @@ import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.global.TestFactory;
 import org.prgms.locomocoserver.image.domain.ImageRepository;
-import org.prgms.locomocoserver.mogakkos.application.MogakkoLikeService;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoParticipationService;
-import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
-import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
-import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
-import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocation;
+import org.prgms.locomocoserver.mogakkos.domain.location.MogakkoLocationRepository;
+import org.prgms.locomocoserver.mogakkos.domain.participants.Participant;
 import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantRepository;
+import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
+import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
@@ -43,7 +33,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class ChatRoomServiceTest {
@@ -60,8 +59,6 @@ class ChatRoomServiceTest {
     private ChatRoomRepository chatRoomRepository;
     @Autowired
     private MongoChatMessageService mongoChatMessageService;
-    @Autowired
-    private MogakkoParticipationService mogakkoParticipationService;
     @Autowired
     private ChatActivityService chatActivityService;
     @Autowired
@@ -95,21 +92,21 @@ class ChatRoomServiceTest {
         // given
         List<User> dummyUsers = new ArrayList<>();
         IntStream.rangeClosed(0, 2).forEach(i -> dummyUsers.add(
-            User.builder().nickname("name" + i).email(i + "email@gmail.com").birth(LocalDate.EPOCH)
-                .temperature(36.5).provider("kakao").gender(Gender.MALE).build()));
+                User.builder().nickname("name" + i).email(i + "email@gmail.com").birth(LocalDate.EPOCH)
+                        .temperature(36.5).provider("kakao").gender(Gender.MALE).build()));
         userRepository.saveAll(dummyUsers);
 
         AddressInfo addressInfo = AddressInfo.builder().address("Martin Garrix").city("Carry You")
-            .build();
+                .build();
 
         MogakkoLocation mogakkoLocation = MogakkoLocation.builder().addressInfo(addressInfo)
-            .latitude(10.233214).longitude(23.312314).build();
+                .latitude(10.233214).longitude(23.312314).build();
         MogakkoCreateResponseDto responseDto = mogakkoService.save(
-            new MogakkoCreateRequestDto(dummyUsers.get(0).getId(), "title",
-                LocationInfoDto.create(mogakkoLocation),
-                LocalDateTime.now(), LocalDateTime.now().plusHours(2),
-                LocalDateTime.now().plusHours(1),
-                10, "", List.of()));
+                new MogakkoCreateRequestDto(dummyUsers.get(0).getId(), "title",
+                        LocationInfoDto.create(mogakkoLocation),
+                        LocalDateTime.now(), LocalDateTime.now().plusHours(2),
+                        LocalDateTime.now().plusHours(1),
+                        10, "", List.of()));
         Mogakko mogakko = mogakkoService.getByIdNotDeleted(responseDto.id());
 
         // when
@@ -120,7 +117,7 @@ class ChatRoomServiceTest {
         TransactionStatus status = tx.getTransaction(new DefaultTransactionDefinition());
 
         ChatRoom chatRoom = chatRoomRepository.findByIdAndDeletedAtIsNull(
-            mogakko.getChatRoom().getId()).orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
+                mogakko.getChatRoom().getId()).orElseThrow(() -> new ChatException(ChatErrorType.CHATROOM_NOT_FOUND));
 
         assertThat(chatRoom.getMogakko().getId()).isEqualTo(mogakko.getId());
         assertThat(chatRoom.getCreator().getId()).isEqualTo(dummyUsers.get(0).getId());
@@ -140,16 +137,24 @@ class ChatRoomServiceTest {
         Mogakko mogakko = TestFactory.createMogakko(user);
         mogakko = mogakkoRepository.save(mogakko);
         ChatRoom chatRoom1 = TestFactory.createChatRoom(user, mogakko);
-        chatRoomRepository.save(chatRoom1);
-        mogakkoParticipationService.participate(mogakko.getId(), new ParticipationRequestDto(user1.getId(), null, null));
+        chatRoom1 = chatRoomRepository.save(chatRoom1);
+        participantRepository.save(new Participant(null, null, user, mogakko));
+        ChatParticipant chatParticipant = chatParticipantRepository.save(new ChatParticipant(user, chatRoom1));
+        chatRoom1.addChatParticipant(chatParticipant);
 
-        mongoChatMessageService.createChatRoom(chatRoom1.getId());
         ChatMessageDto messageDto1 = mongoChatMessageService.saveChatMessage(chatRoom1.getId(), new ChatMessageRequestDto(chatRoom1.getId(), user.getId(), "test1", null));
         ChatMessageDto messageDto2 = mongoChatMessageService.saveChatMessage(chatRoom1.getId(), new ChatMessageRequestDto(chatRoom1.getId(), user.getId(), "test2", null));
 
         // when
-        chatActivityService.updateLastReadMessage(chatRoom1.getId(), new ChatActivityRequestDto(user1.getId(), messageDto1.chatMessageId()));
-        List<ChatRoomDto> chatRoomDtos = chatRoomService.getAllChatRoom(user1.getId(), Long.MAX_VALUE, 10);
+        chatParticipant.updateLastReadMessageId(messageDto1.chatMessageId());
+        chatParticipantRepository.save(chatParticipant);
+        System.out.println("-------------" + chatParticipant.getLastReadMessageId());
+        List<ChatRoomDto> chatRoomDtos = chatRoomService.getAllChatRoom(user.getId(), LocalDateTime.now().toString(), 10);
+        System.out.println(chatRoomDtos.get(0).updatedAt() + " " + LocalDateTime.now().toString());
+
+        for(int i=0; i<chatRoomDtos.size(); i++) {
+            System.out.println(chatRoomDtos.get(i).roomId());
+        }
 
         // then
         assertThat(chatRoomDtos.get(0).unReadMsgCnt()).isEqualTo(1);
