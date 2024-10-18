@@ -2,37 +2,45 @@ package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
+import org.prgms.locomocoserver.chat.dao.ChatActivityDao;
+import org.prgms.locomocoserver.chat.dao.ChatActivityRequestDao;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
-import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoCustomRepository;
 import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
 import org.prgms.locomocoserver.chat.domain.querydsl.ChatRoomCustomRepository;
+import org.prgms.locomocoserver.chat.dto.ChatMessageBriefDto;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
+import org.prgms.locomocoserver.chat.dto.ChatUserInfo;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.user.domain.User;
+import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
 
-    private final MongoChatMessageService mongoChatMessageService;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomCustomRepository chatRoomCustomRepository;
     private final ChatParticipantCustomRepository chatParticipantCustomRepository;
-    private final ChatActivityService chatActivityService;
+    private final UserRepository userRepository;
+    private final ChatMessageMongoCustomRepository chatMessageMongoCustomRepository;
 
     private final StompChatService stompChatService;
     private final ChatMessagePolicy chatMessagePolicy;
@@ -81,23 +89,37 @@ public class ChatRoomService {
         return chatMessagePolicy.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant());
     }
 
+
     @Transactional(readOnly = true)
     public List<ChatRoomDto> getAllChatRoom(Long userId, String cursor, int pageSize) {
         if (cursor == null) cursor = LocalDateTime.now().toString();
+
         List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(userId, cursor, pageSize);
 
-        List<ChatRoomDto> chatRoomDtos = chatRooms.stream()
-                .map(chatRoom -> {
-                    ChatMessageDto lastMessageDto = chatMessagePolicy.getLastChatMessage(chatRoom.getId());
-                    ChatParticipant chatParticipant = getChatParticipant(chatRoom, userId);
+        List<ChatActivityRequestDao> chatActivityRequestDaos = createChatActivityRequestDao(userId, chatRooms);
+        List<ChatActivityDao> lastMessages = chatMessageMongoCustomRepository.findLastMessagesAndUnReadMsgCount(chatActivityRequestDaos);
 
-                    log.info(chatRoom.getChatParticipants().get(0).getLastReadMessageId());
-                    int unReadMsgCnt = chatActivityService.unReadMessageCount(chatRoom.getId(), chatParticipant.getLastReadMessageId());
-                    return ChatRoomDto.of(chatRoom, unReadMsgCnt, lastMessageDto);
+        Map<String, ChatActivityDao> lastMsgMongoMap = lastMessages.stream()
+                .collect(Collectors.toMap(
+                        dao -> dao.chatRoomId(),
+                        dao -> dao
+                ));
+
+        List<Long> userIds = createUserIds(lastMessages);
+        Map<Long, User> userMap = userRepository.findByIdIn(userIds).stream()
+                .collect(Collectors.toMap(User::getId, user -> user));
+
+        return chatRooms.stream()
+                .map(chatRoom -> {
+                    ChatActivityDao dao = lastMsgMongoMap.get(chatRoom.getId());
+                    ChatMessageBriefDto lastMessageDto = ChatMessageBriefDto.of(dao.chatRoomId(), dao.chatMessageId().toString(), dao.senderId(), dao.message(), dao.createdAt());
+                    User user = userMap.get(Long.parseLong(dao.senderId()));
+                    ChatUserInfo chatUserInfo = user.getDeletedAt() == null ? ChatUserInfo.of(user) : ChatUserInfo.deletedUser(user.getId());
+
+                    return ChatRoomDto.of(chatRoom, Integer.parseInt(dao.unReadMsgCnt()), lastMessageDto, chatUserInfo);
                 })
-                .filter(Objects::nonNull) // null인 경우 제외
+                .filter(Objects::nonNull)
                 .toList();
-        return chatRoomDtos;
     }
 
     @Transactional(readOnly = true)
@@ -137,10 +159,23 @@ public class ChatRoomService {
                 .anyMatch(chatParticipant -> chatParticipant.getUser().getId().equals(user.getId()));
     }
 
-    private ChatParticipant getChatParticipant(ChatRoom chatRoom, Long userId) {
-        return chatRoom.getChatParticipants().stream()
-                .filter(p -> p.getUser().getId().equals(userId))
-                .findFirst()
-                .orElse(null);
+    private List<ChatActivityRequestDao> createChatActivityRequestDao(Long userId, List<ChatRoom> chatRooms) {
+        return chatRooms.stream()
+                .map(chatRoom -> new ChatActivityRequestDao(
+                        chatRoom.getId().toString(),
+                        chatRoom.getChatParticipants().stream()
+                                .filter(p -> p.getUser().getId().equals(userId))
+                                .findFirst()
+                                .map(user -> new ObjectId(user.getLastReadMessageId()))
+                                .orElse(null)
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> createUserIds(List<ChatActivityDao> lastMessages) {
+        return lastMessages.stream()
+                .map(dao -> Long.valueOf(dao.senderId()))
+                .distinct()
+                .collect(Collectors.toList());
     }
 }
