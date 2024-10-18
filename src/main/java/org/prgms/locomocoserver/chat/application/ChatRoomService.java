@@ -22,6 +22,7 @@ import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
+import org.prgms.locomocoserver.user.domain.querydsl.UserCustomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +40,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomCustomRepository chatRoomCustomRepository;
     private final ChatParticipantCustomRepository chatParticipantCustomRepository;
-    private final UserRepository userRepository;
+    private final UserCustomRepository userCustomRepository;
     private final ChatMessageMongoCustomRepository chatMessageMongoCustomRepository;
 
     private final StompChatService stompChatService;
@@ -94,10 +95,14 @@ public class ChatRoomService {
     public List<ChatRoomDto> getAllChatRoom(Long userId, String cursor, int pageSize) {
         if (cursor == null) cursor = LocalDateTime.now().toString();
 
+        log.info("START findByParticipantsId");
         List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(userId, cursor, pageSize);
+        log.info("END findByParticipantsId");
 
         List<ChatActivityRequestDao> chatActivityRequestDaos = createChatActivityRequestDao(userId, chatRooms);
+        log.info("START findLastMessagesAndUnReadMsgCount");
         List<ChatActivityDao> lastMessages = chatMessageMongoCustomRepository.findLastMessagesAndUnReadMsgCount(chatActivityRequestDaos);
+        log.info("END findLastMessagesAndUnreadMsgCount");
 
         Map<Long, ChatActivityDao> lastMsgMongoMap = lastMessages.stream()
                 .collect(Collectors.toMap(
@@ -106,9 +111,12 @@ public class ChatRoomService {
                 ));
 
         List<Long> userIds = createUserIds(lastMessages);
-        Map<Long, User> userMap = userRepository.findByIdIn(userIds).stream()
+        log.info("START findByIdIn");
+        Map<Long, User> userMap = userCustomRepository.findAllWithImageByIdIn(userIds).stream()
                 .collect(Collectors.toMap(User::getId, user -> user));
+        log.info("END findByIdIn");
 
+        log.info("START dto Change");
         return chatRooms.stream()
                 .map(chatRoom -> {
                     ChatActivityDao dao = lastMsgMongoMap.get(chatRoom.getId());
