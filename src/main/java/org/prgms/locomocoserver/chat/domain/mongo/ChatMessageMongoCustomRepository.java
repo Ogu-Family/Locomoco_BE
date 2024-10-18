@@ -76,9 +76,7 @@ public class ChatMessageMongoCustomRepository {
         );
 
         // 7. Aggregation 결과 실행
-        System.out.println("Raw Aggregation Results: " + mongoTemplate.aggregate(aggregation, "chat_messages", Map.class).getMappedResults());
         AggregationResults<ChatActivityDao> aggregationResults = mongoTemplate.aggregate(aggregation, "chat_messages", ChatActivityDao.class);
-        System.out.println("Aggregation Results: " + aggregationResults.getMappedResults());
 
         // 8. 마지막 메시지 결과 반환
         List<ChatActivityDao> lastMessages = aggregationResults.getMappedResults();
