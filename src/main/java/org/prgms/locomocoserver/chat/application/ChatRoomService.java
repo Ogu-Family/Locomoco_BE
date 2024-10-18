@@ -99,9 +99,9 @@ public class ChatRoomService {
         List<ChatActivityRequestDao> chatActivityRequestDaos = createChatActivityRequestDao(userId, chatRooms);
         List<ChatActivityDao> lastMessages = chatMessageMongoCustomRepository.findLastMessagesAndUnReadMsgCount(chatActivityRequestDaos);
 
-        Map<String, ChatActivityDao> lastMsgMongoMap = lastMessages.stream()
+        Map<Long, ChatActivityDao> lastMsgMongoMap = lastMessages.stream()
                 .collect(Collectors.toMap(
-                        dao -> dao.chatRoomId(),
+                        dao -> Long.parseLong(dao.chatRoomId()),
                         dao -> dao
                 ));
 
