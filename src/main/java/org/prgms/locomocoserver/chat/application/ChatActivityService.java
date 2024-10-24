@@ -24,12 +24,4 @@ public class ChatActivityService {
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHAT_PARTICIPANT_NOT_FOUND));
         chatParticipant.updateLastReadMessageId(requestDto.lastReadMessageId());
     }
-
-    @Transactional(readOnly = true)
-    public int unReadMessageCount(Long roomId, String lastReadMsgId) {
-        if (lastReadMsgId == null) {
-            return 0;
-        }
-        return (int) chatMessageMongoRepository.countByChatRoomIdAndIdGreaterThan(roomId.toString(), new ObjectId(lastReadMsgId));
-    }
 }
