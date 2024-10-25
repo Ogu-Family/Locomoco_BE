@@ -32,6 +32,6 @@ public class ChatActivityService {
         ChatActivity chatActivity = chatActivityRepository.findByUserIdAndChatRoomId(String.valueOf(userId), String.valueOf(chatRoomId))
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHAT_PARTICIPANT_NOT_FOUND));
         chatActivity.increaseUnreadMsgCnt();
-        return ChatActivityDto.of(chatActivity.getChatRoomId(), chatActivity.getUnReadMsgCnt());
+        return ChatActivityDto.of(chatActivity);
     }
 }
