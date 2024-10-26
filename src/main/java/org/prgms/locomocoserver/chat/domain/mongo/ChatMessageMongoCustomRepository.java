@@ -42,22 +42,23 @@ public class ChatMessageMongoCustomRepository {
     public List<ChatActivityDao> findLastMessagesAndUnReadMsgCount(List<ChatActivityRequestDao> chatRoomInfoDtos) {
         // 1. 채팅방 roomId 목록 생성
         List<String> chatRoomIds = chatRoomInfoDtos.stream()
-                .map(dao -> dao.chatRoomId().toString())
+                .map(ChatActivityRequestDao::chatRoomId)
                 .collect(Collectors.toList());
 
         // 2. 채팅방 필터링 (roomId 기반)
-        AggregationOperation matchChatRooms = Aggregation.match(Criteria.where("chatRoomId").in(chatRoomIds));
+        Criteria criteria = Criteria.where("chatRoomId").in(chatRoomIds);
+        AggregationOperation matchChatRooms = Aggregation.match(criteria);
 
         // 3. 메시지 시간 순으로 정렬 (최신 메시지가 상단에 오도록)
         AggregationOperation sortMessagesByCreatedAtDesc = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // 4. 각 채팅방별로 마지막 메시지를 그룹화하고 필요한 필드 선택
         AggregationOperation groupLastMessage = Aggregation.group("chatRoomId")
-                .first("chatRoomId").as("chatRoomId")  // 채팅방 ID 가져오기
-                .first("senderId").as("senderId")      // 마지막 메시지 보낸 사람
-                .first("message").as("message")        // 마지막 메시지 내용
-                .first("createdAt").as("createdAt")    // 마지막 메시지 시간
-                .first("_id").as("chatMessageId");     // 마지막 메시지의 MongoDB _id
+                .first("chatRoomId").as("chatRoomId")
+                .first("senderId").as("senderId")
+                .first("message").as("message")
+                .first("createdAt").as("createdAt")
+                .first("_id").as("chatMessageId");
 
         // 5. 필요 필드만 선택하는 project 단계 추가
         AggregationOperation projectFields = Aggregation.project()
@@ -67,47 +68,49 @@ public class ChatMessageMongoCustomRepository {
                 .and("createdAt").as("createdAt")
                 .and("chatMessageId").as("chatMessageId");
 
-        // 6. Aggregation Pipeline 생성 (마지막 메시지만 가져옴)
+        // 6. Aggregation Pipeline 생성
         Aggregation aggregation = Aggregation.newAggregation(
-                matchChatRooms,                     // roomId로 필터링
-                sortMessagesByCreatedAtDesc,       // 시간순 정렬
-                groupLastMessage,                   // 각 채팅방별 마지막 메시지 그룹화
-                projectFields                       // 필요한 필드만 선택
+                matchChatRooms,
+                sortMessagesByCreatedAtDesc,
+                groupLastMessage,
+                projectFields
         );
 
         // 7. Aggregation 결과 실행
-        AggregationResults<ChatActivityDao> aggregationResults = mongoTemplate.aggregate(aggregation, "chat_messages", ChatActivityDao.class);
+        List<ChatActivityDao> lastMessages = mongoTemplate.aggregate(aggregation, "chat_messages", ChatActivityDao.class)
+                .getMappedResults();
 
-        // 8. 마지막 메시지 결과 반환
-        List<ChatActivityDao> lastMessages = aggregationResults.getMappedResults();
-
-        // 9. 읽지 않은 메시지 수 계산을 위한 roomId와 lastReadMsgId 맵 생성
+        // 8. 읽지 않은 메시지 수 계산을 위한 roomId와 lastReadMsgId 맵 생성
         Map<String, ObjectId> lastReadMessageIdMap = chatRoomInfoDtos.stream()
                 .filter(dao -> dao.lastReadMsgId() != null)
                 .collect(Collectors.toMap(
-                        dao -> dao.chatRoomId().toString(),
-                        dao -> dao.lastReadMsgId()
+                        ChatActivityRequestDao::chatRoomId,
+                        ChatActivityRequestDao::lastReadMsgId
                 ));
 
-        // 10. 읽지 않은 메시지 수를 가져오기 위한 쿼리 생성
+        // 9. unread 메시지 수를 가져오기 위한 쿼리 생성
         List<ChatActivityDao> unreadCounts = lastMessages.stream()
                 .map(chatActivityDao -> {
-                    String chatRoomId = chatActivityDao.chatRoomId(); // chatRoomId 가져오기
-                    ObjectId lastReadMsgId = lastReadMessageIdMap.get(chatRoomId); // lastReadMsgId 가져오기
+                    String chatRoomId = chatActivityDao.chatRoomId();
+                    ObjectId lastReadMsgId = lastReadMessageIdMap.getOrDefault(chatRoomId, null);
 
-                    // 11. unread 메시지 수 계산 쿼리
-                    long unreadCount = mongoTemplate.getCollection("chat_messages").countDocuments(Filters.and(
-                            Filters.eq("chatRoomId", chatRoomId),
-                            Filters.gt("_id", lastReadMsgId)
-                    ));
+                    // 10. unread 메시지 수 계산 쿼리
+                    long unreadCount = mongoTemplate.getCollection("chat_messages")
+                            .countDocuments(Filters.and(
+                                    Filters.eq("chatRoomId", chatRoomId),
+                                    Filters.gt("_id", lastReadMsgId)
+                            ));
 
-                    // 12. 읽지 않은 메시지 수와 마지막 메시지 결합
-                    return new ChatActivityDao(String.valueOf(unreadCount), chatActivityDao.chatRoomId(), chatActivityDao.chatMessageId(), chatActivityDao.senderId(), chatActivityDao.message(), chatActivityDao.createdAt());
+                    // 11. 읽지 않은 메시지 수와 마지막 메시지 결합
+                    return new ChatActivityDao(String.valueOf(unreadCount), chatActivityDao.chatRoomId(),
+                            chatActivityDao.chatMessageId(), chatActivityDao.senderId(),
+                            chatActivityDao.message(), chatActivityDao.createdAt());
                 })
                 .collect(Collectors.toList());
 
-        // 13. 결과 반환
+        // 12. 결과 반환
         return unreadCounts;
     }
+
 
 }
