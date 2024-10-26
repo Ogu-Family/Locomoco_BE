@@ -22,12 +22,5 @@ public class ChatActivityController {
         chatActivityService.updateLastReadMessage(chatRoomId, request);
         return ResponseEntity.ok().build();
     }
-
-    @PatchMapping("/chats/activity/{chatRoomId}/increase-count")
-    public ResponseEntity<ChatActivityDto> increaseUnReadMsgCnt(@PathVariable Long chatRoomId,
-                                                      @GetUser User user) {
-        ChatActivityDto chatActivityDto = chatActivityService.increaseLastReadMessage(chatRoomId, user.getId());
-        return ResponseEntity.ok(chatActivityDto);
-    }
 }
 

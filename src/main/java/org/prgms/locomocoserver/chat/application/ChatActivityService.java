@@ -2,12 +2,8 @@ package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatActivity;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatActivityRepository;
-import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoRepository;
-import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
-import org.prgms.locomocoserver.chat.dto.ChatActivityDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatActivityRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
@@ -27,11 +23,4 @@ public class ChatActivityService {
         chatActivity.updateLastReadMessage(requestDto.userId().toString(), new ObjectId(requestDto.lastReadMessageId()));
     }
 
-    @Transactional
-    public ChatActivityDto increaseLastReadMessage(Long chatRoomId, Long userId) {
-        ChatActivity chatActivity = chatActivityRepository.findByUserIdAndChatRoomId(String.valueOf(userId), String.valueOf(chatRoomId))
-                .orElseThrow(() -> new ChatException(ChatErrorType.CHAT_PARTICIPANT_NOT_FOUND));
-        chatActivity.increaseUnreadMsgCnt();
-        return ChatActivityDto.of(chatActivity);
-    }
 }
