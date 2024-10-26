@@ -16,14 +16,12 @@ public class ChatActivity {
     private String userId;
     private String chatRoomId;
     private ObjectId lastReadMsgId;
-    private long unReadMsgCnt;
 
     @Builder
     public ChatActivity(String userId, String chatRoomId) {
         this.userId = userId;
         this.chatRoomId = chatRoomId;
         this.lastReadMsgId = null;
-        this.unReadMsgCnt = 0;
     }
 
     public void updateLastReadMessage(String userId, ObjectId lastReadMsgId) {
@@ -31,10 +29,5 @@ public class ChatActivity {
             throw new IllegalArgumentException("Invalid User Id : " + userId);
         }
         this.lastReadMsgId = lastReadMsgId;
-        this.unReadMsgCnt = 0;
-    }
-
-    public void increaseUnreadMsgCnt() {
-        this.unReadMsgCnt++;
     }
 }
