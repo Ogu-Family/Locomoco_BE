@@ -99,7 +99,6 @@ public class ChatRoomService {
         return chatMessagePolicy.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant());
     }
 
-
     @Transactional(readOnly = true)
     public List<ChatRoomDto> getAllChatRoom(Long userId, String cursor, int pageSize) {
         if (cursor == null) cursor = LocalDateTime.now().toString();
