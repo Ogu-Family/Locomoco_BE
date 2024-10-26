@@ -8,6 +8,8 @@ import org.prgms.locomocoserver.chat.dao.ChatActivityRequestDao;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatActivity;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatActivityRepository;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoCustomRepository;
 import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
 import org.prgms.locomocoserver.chat.domain.querydsl.ChatRoomCustomRepository;
@@ -21,7 +23,6 @@ import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.user.domain.User;
-import org.prgms.locomocoserver.user.domain.UserRepository;
 import org.prgms.locomocoserver.user.domain.querydsl.UserCustomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +43,7 @@ public class ChatRoomService {
     private final ChatParticipantCustomRepository chatParticipantCustomRepository;
     private final UserCustomRepository userCustomRepository;
     private final ChatMessageMongoCustomRepository chatMessageMongoCustomRepository;
+    private final ChatActivityRepository chatActivityRepository;
 
     private final StompChatService stompChatService;
     private final ChatMessagePolicy chatMessagePolicy;
@@ -56,6 +58,9 @@ public class ChatRoomService {
             ChatParticipant chatParticipant = chatParticipantCustomRepository.save(ChatParticipant.builder().user(requestDto.participant())
                     .chatRoom(chatRoom).build()).orElseThrow(() -> new RuntimeException("채팅방 참여에 실패했습니다."));
 
+            chatActivityRepository.save(ChatActivity.builder().chatRoomId(requestDto.chatRoomId().toString())
+                    .userId(requestDto.participant().getId().toString()).build());
+
             chatRoom.addChatParticipant(chatParticipant);
             stompChatService.sendToSubscribers(chatMessageDto);
         }
@@ -69,6 +74,8 @@ public class ChatRoomService {
 
         chatRoom.addChatParticipant(chatParticipant);
         chatRoomRepository.save(chatRoom); // mysql chat room create
+        chatActivityRepository.save(ChatActivity.builder()
+                .chatRoomId(chatRoom.getId().toString()).userId(requestDto.creator().getId().toString()).build());
 
         chatMessagePolicy.saveEnterMessage(chatRoom.getId(), chatParticipant.getUser());
 
@@ -77,7 +84,9 @@ public class ChatRoomService {
 
     @Transactional
     public ChatMessageDto saveChatMessage(ChatMessageRequestDto requestDto) {
-        return chatMessagePolicy.saveChatMessage(requestDto.chatRoomId(), requestDto);
+        ChatMessageDto chatMessageDto = chatMessagePolicy.saveChatMessage(requestDto.chatRoomId(), requestDto);
+
+        return chatMessageDto;
     }
 
     @Transactional
