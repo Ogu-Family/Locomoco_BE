@@ -2,9 +2,7 @@ package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.prgms.locomocoserver.chat.dao.ChatActivityDao;
-import org.prgms.locomocoserver.chat.dao.ChatActivityRequestDao;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
@@ -107,9 +105,9 @@ public class ChatRoomService {
         List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(userId, cursor, pageSize);
         log.info("END findByParticipantsId");
 
-        List<ChatActivityRequestDao> chatActivityRequestDaos = createChatActivityRequestDao(userId, chatRooms);
+        List<String> chatRoomIds = createChatRoomIds(chatRooms);
         log.info("START findLastMessagesAndUnReadMsgCount");
-        List<ChatActivityDao> lastMessages = chatMessageMongoCustomRepository.findLastMessagesAndUnReadMsgCount(chatActivityRequestDaos);
+        List<ChatActivityDao> lastMessages = chatMessageMongoCustomRepository.findLastMessagesAndUnReadMsgCount(userId.toString(), chatRoomIds);
         log.info("END findLastMessagesAndUnreadMsgCount");
 
         Map<Long, ChatActivityDao> lastMsgMongoMap = lastMessages.stream()
@@ -175,17 +173,9 @@ public class ChatRoomService {
                 .anyMatch(chatParticipant -> chatParticipant.getUser().getId().equals(user.getId()));
     }
 
-    private List<ChatActivityRequestDao> createChatActivityRequestDao(Long userId, List<ChatRoom> chatRooms) {
+    private List<String> createChatRoomIds(List<ChatRoom> chatRooms) {
         return chatRooms.stream()
-                .map(chatRoom -> new ChatActivityRequestDao(
-                        chatRoom.getId().toString(),
-                        chatRoom.getChatParticipants().stream()
-                                .filter(p -> p.getUser().getId().equals(userId))
-                                .findFirst()
-                                .map(user -> new ObjectId(user.getLastReadMessageId()))
-                                .orElse(null)
-                ))
-                .collect(Collectors.toList());
+                .map(chatRoom -> chatRoom.getId().toString()).collect(Collectors.toList());
     }
 
     private List<Long> createUserIds(List<ChatActivityDao> lastMessages) {
