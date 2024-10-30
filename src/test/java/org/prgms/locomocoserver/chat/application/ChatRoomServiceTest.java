@@ -1,20 +1,21 @@
 package org.prgms.locomocoserver.chat.application;
 
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.prgms.locomocoserver.chat.domain.*;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatActivity;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatActivityRepository;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
-import org.prgms.locomocoserver.chat.dto.request.ChatActivityRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
 import org.prgms.locomocoserver.global.TestFactory;
 import org.prgms.locomocoserver.image.domain.ImageRepository;
-import org.prgms.locomocoserver.mogakkos.application.MogakkoParticipationService;
 import org.prgms.locomocoserver.mogakkos.application.MogakkoService;
 import org.prgms.locomocoserver.mogakkos.domain.Mogakko;
 import org.prgms.locomocoserver.mogakkos.domain.MogakkoRepository;
@@ -25,7 +26,6 @@ import org.prgms.locomocoserver.mogakkos.domain.participants.ParticipantReposito
 import org.prgms.locomocoserver.mogakkos.domain.vo.AddressInfo;
 import org.prgms.locomocoserver.mogakkos.dto.LocationInfoDto;
 import org.prgms.locomocoserver.mogakkos.dto.request.MogakkoCreateRequestDto;
-import org.prgms.locomocoserver.mogakkos.dto.request.ParticipationRequestDto;
 import org.prgms.locomocoserver.mogakkos.dto.response.MogakkoCreateResponseDto;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.UserRepository;
@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.time.LocalDate;
@@ -63,6 +62,8 @@ class ChatRoomServiceTest {
     @Autowired
     private ChatMessageMongoRepository chatMessageMongoRepository;
     @Autowired
+    private ChatActivityRepository chatActivityRepository;
+    @Autowired
     private MogakkoRepository mogakkoRepository;
     @Autowired
     private ChatParticipantRepository chatParticipantRepository;
@@ -85,6 +86,7 @@ class ChatRoomServiceTest {
         mogakkoRepository.deleteAll();
         userRepository.deleteAll();
         imageRepository.deleteAll();
+        chatActivityRepository.deleteAll();
         chatMessageMongoRepository.deleteAll();
     }
 
@@ -136,29 +138,56 @@ class ChatRoomServiceTest {
         User user1 = TestFactory.createUser();
         imageRepository.saveAll(List.of(user.getProfileImage(), user1.getProfileImage()));
         userRepository.saveAll(List.of(user, user1));
-        Mogakko mogakko = TestFactory.createMogakko(user);
-        mogakko = mogakkoRepository.save(mogakko);
-        ChatRoom chatRoom1 = TestFactory.createChatRoom(user, mogakko);
+
+        Mogakko mogakko1 = TestFactory.createMogakko(user);
+        Mogakko mogakko2 = TestFactory.createMogakko(user1);
+        mogakkoRepository.saveAll(List.of(mogakko1, mogakko2));
+
+        ChatRoom chatRoom1 = TestFactory.createChatRoom(user, mogakko1);
+        ChatRoom chatRoom2 = TestFactory.createChatRoom(user, mogakko2);
         chatRoom1 = chatRoomRepository.save(chatRoom1);
-        participantRepository.save(new Participant(null, null, user, mogakko));
-        ChatParticipant chatParticipant = chatParticipantRepository.save(new ChatParticipant(user, chatRoom1));
-        chatRoom1.addChatParticipant(chatParticipant);
+        chatRoom2 = chatRoomRepository.save(chatRoom2);
+
+        participantRepository.save(new Participant(null, null, user, mogakko1));
+        participantRepository.save(new Participant(null, null, user, mogakko2));
+
+        ChatParticipant chatParticipant1 = chatParticipantRepository.save(new ChatParticipant(user, chatRoom1));
+        ChatParticipant chatParticipant2 = chatParticipantRepository.save(new ChatParticipant(user, chatRoom2));
+        chatRoom1.addChatParticipant(chatParticipant1);
+        chatRoom2.addChatParticipant(chatParticipant2);
+
+        ChatActivity chatActivity1 = chatActivityRepository.save(new ChatActivity(user.getId().toString(), chatRoom1.getId().toString()));
+        ChatActivity chatActivity2 = chatActivityRepository.save(new ChatActivity(user.getId().toString(), chatRoom2.getId().toString()));
 
         ChatMessageDto messageDto1 = mongoChatMessageService.saveChatMessage(chatRoom1.getId(), new ChatMessageRequestDto(chatRoom1.getId(), user.getId(), "test1", null));
         ChatMessageDto messageDto2 = mongoChatMessageService.saveChatMessage(chatRoom1.getId(), new ChatMessageRequestDto(chatRoom1.getId(), user.getId(), "test2", null));
 
-        // when
-        chatParticipant.updateLastReadMessageId(messageDto1.chatMessageId());
-        chatParticipantRepository.save(chatParticipant);
-        System.out.println("-------------" + chatParticipant.getLastReadMessageId());
-        List<ChatRoomDto> chatRoomDtos = chatRoomService.getAllChatRoom(user.getId(), LocalDateTime.now().toString(), 10);
-        System.out.println(chatRoomDtos.get(0).updatedAt() + " " + LocalDateTime.now().toString());
+        ChatMessageDto messageDto3 = mongoChatMessageService.saveChatMessage(chatRoom2.getId(), new ChatMessageRequestDto(chatRoom2.getId(), user.getId(), "test11", null));
+        ChatMessageDto messageDto4 = mongoChatMessageService.saveChatMessage(chatRoom2.getId(), new ChatMessageRequestDto(chatRoom2.getId(), user.getId(), "test22", null));
+        ChatMessageDto messageDto5 = mongoChatMessageService.saveChatMessage(chatRoom2.getId(), new ChatMessageRequestDto(chatRoom2.getId(), user.getId(), "test22", null));
 
-        for(int i=0; i<chatRoomDtos.size(); i++) {
-            System.out.println(chatRoomDtos.get(i).roomId());
-        }
+        // when
+        chatParticipant1.updateLastReadMessageId(messageDto1.chatMessageId());
+        chatActivity1.updateLastReadMessage(user.getId().toString(), new ObjectId(messageDto1.chatMessageId()));
+        chatParticipantRepository.save(chatParticipant1);
+        chatActivityRepository.save(chatActivity1);
+
+        chatParticipant2.updateLastReadMessageId(messageDto3.chatMessageId());
+        chatActivity2.updateLastReadMessage(user.getId().toString(), new ObjectId(messageDto3.chatMessageId()));
+        chatParticipantRepository.save(chatParticipant2);
+        chatActivityRepository.save(chatActivity2);
+
+        List<ChatRoomDto> chatRoomDtos = chatRoomService.getAllChatRoom(user.getId(), LocalDateTime.now().toString(), 10);
 
         // then
-        assertThat(chatRoomDtos.get(0).unReadMsgCnt()).isEqualTo(1);
+        assertThat(chatRoomDtos.size()).isEqualTo(2);
+
+        for (ChatRoomDto chatRoomDto : chatRoomDtos) {
+            if (chatRoomDto.roomId().equals(chatRoom1.getId())) {
+                assertThat(chatRoomDto.unReadMsgCnt()).isEqualTo(1);
+            } else if (chatRoomDto.roomId().equals(chatRoom2.getId())) {
+                assertThat(chatRoomDto.unReadMsgCnt()).isEqualTo(2);
+            }
+        }
     }
 }
