@@ -2,7 +2,7 @@ package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.prgms.locomocoserver.chat.dao.ChatActivityDao;
+import org.prgms.locomocoserver.chat.dto.ChatActivityDto;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
@@ -107,10 +107,10 @@ public class ChatRoomService {
 
         List<String> chatRoomIds = createChatRoomIds(chatRooms);
         log.info("START findLastMessagesAndUnReadMsgCount");
-        List<ChatActivityDao> lastMessages = chatMessageMongoCustomRepository.findLastMessagesAndUnReadMsgCount(userId.toString(), chatRoomIds);
+        List<ChatActivityDto> lastMessages = chatMessageMongoCustomRepository.findLastMessagesAndUnReadMsgCount(userId.toString(), chatRoomIds);
         log.info("END findLastMessagesAndUnreadMsgCount");
 
-        Map<Long, ChatActivityDao> lastMsgMongoMap = lastMessages.stream()
+        Map<Long, ChatActivityDto> lastMsgMongoMap = lastMessages.stream()
                 .collect(Collectors.toMap(
                         dao -> Long.parseLong(dao.chatRoomId()),
                         dao -> dao
@@ -125,7 +125,7 @@ public class ChatRoomService {
         log.info("START dto Change");
         return chatRooms.stream()
                 .map(chatRoom -> {
-                    ChatActivityDao dao = lastMsgMongoMap.get(chatRoom.getId());
+                    ChatActivityDto dao = lastMsgMongoMap.get(chatRoom.getId());
                     ChatMessageBriefDto lastMessageDto = ChatMessageBriefDto.of(dao.chatRoomId(), dao.chatMessageId().toString(), dao.senderId(), dao.message(), dao.createdAt());
                     User user = userMap.get(Long.parseLong(dao.senderId()));
                     ChatUserInfo chatUserInfo = user.getDeletedAt() == null ? ChatUserInfo.of(user) : ChatUserInfo.deletedUser(user.getId());
@@ -178,7 +178,7 @@ public class ChatRoomService {
                 .map(chatRoom -> chatRoom.getId().toString()).collect(Collectors.toList());
     }
 
-    private List<Long> createUserIds(List<ChatActivityDao> lastMessages) {
+    private List<Long> createUserIds(List<ChatActivityDto> lastMessages) {
         return lastMessages.stream()
                 .map(dao -> Long.valueOf(dao.senderId()))
                 .distinct()

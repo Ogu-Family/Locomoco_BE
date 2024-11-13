@@ -1,13 +1,15 @@
 package org.prgms.locomocoserver.chat.dto;
 
-import org.prgms.locomocoserver.chat.domain.mongo.ChatActivity;
+import org.bson.types.ObjectId;
+
+import java.time.LocalDateTime;
 
 public record ChatActivityDto(
-        String userId,
+        String unReadMsgCnt,
         String chatRoomId,
-        String lastReadMsgId
+        ObjectId chatMessageId,
+        String senderId,
+        String message,
+        LocalDateTime createdAt
 ) {
-    public static ChatActivityDto of(ChatActivity chatActivity) {
-        return new ChatActivityDto(chatActivity.getUserId(), chatActivity.getChatRoomId(), chatActivity.getLastReadMsgId().toString());
-    }
 }

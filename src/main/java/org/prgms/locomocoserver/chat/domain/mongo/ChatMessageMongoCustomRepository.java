@@ -1,17 +1,13 @@
 package org.prgms.locomocoserver.chat.domain.mongo;
 
-import com.mongodb.client.model.Filters;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.prgms.locomocoserver.chat.dao.ChatActivityDao;
-import org.prgms.locomocoserver.chat.dao.ChatActivityRequestDao;
+import org.prgms.locomocoserver.chat.dto.ChatActivityDto;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -41,9 +37,9 @@ public class ChatMessageMongoCustomRepository {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatActivityDao> findLastMessagesAndUnReadMsgCount(String userId, List<String> chatRoomIds) {
+    public List<ChatActivityDto> findLastMessagesAndUnReadMsgCount(String userId, List<String> chatRoomIds) {
         // 1. 채팅방별 마지막 메시지 조회
-        Map<String, ChatActivityDao> lastMsgMap = findLastMessages(chatRoomIds);
+        Map<String, ChatActivityDto> lastMsgMap = findLastMessages(chatRoomIds);
 
         // 2. 채팅방별 lastReadMsgId 조회
         Map<String, ObjectId> lastReadMsgIdMap = fetchLastReadMsgIds(userId, chatRoomIds);
@@ -56,7 +52,7 @@ public class ChatMessageMongoCustomRepository {
     }
 
     // 마지막 메시지 조회
-    private Map<String, ChatActivityDao> findLastMessages(List<String> chatRoomIds) {
+    private Map<String, ChatActivityDto> findLastMessages(List<String> chatRoomIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("chatRoomId").in(chatRoomIds)),
                 Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt")),
@@ -69,11 +65,11 @@ public class ChatMessageMongoCustomRepository {
                 Aggregation.project("chatRoomId", "senderId", "message", "createdAt", "chatMessageId")
         );
 
-        List<ChatActivityDao> lastMessages = mongoTemplate.aggregate(aggregation, "chat_messages", ChatActivityDao.class)
+        List<ChatActivityDto> lastMessages = mongoTemplate.aggregate(aggregation, "chat_messages", ChatActivityDto.class)
                 .getMappedResults();
 
         return lastMessages.stream()
-                .collect(Collectors.toMap(ChatActivityDao::chatRoomId, chatActivityDao -> chatActivityDao));
+                .collect(Collectors.toMap(ChatActivityDto::chatRoomId, chatActivityDto -> chatActivityDto));
     }
 
     // lastReadMsgId 조회
@@ -99,7 +95,7 @@ public class ChatMessageMongoCustomRepository {
     }
 
     // 읽지 않은 메시지 수 집계
-    private List<ChatActivityDao> countUnreadMessages(List<Criteria> criteriaList, Map<String, ChatActivityDao> lastMsgMap) {
+    private List<ChatActivityDto> countUnreadMessages(List<Criteria> criteriaList, Map<String, ChatActivityDto> lastMsgMap) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(new Criteria().orOperator(criteriaList.toArray(new Criteria[0]))),
                 Aggregation.group("chatRoomId").count().as("unreadCount"),
@@ -112,9 +108,9 @@ public class ChatMessageMongoCustomRepository {
                 .map(result -> {
                     String chatRoomId = result.getString("chatRoomId");
                     Integer unreadCount = result.getInteger("unreadCount");
-                    ChatActivityDao chatActivityDao = lastMsgMap.get(chatRoomId);
-                    return new ChatActivityDao(String.valueOf(unreadCount), chatRoomId, chatActivityDao.chatMessageId(),
-                            chatActivityDao.senderId(), chatActivityDao.message(), chatActivityDao.createdAt());
+                    ChatActivityDto chatActivityDto = lastMsgMap.get(chatRoomId);
+                    return new ChatActivityDto(String.valueOf(unreadCount), chatRoomId, chatActivityDto.chatMessageId(),
+                            chatActivityDto.senderId(), chatActivityDto.message(), chatActivityDto.createdAt());
                 })
                 .collect(Collectors.toList());
     }
