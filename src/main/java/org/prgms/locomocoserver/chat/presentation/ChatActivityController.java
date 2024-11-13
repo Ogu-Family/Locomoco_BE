@@ -2,10 +2,7 @@ package org.prgms.locomocoserver.chat.presentation;
 
 import lombok.RequiredArgsConstructor;
 import org.prgms.locomocoserver.chat.application.ChatActivityService;
-import org.prgms.locomocoserver.chat.dto.ChatActivityDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatActivityRequestDto;
-import org.prgms.locomocoserver.global.annotation.GetUser;
-import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
