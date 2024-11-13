@@ -7,6 +7,7 @@ import org.prgms.locomocoserver.chat.domain.ChatParticipantRepository;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongo;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoRepository;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.global.TestFactory;
@@ -20,14 +21,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.shaded.org.apache.commons.lang3.ObjectUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -57,6 +61,8 @@ class MongoChatServiceTest {
     MogakkoRepository mogakkoRepository;
     @Autowired
     ChatParticipantRepository chatParticipantRepository;
+    @Autowired
+    ChatMessageMongoRepository chatMessageMongoRepository;
 
     private User creator;
     private ChatRoom chatRoom;
@@ -70,6 +76,7 @@ class MongoChatServiceTest {
         userRepository.deleteAll();
         imageRepository.deleteAll();
         categoryRepository.deleteAll();
+        chatMessageMongoRepository.deleteAll();
 
         User sender = TestFactory.createUser();
         imageRepository.save(sender.getProfileImage());
@@ -82,6 +89,17 @@ class MongoChatServiceTest {
         chatParticipantRepository.save(TestFactory.createChatParticipant(sender, chatRoom));
     }
 
+    @AfterAll
+    void tearDown() {
+        chatParticipantRepository.deleteAll();
+        chatRoomRepository.deleteAll();
+        mogakkoRepository.deleteAll();
+        userRepository.deleteAll();
+        imageRepository.deleteAll();
+        categoryRepository.deleteAll();
+        chatMessageMongoRepository.deleteAll();
+    }
+
     @Test
     @Order(1)
     @DisplayName("채팅방 입장 메시지를 저장할 수 있다.")
@@ -92,10 +110,10 @@ class MongoChatServiceTest {
 
         // when
         mongoChatMessageService.saveEnterMessage(roomId, creator);
-        boolean collectionExists = mongoTemplate.collectionExists("chat_messages_" + roomId);
+        Optional<ChatMessageMongo> chatMessage = chatMessageMongoRepository.findTopByChatRoomIdOrderByCreatedAtDesc(roomId.toString());
 
         // then
-        assertThat(collectionExists).isTrue();
+        assertThat(chatMessage).isNotEmpty();
     }
 
     @Test
@@ -106,8 +124,7 @@ class MongoChatServiceTest {
         // given
         Long roomId = chatRoom.getId();
         Long senderId = creator.getId();
-        String collectionName = mongoChatMessageService.getChatRoomName(roomId);
-        long beforeMessageCount = mongoTemplate.getCollection(collectionName).countDocuments();
+        long beforeMessageCount = chatMessageMongoRepository.findAllByChatRoomId(roomId.toString()).size();
 
         byte[] byteCode = imageToByteArray("src/test/resources/스누피4.jpeg");
         String imageBase64 = Base64.getEncoder().encodeToString(byteCode);
@@ -117,15 +134,13 @@ class MongoChatServiceTest {
         List<String> imageUrls = chatImageService.create(requestDto);
         mongoChatMessageService.saveChatMessageWithImage(roomId, imageUrls, requestDto);
 
-        boolean collectionExists = mongoTemplate.collectionExists(collectionName);
-        long messageCount = mongoTemplate.getCollection(collectionName).countDocuments();
+        long messageCount = chatMessageMongoRepository.findAllByChatRoomId(roomId.toString()).size();
 
-        List<ChatMessageMongo> messages = mongoTemplate.findAll(ChatMessageMongo.class, collectionName);
+        List<ChatMessageMongo> messages = chatMessageMongoRepository.findAllByChatRoomId(roomId.toString());
         assertThat(messages).isNotEmpty();
         ChatMessageMongo lastMessage = messages.get(messages.size() - 1);
 
         // then
-        assertThat(collectionExists).isTrue();
         assertThat(messageCount).isEqualTo(beforeMessageCount + 1);
         assertThat(lastMessage.getImageUrls().size()).isEqualTo(1);
         assertThat(lastMessage.getImageUrls().get(0).contains(".jpeg")).isTrue();
@@ -137,10 +152,9 @@ class MongoChatServiceTest {
     void getAllChatMessages() {
         // given
         Long roomId = chatRoom.getId();
-        String collectionName = mongoChatMessageService.getChatRoomName(roomId);
 
         // when
-        List<ChatMessageDto> chatMessageMongoList = mongoChatMessageService.getAllChatMessages(roomId, "null", 10);
+        List<ChatMessageDto> chatMessageMongoList = mongoChatMessageService.getAllChatMessages(roomId, null, 10);
         assertThat(chatMessageMongoList.size()).isEqualTo(2);
 
         String cursor = chatMessageMongoList.get(1).chatMessageId();

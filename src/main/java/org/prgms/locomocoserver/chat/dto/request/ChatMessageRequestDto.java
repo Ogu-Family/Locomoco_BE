@@ -29,8 +29,9 @@ public record ChatMessageRequestDto(
                 .isNotice(isNotice).build();
     }
 
-    public ChatMessageMongo toChatMessageMongo(boolean isNotice, List<String> imageUrls) {
+    public ChatMessageMongo toChatMessageMongo(Long chatRoomId, boolean isNotice, List<String> imageUrls) {
         return ChatMessageMongo.builder()
+                .chatRoomId(chatRoomId.toString())
                 .senderId(senderId.toString())
                 .message(message)
                 .imageUrls(imageUrls)

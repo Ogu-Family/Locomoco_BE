@@ -19,13 +19,14 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<User> findAllById(List<Long> userIds) {
+    public List<User> findAllWithImageByIdIn(List<Long> userIds) {
         QUser user = QUser.user;
+        QImage image = QImage.image;
 
         return queryFactory
                 .selectFrom(user)
-                .where(user.id.in(userIds)
-                        .and(user.deletedAt.isNull()))
+                .leftJoin(user.profileImage, image).fetchJoin()
+                .where(user.id.in(userIds))
                 .fetch();
     }
 
