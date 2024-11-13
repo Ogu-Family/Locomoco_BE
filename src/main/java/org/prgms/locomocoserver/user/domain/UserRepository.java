@@ -14,4 +14,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByNicknameAndDeletedAtIsNull(String nickname);
     @Query("SELECT u FROM User u WHERE u.id IN (SELECT p.user.id FROM Participant p WHERE p.mogakko = :mogakko)")
     List<User> findAllParticipantsByMogakko(Mogakko mogakko);
+    List<User> findByIdIn(List<Long> ids);
 }

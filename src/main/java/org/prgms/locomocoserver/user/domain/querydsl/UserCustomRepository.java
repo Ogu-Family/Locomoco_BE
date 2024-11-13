@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserCustomRepository {
-    List<User> findAllById(List<Long> userIds);
+    List<User> findAllWithImageByIdIn(List<Long> userIds);
     List<User> findAllParticipantsByMogakko(Mogakko mogakko);
     Optional<User> findUserAndImageByUserIdAndDeletedAtIsNull(Long userId);
 }

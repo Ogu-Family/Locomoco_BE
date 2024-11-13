@@ -1,9 +1,9 @@
 package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
-import org.prgms.locomocoserver.chat.domain.ChatParticipant;
-import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoCustomRepository;
-import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
+import org.bson.types.ObjectId;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatActivity;
+import org.prgms.locomocoserver.chat.domain.mongo.ChatActivityRepository;
 import org.prgms.locomocoserver.chat.dto.request.ChatActivityRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
@@ -14,21 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChatActivityService {
 
-    private final ChatParticipantCustomRepository chatParticipantRepository;
-    private final ChatMessageMongoCustomRepository chatMessageMongoCustomRepository;
+    private final ChatActivityRepository chatActivityRepository;
 
     @Transactional
     public void updateLastReadMessage(Long chatRoomId, ChatActivityRequestDto requestDto) {
-        ChatParticipant chatParticipant = chatParticipantRepository.findByUserIdAndChatRoomId(requestDto.userId(), chatRoomId)
+        ChatActivity chatActivity = chatActivityRepository.findByUserIdAndChatRoomId(requestDto.userId().toString(), String.valueOf(chatRoomId))
                 .orElseThrow(() -> new ChatException(ChatErrorType.CHAT_PARTICIPANT_NOT_FOUND));
-        chatParticipant.updateLastReadMessageId(requestDto.lastReadMessageId());
+        chatActivity.updateLastReadMessage(requestDto.userId().toString(), new ObjectId(requestDto.lastReadMessageId()));
     }
 
-    @Transactional(readOnly = true)
-    public int unReadMessageCount(Long roomId, String lastReadMsgId) {
-        if (lastReadMsgId == null) {
-            return 0;
-        }
-        return chatMessageMongoCustomRepository.unReadMessageCount(roomId, lastReadMsgId);
-    }
 }

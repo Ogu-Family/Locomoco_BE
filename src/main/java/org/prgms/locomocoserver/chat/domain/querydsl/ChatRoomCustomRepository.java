@@ -6,6 +6,6 @@ import org.prgms.locomocoserver.user.domain.User;
 import java.util.List;
 
 public interface ChatRoomCustomRepository {
-    List<ChatRoom> findByParticipantsId(Long userId, Long cursorId, int pageSize);
+    List<ChatRoom> findByParticipantsId(Long userId, String cursor, int pageSize);
     List<User> findParticipantsByRoomId(Long roomId);
 }

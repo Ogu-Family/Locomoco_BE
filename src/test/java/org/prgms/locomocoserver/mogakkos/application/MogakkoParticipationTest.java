@@ -1,20 +1,6 @@
 package org.prgms.locomocoserver.mogakkos.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.within;
-import static org.prgms.locomocoserver.global.TestFactory.createMogakko;
-import static org.prgms.locomocoserver.global.TestFactory.createUser;
-
 import ch.qos.logback.core.util.ExecutorServiceUtil;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.bson.assertions.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -39,6 +25,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.prgms.locomocoserver.global.TestFactory.createMogakko;
+import static org.prgms.locomocoserver.global.TestFactory.createUser;
 
 @SpringBootTest
 class MogakkoParticipationTest {
@@ -75,14 +74,14 @@ class MogakkoParticipationTest {
         userRepository.save(testCreator);
 
         Long savedMogakkoId = mogakkoService.save(
-            new MogakkoCreateRequestDto(testCreator.getId(), testMogakko.getTitle(),
-                new LocationInfoDto("", 127.52d, 27.8621d, null, null), testMogakko.getStartTime(),
-                testMogakko.getEndTime(), testMogakko.getDeadline(),
-                testMogakko.getMaxParticipants(),
-                testMogakko.getContent(), Collections.EMPTY_LIST)).id();
+                new MogakkoCreateRequestDto(testCreator.getId(), testMogakko.getTitle(),
+                        new LocationInfoDto("", 127.52d, 27.8621d, null, null), testMogakko.getStartTime(),
+                        testMogakko.getEndTime(), testMogakko.getDeadline(),
+                        testMogakko.getMaxParticipants(),
+                        testMogakko.getContent(), Collections.EMPTY_LIST)).id();
 
         testMogakko = mogakkoRepository.findById(savedMogakkoId)
-            .orElseThrow(() -> new RuntimeException("mogakko not found"));
+                .orElseThrow(() -> new RuntimeException("mogakko not found"));
     }
 
     @AfterEach
@@ -106,7 +105,7 @@ class MogakkoParticipationTest {
 
         // when then
         assertThatThrownBy(() -> mogakkoParticipationService.participate(mogakkoId, requestDto))
-            .isInstanceOf(RuntimeException.class).hasMessageContaining("이미 참여한 유저입니다."); // TODO: 참여 예외 반환
+                .isInstanceOf(RuntimeException.class).hasMessageContaining("이미 참여한 유저입니다."); // TODO: 참여 예외 반환
     }
 
     @Test
@@ -117,11 +116,11 @@ class MogakkoParticipationTest {
         Long creatorId = testCreator.getId();
 
         ThrowingCallable cancelFunc = () -> mogakkoParticipationService.cancel(
-            mogakkoId, creatorId);
+                mogakkoId, creatorId);
 
         // when then
         assertThatThrownBy(cancelFunc).isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("모각코 생성자가 참여를 취소할 수 없습니다.");
+                .hasMessageContaining("모각코 생성자가 참여를 취소할 수 없습니다.");
     }
 
     @Test
@@ -138,7 +137,7 @@ class MogakkoParticipationTest {
         users.forEach(u -> imageRepository.save(u.getProfileImage()));
         userRepository.saveAll(users);
         List<ParticipationRequestDto> participationRequestDtos = users.stream()
-            .map(u -> new ParticipationRequestDto(u.getId(), null, null)).toList();
+                .map(u -> new ParticipationRequestDto(u.getId(), null, null)).toList();
 
         CountDownLatch countDownLatch = new CountDownLatch(usersNum);
 
@@ -146,17 +145,17 @@ class MogakkoParticipationTest {
         AtomicInteger overCount = new AtomicInteger();
 
         participationRequestDtos.forEach(dto ->
-            threadPoolExecutor.execute(
-                () -> {
-                    try {
-                        mogakkoParticipationService.participate(mogakkoId, dto);
-                    } catch (Exception e) {
-                        log.info("예외 발생");
-                        overCount.getAndIncrement();
-                    } finally {
-                        countDownLatch.countDown();
-                    }
-                })
+                threadPoolExecutor.execute(
+                        () -> {
+                            try {
+                                mogakkoParticipationService.participate(mogakkoId, dto);
+                            } catch (Exception e) {
+                                log.info("예외 발생");
+                                overCount.getAndIncrement();
+                            } finally {
+                                countDownLatch.countDown();
+                            }
+                        })
         );
         countDownLatch.await(5000, TimeUnit.MILLISECONDS);
 
@@ -171,14 +170,14 @@ class MogakkoParticipationTest {
         double latitude = 27.12345678999999d;
         double longitude = 127.12423d;
         ParticipationRequestDto requestDto = new ParticipationRequestDto(testCreator.getId(),
-            longitude, latitude);
+                longitude, latitude);
 
         // when
         mogakkoParticipationService.update(testMogakko.getId(), requestDto);
 
         // then
         Participant participant = participantRepository.findByMogakkoIdAndUserId(
-            testMogakko.getId(), testCreator.getId()).orElseThrow(RuntimeException::new);
+                testMogakko.getId(), testCreator.getId()).orElseThrow(RuntimeException::new);
 
         double columnPointLimit = 0.0000000001d;
         assertThat(participant.getLongitude()).isEqualTo(longitude, within(columnPointLimit));
@@ -212,7 +211,7 @@ class MogakkoParticipationTest {
 
         // then
         List<Participant> participants = participantRepository.findAllByMogakkoId(
-            testMogakko.getId());
+                testMogakko.getId());
 
         assertThat(participants).hasSize(1);
     }
@@ -222,9 +221,9 @@ class MogakkoParticipationTest {
     void success_check_whether_user_participate_in_mogakko() {
         // when
         ParticipationCheckingDto checkedTrueDto = mogakkoParticipationService.check(testMogakko.getId(),
-            testCreator.getId());
+                testCreator.getId());
         ParticipationCheckingDto checkedFalseDto = mogakkoParticipationService.check(testMogakko.getId(),
-            testCreator.getId() + 1L);
+                testCreator.getId() + 1L);
 
         // then
         assertThat(checkedTrueDto.isParticipated()).isTrue();

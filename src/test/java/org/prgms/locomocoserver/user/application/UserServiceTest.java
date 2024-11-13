@@ -211,7 +211,7 @@ class UserServiceTest {
                 .extracting(participant -> participant.getId())
                 .doesNotContain(user.getId());
 
-        List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(user.getId(), 0L, 10);
+        List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(user.getId(), LocalDateTime.now().toString(), 10);
         assertThat(chatRooms).isEmpty();
     }
 

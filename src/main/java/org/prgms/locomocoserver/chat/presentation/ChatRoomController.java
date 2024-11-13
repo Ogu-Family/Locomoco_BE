@@ -24,7 +24,7 @@ public class ChatRoomController {
     @Operation(summary = "채팅방 목록 조회", description = "userId 기반 채팅방 조회")
     @GetMapping("/chats/rooms/{userId}")
     public ResponseEntity<List<ChatRoomDto>> getAllChatRooms(@PathVariable Long userId,
-                                                             @RequestParam(name = "cursor", required = false) Long cursor,
+                                                             @RequestParam(name = "cursor", required = false) String cursor,
                                                              @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         List<ChatRoomDto> chatRoomDtos = chatRoomService.getAllChatRoom(userId, cursor, pageSize);
         return ResponseEntity.ok(chatRoomDtos);
