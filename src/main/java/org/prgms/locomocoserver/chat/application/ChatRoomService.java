@@ -2,7 +2,6 @@ package org.prgms.locomocoserver.chat.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.prgms.locomocoserver.chat.dto.ChatActivityDto;
 import org.prgms.locomocoserver.chat.domain.ChatParticipant;
 import org.prgms.locomocoserver.chat.domain.ChatRoom;
 import org.prgms.locomocoserver.chat.domain.ChatRoomRepository;
@@ -11,10 +10,7 @@ import org.prgms.locomocoserver.chat.domain.mongo.ChatActivityRepository;
 import org.prgms.locomocoserver.chat.domain.mongo.ChatMessageMongoCustomRepository;
 import org.prgms.locomocoserver.chat.domain.querydsl.ChatParticipantCustomRepository;
 import org.prgms.locomocoserver.chat.domain.querydsl.ChatRoomCustomRepository;
-import org.prgms.locomocoserver.chat.dto.ChatMessageBriefDto;
-import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
-import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
-import org.prgms.locomocoserver.chat.dto.ChatUserInfo;
+import org.prgms.locomocoserver.chat.dto.*;
 import org.prgms.locomocoserver.chat.dto.request.ChatCreateRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
@@ -52,7 +48,6 @@ public class ChatRoomService {
 
         if (!isParticipantExist(chatRoom, requestDto.participant())) {
             ChatMessageDto chatMessageDto = saveEnterMessage(requestDto);
-            chatMessagePolicy.saveEnterMessage(requestDto.chatRoomId(), requestDto.participant());
             ChatParticipant chatParticipant = chatParticipantCustomRepository.save(ChatParticipant.builder().user(requestDto.participant())
                     .chatRoom(chatRoom).build()).orElseThrow(() -> new RuntimeException("채팅방 참여에 실패했습니다."));
 
