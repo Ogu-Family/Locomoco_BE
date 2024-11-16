@@ -91,16 +91,19 @@ public class ChatMessageMongoCustomRepository {
         }
 
         return results.stream()
-                .filter(doc -> doc.getObjectId("lastReadMsgId") != null)
                 .collect(Collectors.toMap(
                         doc -> doc.getString("chatRoomId"),
-                        doc -> doc.getObjectId("lastReadMsgId")
+                        doc -> {
+                            ObjectId lastReadMsgId = doc.getObjectId("lastReadMsgId");
+                            return lastReadMsgId != null ? lastReadMsgId : new ObjectId();
+                        }
                 ));
     }
 
     // 읽지 않은 메시지 수 계산 기준 생성
     private List<Criteria> createUnreadMessageCriteria(Map<String, ObjectId> lastReadMsgIdMap) {
         return lastReadMsgIdMap.entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
                 .map(entry -> Criteria.where("chatRoomId").is(entry.getKey()).and("_id").gt(entry.getValue()))
                 .collect(Collectors.toList());
     }
