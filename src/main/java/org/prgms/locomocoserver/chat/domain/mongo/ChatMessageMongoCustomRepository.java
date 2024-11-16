@@ -46,6 +46,7 @@ public class ChatMessageMongoCustomRepository {
 
         // 2. 채팅방별 lastReadMsgId 조회
         Map<String, ObjectId> lastReadMsgIdMap = fetchLastReadMsgIds(userId, chatRoomIds);
+        log.info("findLastMessagesAndUnReadMsgCount - lastReadMsgIdMap : " + lastReadMsgIdMap);
 
         // 3. 읽지 않은 메시지 수 계산 기준 생성
         List<Criteria> criteriaList = createUnreadMessageCriteria(lastReadMsgIdMap);
@@ -117,7 +118,6 @@ public class ChatMessageMongoCustomRepository {
         );
 
         AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "chat_messages", Document.class);
-        log.info("countUnreadMessages : " + results);
 
         return results.getMappedResults().stream()
                 .map(result -> {

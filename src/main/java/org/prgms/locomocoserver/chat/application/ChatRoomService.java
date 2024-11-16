@@ -104,6 +104,7 @@ public class ChatRoomService {
         log.info("START findLastMessagesAndUnReadMsgCount");
         List<ChatActivityDto> lastMessages = chatMessageMongoCustomRepository.findLastMessagesAndUnReadMsgCount(userId.toString(), chatRoomIds);
         log.info("END findLastMessagesAndUnreadMsgCount");
+        log.info(lastMessages.toString());
 
         Map<Long, ChatActivityDto> lastMsgMongoMap = lastMessages.stream()
                 .collect(Collectors.toMap(
