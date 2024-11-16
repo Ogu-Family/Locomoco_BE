@@ -117,6 +117,7 @@ public class ChatMessageMongoCustomRepository {
         );
 
         AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "chat_messages", Document.class);
+        log.info("countUnreadMessages : " + results);
 
         return results.getMappedResults().stream()
                 .map(result -> {
