@@ -1,6 +1,7 @@
 package org.prgms.locomocoserver.chat.domain.mongo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.prgms.locomocoserver.chat.dto.ChatActivityDto;
@@ -14,10 +15,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ChatMessageMongoCustomRepository {
@@ -67,6 +70,10 @@ public class ChatMessageMongoCustomRepository {
 
         List<ChatActivityDto> lastMessages = mongoTemplate.aggregate(aggregation, "chat_messages", ChatActivityDto.class)
                 .getMappedResults();
+        if (lastMessages == null || lastMessages.isEmpty()) {
+            log.info("findLastMessages : No message");
+            return new HashMap<>();
+        }
 
         return lastMessages.stream()
                 .collect(Collectors.toMap(ChatActivityDto::chatRoomId, chatActivityDto -> chatActivityDto));
@@ -78,6 +85,10 @@ public class ChatMessageMongoCustomRepository {
         query.fields().include("chatRoomId").include("lastReadMsgId");
 
         List<Document> results = mongoTemplate.find(query, Document.class, "chat_activity");
+        if (results == null || results.isEmpty()) {
+            log.info("fetchLastReadMsgIds : No message");
+            return new HashMap<>();
+        }
 
         return results.stream()
                 .filter(doc -> doc.getObjectId("lastReadMsgId") != null)
