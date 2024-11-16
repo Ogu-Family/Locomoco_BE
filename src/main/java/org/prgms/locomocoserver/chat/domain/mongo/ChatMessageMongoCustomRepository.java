@@ -14,10 +14,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,6 +40,9 @@ public class ChatMessageMongoCustomRepository {
     public List<ChatActivityDto> findLastMessagesAndUnReadMsgCount(String userId, List<String> chatRoomIds) {
         // 1. 채팅방별 마지막 메시지 조회
         Map<String, ChatActivityDto> lastMsgMap = findLastMessages(chatRoomIds);
+        if (lastMsgMap == null || lastMsgMap.isEmpty()) {
+            return new ArrayList<>();
+        }
 
         // 2. 채팅방별 lastReadMsgId 조회
         Map<String, ObjectId> lastReadMsgIdMap = fetchLastReadMsgIds(userId, chatRoomIds);
