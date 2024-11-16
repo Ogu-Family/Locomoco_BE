@@ -121,7 +121,10 @@ public class ChatMessageMongoCustomRepository {
 
         AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "chat_messages", Document.class);
 
-        return results.getMappedResults().stream()
+        List<Document> mappedResults = results.getMappedResults();
+        mappedResults.forEach(result -> log.info(result.toJson()));
+
+        return mappedResults.stream()
                 .map(result -> {
                     String chatRoomId = result.getString("chatRoomId");
                     Integer unreadCount = result.getInteger("unreadCount");
