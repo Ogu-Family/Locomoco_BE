@@ -7,8 +7,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Document(collection = "chat_activity")
 @CompoundIndex(def = "{'userId': 1, 'chatRoomId': 1}", name = "user_chatRoom_idx", unique = true)

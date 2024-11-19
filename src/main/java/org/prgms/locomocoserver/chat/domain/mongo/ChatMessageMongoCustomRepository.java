@@ -14,7 +14,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,7 +29,7 @@ public class ChatMessageMongoCustomRepository {
 
     @Transactional(readOnly = true)
     public List<ChatMessageMongo> findAllChatMessages(Long roomId, String cursorValue, int pageSize) {
-        ObjectId cursor = cursorValue == null ? new ObjectId(new Date(Long.MAX_VALUE)) : new ObjectId(cursorValue);
+        ObjectId cursor = cursorValue == null ? new ObjectId() : new ObjectId(cursorValue);
         Query query = new Query();
         query.with(Sort.by(Sort.Direction.DESC, "_id"));
         query.addCriteria(Criteria.where("chatRoomId").is(roomId.toString())
