@@ -79,10 +79,8 @@ public class ChatMessageMongoCustomRepository {
         List<ChatActivityDto> lastMessages = mongoTemplate.aggregate(aggregation, "chat_messages", ChatActivityDto.class)
                 .getMappedResults();
         if (lastMessages == null || lastMessages.isEmpty()) {
-            log.info("findLastMessages : No message");
             return new HashMap<>();
         }
-        log.info("findLastMessages : Results fetched - {}", lastMessages);
 
         return lastMessages.stream()
                 .collect(Collectors.toMap(ChatActivityDto::chatRoomId, chatActivityDto -> chatActivityDto));
@@ -95,10 +93,8 @@ public class ChatMessageMongoCustomRepository {
 
         List<Document> results = mongoTemplate.find(query, Document.class, "chat_activity");
         if (results == null || results.isEmpty()) {
-            log.info("fetchLastReadMsgIds : No message");
             return new HashMap<>();
         }
-        log.info("fetchLastReadMsgIds : Results fetched - {}", results.toString());
 
         return results.stream()
                 .collect(Collectors.toMap(
@@ -131,7 +127,6 @@ public class ChatMessageMongoCustomRepository {
         AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "chat_messages", Document.class);
 
         List<Document> mappedResults = results.getMappedResults();
-        log.info("countUnreadMessages - Mapped results : " + mappedResults);
 
         return mappedResults.stream()
                 .map(result -> {

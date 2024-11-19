@@ -96,15 +96,11 @@ public class ChatRoomService {
     public List<ChatRoomDto> getAllChatRoom(Long userId, String cursor, int pageSize) {
         if (cursor == null) cursor = LocalDateTime.now().toString();
 
-        log.info("START findByParticipantsId");
         List<ChatRoom> chatRooms = chatRoomCustomRepository.findByParticipantsId(userId, cursor, pageSize);
-        log.info("END findByParticipantsId");
 
         List<String> chatRoomIds = createChatRoomIds(chatRooms);
         log.info("START findLastMessagesAndUnReadMsgCount");
         List<ChatActivityDto> lastMessages = chatMessageMongoCustomRepository.findLastMessagesAndUnReadMsgCount(userId.toString(), chatRoomIds);
-        log.info("END findLastMessagesAndUnreadMsgCount");
-        log.info(lastMessages.toString());
 
         Map<Long, ChatActivityDto> lastMsgMongoMap = lastMessages.stream()
                 .collect(Collectors.toMap(
@@ -116,9 +112,7 @@ public class ChatRoomService {
         log.info("START findByIdIn");
         Map<Long, User> userMap = userCustomRepository.findAllWithImageByIdIn(userIds).stream()
                 .collect(Collectors.toMap(User::getId, user -> user));
-        log.info("END findByIdIn");
 
-        log.info("START dto Change");
         return chatRooms.stream()
                 .map(chatRoom -> {
                     ChatActivityDto dto = lastMsgMongoMap.get(chatRoom.getId());

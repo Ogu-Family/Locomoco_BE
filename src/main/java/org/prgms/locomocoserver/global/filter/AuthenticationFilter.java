@@ -44,19 +44,15 @@ public class AuthenticationFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        try {
-            // Preflight 처리
-            if (isPreflightRequest(httpRequest)) {
-                handleCorsPreflight(httpRequest, httpResponse);
-                return;
-            }
+        // Preflight 처리
+        if (isPreflightRequest(httpRequest)) {
+            handleCorsPreflight(httpRequest, httpResponse);
+            return;
+        }
 
-            if (isAuthRequired(httpRequest)) {
-                log.info("Authentication Required for {}", httpRequest.getRequestURI());
-                handleAuthentication(httpRequest, httpResponse);
-            }
-        } finally {
-            log.info("Authentication Filter Ended");
+        if (isAuthRequired(httpRequest)) {
+            log.info("Authentication Required for {}", httpRequest.getRequestURI());
+            handleAuthentication(httpRequest, httpResponse);
         }
 
         chain.doFilter(request, response);

@@ -27,7 +27,6 @@ public class ExceptionHandlerFilter extends GenericFilterBean {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
         try {
-            log.info("ExceptionHandler - doFilter : started");
             chain.doFilter(request, response);
         } catch (RuntimeException e) {
             handleException(httpServletResponse, e);

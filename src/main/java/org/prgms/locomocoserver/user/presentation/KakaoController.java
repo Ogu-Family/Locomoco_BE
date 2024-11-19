@@ -52,8 +52,6 @@ public class KakaoController {
     @GetMapping("/users/login/kakao/callback")
     public ResponseEntity<UserLoginResponse> getKakaoLoginCallback(@RequestParam(name = "code") String code,
                                                                    HttpServletRequest request) throws JsonProcessingException {
-        log.info("KakaoController.getKakaoLoginCallback " + code);
-
         String origin = request.getHeader("Origin");
         TokenResponseDto tokenResponseDto = origin.contains("local") ? getTokenDto(code, kakao_redirect_uri_local) : getTokenDto(code, kakao_redirect_uri);
         KakaoUserInfoResponseDto kakaoUserInfoResponseDto = loadUserInfo(tokenResponseDto.accessToken());
