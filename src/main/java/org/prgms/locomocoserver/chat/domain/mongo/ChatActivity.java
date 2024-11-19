@@ -7,6 +7,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Document(collection = "chat_activity")
 @CompoundIndex(def = "{'userId': 1, 'chatRoomId': 1}", name = "user_chatRoom_idx", unique = true)
@@ -21,7 +23,7 @@ public class ChatActivity {
     public ChatActivity(String userId, String chatRoomId) {
         this.userId = userId;
         this.chatRoomId = chatRoomId;
-        this.lastReadMsgId = null;
+        this.lastReadMsgId = new ObjectId();
     }
 
     public void updateLastReadMessage(String userId, ObjectId lastReadMsgId) {
