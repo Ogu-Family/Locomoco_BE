@@ -108,8 +108,8 @@ public class ChatRoomService {
 
         Map<Long, ChatActivityDto> lastMsgMongoMap = lastMessages.stream()
                 .collect(Collectors.toMap(
-                        dao -> Long.parseLong(dao.chatRoomId()),
-                        dao -> dao
+                        dto -> Long.parseLong(dto.chatRoomId()),
+                        dto -> dto
                 ));
 
         List<Long> userIds = createUserIds(lastMessages);
@@ -121,12 +121,12 @@ public class ChatRoomService {
         log.info("START dto Change");
         return chatRooms.stream()
                 .map(chatRoom -> {
-                    ChatActivityDto dao = lastMsgMongoMap.get(chatRoom.getId());
-                    ChatMessageBriefDto lastMessageDto = ChatMessageBriefDto.of(dao.chatRoomId(), dao.chatMessageId().toString(), dao.senderId(), dao.message(), dao.createdAt());
-                    User user = userMap.get(Long.parseLong(dao.senderId()));
+                    ChatActivityDto dto = lastMsgMongoMap.get(chatRoom.getId());
+                    ChatMessageBriefDto lastMessageDto = ChatMessageBriefDto.of(dto.chatRoomId(), dto.chatMessageId().toString(), dto.senderId(), dto.message(), dto.createdAt());
+                    User user = userMap.get(Long.parseLong(dto.senderId()));
                     ChatUserInfo chatUserInfo = user.getDeletedAt() == null ? ChatUserInfo.of(user) : ChatUserInfo.deletedUser(user.getId());
 
-                    return ChatRoomDto.of(chatRoom, Integer.parseInt(dao.unReadMsgCnt()), lastMessageDto, chatUserInfo);
+                    return ChatRoomDto.of(chatRoom, Integer.parseInt(dto.unReadMsgCnt()), lastMessageDto, chatUserInfo);
                 })
                 .filter(Objects::nonNull)
                 .toList();

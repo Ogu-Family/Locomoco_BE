@@ -75,6 +75,7 @@ public class ChatMessageMongoCustomRepository {
             log.info("findLastMessages : No message");
             return new HashMap<>();
         }
+        log.info("findLastMessages : Results fetched - {}", lastMessages);
 
         return lastMessages.stream()
                 .collect(Collectors.toMap(ChatActivityDto::chatRoomId, chatActivityDto -> chatActivityDto));
@@ -90,6 +91,7 @@ public class ChatMessageMongoCustomRepository {
             log.info("fetchLastReadMsgIds : No message");
             return new HashMap<>();
         }
+        log.info("fetchLastReadMsgIds : Results fetched - {}", results.toString());
 
         return results.stream()
                 .collect(Collectors.toMap(
