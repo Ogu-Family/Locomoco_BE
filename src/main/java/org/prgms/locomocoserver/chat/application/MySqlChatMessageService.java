@@ -60,7 +60,7 @@ public class MySqlChatMessageService implements ChatMessagePolicy {
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, String cursorValue, int pageSize) {
         Long cursor = Long.MAX_VALUE;
-        if (cursorValue != "null") cursor = Long.parseLong(cursorValue);
+        if (cursorValue != null) cursor = Long.parseLong(cursorValue);
 
         List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomIdAndIdGreaterThan(roomId, cursor, pageSize);
 

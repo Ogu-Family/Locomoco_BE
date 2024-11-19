@@ -134,8 +134,7 @@ public class ChatRoomService {
 
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(Long roomId, String cursor, int pageSize) {
-        String cursorValue = cursor == null ? "null" : cursor;
-        return chatMessagePolicy.getAllChatMessages(roomId, cursorValue, pageSize);
+        return chatMessagePolicy.getAllChatMessages(roomId, cursor, pageSize);
     }
 
     @Transactional(readOnly = true)
