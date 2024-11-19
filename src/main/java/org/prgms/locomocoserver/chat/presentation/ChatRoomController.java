@@ -3,11 +3,15 @@ package org.prgms.locomocoserver.chat.presentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.prgms.locomocoserver.chat.application.ChatActivityService;
 import org.prgms.locomocoserver.chat.application.ChatMessagePolicy;
 import org.prgms.locomocoserver.chat.application.ChatRoomService;
 import org.prgms.locomocoserver.chat.application.MySqlChatMessageService;
 import org.prgms.locomocoserver.chat.dto.ChatMessageDto;
 import org.prgms.locomocoserver.chat.dto.ChatRoomDto;
+import org.prgms.locomocoserver.chat.dto.request.ChatActivityRequestDto;
+import org.prgms.locomocoserver.global.annotation.GetUser;
+import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +24,7 @@ import java.util.List;
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
+    private final ChatActivityService chatActivityService;
 
     @Operation(summary = "채팅방 목록 조회", description = "userId 기반 채팅방 조회")
     @GetMapping("/chats/rooms/{userId}")
@@ -34,8 +39,11 @@ public class ChatRoomController {
     @GetMapping("/chats/room/{roomId}/messages")
     public ResponseEntity<List<ChatMessageDto>> getAllChatMessages(@PathVariable Long roomId,
                                                                    @RequestParam(name = "cursor", required = false) String cursor,
-                                                                   @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
+                                                                   @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+                                                                   @GetUser User user) {
         List<ChatMessageDto> chatMessageDtos = chatRoomService.getAllChatMessages(roomId, cursor, pageSize);
+        chatActivityService.updateLastReadMessage(roomId, new ChatActivityRequestDto(user.getId(), chatMessageDtos.get(chatMessageDtos.size()-1).chatMessageId()));
+
         return ResponseEntity.ok(chatMessageDtos);
     }
 
