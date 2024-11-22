@@ -129,7 +129,7 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public List<ChatMessageDto> getAllChatMessages(User user, Long roomId, String cursor, int pageSize) {
         ChatRoom chatRoom = getById(roomId);
-        if(!isParticipantExist(chatRoom, user)) {
+        if (!isParticipantExist(chatRoom, user)) {
             throw new ChatException(ChatErrorType.CHAT_PARTICIPANT_NOT_FOUND);
         }
         return chatMessagePolicy.getAllChatMessages(roomId, cursor, pageSize);
