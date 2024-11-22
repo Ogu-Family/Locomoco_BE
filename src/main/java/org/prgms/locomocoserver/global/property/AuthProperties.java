@@ -12,7 +12,7 @@ public class AuthProperties {
             // User
             "GET:/api/v1/users/\\d+",
 
-            // Chatㅇ
+            // Chat
             "GET:/api/v1/chats/room/\\d+(/messages(\\?[^\\s]*)?)?",
             "GET:/api/v1/chats/rooms/\\d+",
 
