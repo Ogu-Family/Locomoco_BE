@@ -9,9 +9,14 @@ import java.util.List;
 @Component
 public class AuthProperties {
     private final List<String> authRequired = List.of(
+            // User
+            "GET:/api/v1/users/\\d+",
+
+            // Chatㅇ
+            "GET:/api/v1/chats/room/\\d+(/messages(\\?[^\\s]*)?)?",
             "GET:/api/v1/chats/rooms/\\d+",
-            "PATCH:/api/v1/mogakko/map/\\d+",
-            "GET:/api/v1/users/\\d+"
-            //"GET:/api/v1/chats/(rooms|room)/\\\\d+(/messages)?\n"
+
+            // Mogakko
+            "PATCH:/api/v1/mogakko/map/\\d+"
     );
 }
