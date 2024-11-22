@@ -1,6 +1,5 @@
 package org.prgms.locomocoserver.global.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,17 +11,11 @@ import org.prgms.locomocoserver.global.exception.ErrorCode;
 import org.prgms.locomocoserver.global.property.AuthProperties;
 import org.prgms.locomocoserver.global.property.CorsProperties;
 import org.prgms.locomocoserver.user.application.AuthenticationService;
-import org.prgms.locomocoserver.user.application.RefreshTokenService;
 import org.prgms.locomocoserver.user.application.TokenService;
-import org.prgms.locomocoserver.user.domain.RefreshToken;
 import org.prgms.locomocoserver.user.domain.User;
-import org.prgms.locomocoserver.user.domain.enums.Provider;
-import org.prgms.locomocoserver.user.dto.response.TokenResponseDto;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
