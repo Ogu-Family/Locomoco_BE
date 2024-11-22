@@ -39,9 +39,10 @@ public class ChatRoomController {
     @GetMapping("/chats/room/{roomId}/messages")
     public ResponseEntity<List<ChatMessageDto>> getAllChatMessages(@PathVariable Long roomId,
                                                                    @RequestParam(name = "cursor", required = false) String cursor,
-                                                                   @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
+                                                                   @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+                                                                   @GetUser User user) {
         List<ChatMessageDto> chatMessageDtos = chatRoomService.getAllChatMessages(roomId, cursor, pageSize);
-        //chatActivityService.updateLastReadMessage(roomId, new ChatActivityRequestDto(user.getId(), chatMessageDtos.get(chatMessageDtos.size()-1).chatMessageId()));
+        chatActivityService.updateLastReadMessage(roomId, new ChatActivityRequestDto(user.getId(), chatMessageDtos.get(chatMessageDtos.size()-1).chatMessageId()));
 
         return ResponseEntity.ok(chatMessageDtos);
     }
