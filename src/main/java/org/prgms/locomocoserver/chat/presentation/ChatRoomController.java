@@ -24,7 +24,6 @@ import java.util.List;
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
-    private final ChatActivityService chatActivityService;
 
     @Operation(summary = "채팅방 목록 조회", description = "userId 기반 채팅방 조회")
     @GetMapping("/chats/rooms/{userId}")
@@ -41,8 +40,7 @@ public class ChatRoomController {
                                                                    @RequestParam(name = "cursor", required = false) String cursor,
                                                                    @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
                                                                    @GetUser User user) {
-        List<ChatMessageDto> chatMessageDtos = chatRoomService.getAllChatMessages(roomId, cursor, pageSize);
-        chatActivityService.updateLastReadMessage(roomId, new ChatActivityRequestDto(user.getId(), chatMessageDtos.get(chatMessageDtos.size()-1).chatMessageId()));
+        List<ChatMessageDto> chatMessageDtos = chatRoomService.getAllChatMessages(user, roomId, cursor, pageSize);
 
         return ResponseEntity.ok(chatMessageDtos);
     }
