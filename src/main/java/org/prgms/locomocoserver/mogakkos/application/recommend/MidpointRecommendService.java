@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -53,9 +54,11 @@ public class MidpointRecommendService {
         CompletableFuture<Pair<Midpoint, Integer>> cafeMidpointFuture = CompletableFuture.supplyAsync(
             () -> getMidpoint(latitudeAvg, longitudeAvg, locations, CAFE));
 
+        /*
         if (maximumDistance > SUBWAY_DIST_KM) {
              midpointCandidate.add(getMidpoint(latitudeAvg, longitudeAvg, locations, SUBWAY));
         }
+        */ // ODSay 기간 만료
 
         try {
             midpointCandidate.add(cafeMidpointFuture.get());
@@ -111,6 +114,10 @@ public class MidpointRecommendService {
     private int getRoadDistance(Location origin, Place dest, String categoryGroup) {
         int ret;
         FindRoadInfo findRoadInfo = findRoadFactory.getFindRoadInfo(categoryGroup);
+
+        if (Objects.isNull(findRoadInfo)) {
+            throw new RuntimeException("길찾기를 위해 설정된 외부 API가 없습니다. (findRoadInfo == null)");
+        }
 
         URI uri = findRoadInfo.getUri(origin.getLongitude(), origin.getLatitude(), dest.longitude(), dest.latitude());
         String response = restTemplate.exchange(uri, HttpMethod.GET, findRoadInfo.getHttpInfo(), String.class).getBody(); // TODO: 타임 아웃, API 장애 등 상황에 따른 설정

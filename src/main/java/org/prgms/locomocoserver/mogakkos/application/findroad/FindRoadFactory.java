@@ -16,7 +16,7 @@ public class FindRoadFactory {
     public FindRoadInfo getFindRoadInfo(String categoryGroup) {
         return switch (categoryGroup) {
             case CAFE -> new KakaoFindRoadInfo(kakaoApiKey);
-            case SUBWAY -> new OdsayFindRoadInfo(odsayApiKey);
+            // case SUBWAY -> new OdsayFindRoadInfo(odsayApiKey); // ODSay 기간 만료
             default -> null;
         };
     }
