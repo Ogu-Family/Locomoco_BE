@@ -60,7 +60,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                 .join(chatParticipant).on(chatParticipant.user.id.eq(user.id))
                 .leftJoin(user.profileImage, image)
                 .fetchJoin()
-                .where(chatParticipant.chatRoom.id.eq(roomId).and(user.deletedAt.isNotNull()))
+                .where(chatParticipant.chatRoom.id.eq(roomId).and(user.deletedAt.isNull()))
                 .fetch();
     }
 }
