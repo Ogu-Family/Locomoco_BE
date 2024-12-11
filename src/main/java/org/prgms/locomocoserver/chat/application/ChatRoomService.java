@@ -107,11 +107,13 @@ public class ChatRoomService {
                         dto -> Long.parseLong(dto.chatRoomId()),
                         dto -> dto
                 ));
+        log.info(lastMsgMongoMap.toString());
 
         List<Long> userIds = createUserIds(lastMessages);
         log.info("START findByIdIn");
         Map<Long, User> userMap = userCustomRepository.findAllWithImageByIdIn(userIds).stream()
                 .collect(Collectors.toMap(User::getId, user -> user));
+        log.info(userMap.toString());
 
         return chatRooms.stream()
                 .map(chatRoom -> {
