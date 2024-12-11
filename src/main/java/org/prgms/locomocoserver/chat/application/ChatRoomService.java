@@ -117,6 +117,7 @@ public class ChatRoomService {
 
         return chatRooms.stream()
                 .map(chatRoom -> {
+                    log.info("chatRoom : " + chatRoom.getId());
                     ChatActivityDto dto = lastMsgMongoMap.get(chatRoom.getId());
                     ChatMessageBriefDto lastMessageDto = ChatMessageBriefDto.of(dto.chatRoomId(), dto.chatMessageId().toString(), dto.senderId(), dto.message(), dto.createdAt());
                     User user = userMap.get(Long.parseLong(dto.senderId()));
