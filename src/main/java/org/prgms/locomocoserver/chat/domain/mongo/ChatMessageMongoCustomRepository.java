@@ -126,15 +126,14 @@ public class ChatMessageMongoCustomRepository {
 
         AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "chat_messages", Document.class);
 
-        List<Document> mappedResults = results.getMappedResults();
+        Map<String, Integer> unreadCountMap = results.getMappedResults().stream()
+                .collect(Collectors.toMap(doc -> doc.getString("chatRoomId"), doc -> doc.getInteger("unreadCount")));
 
-        return mappedResults.stream()
-                .map(result -> {
-                    String chatRoomId = result.getString("chatRoomId");
-                    Integer unreadCount = result.getInteger("unreadCount");
-                    ChatActivityDto chatActivityDto = lastMsgMap.get(chatRoomId);
-                    return new ChatActivityDto(String.valueOf(unreadCount), chatRoomId, chatActivityDto.chatMessageId(),
-                            chatActivityDto.senderId(), chatActivityDto.message(), chatActivityDto.createdAt());
+        return lastMsgMap.values().stream()
+                .map(dto -> {
+                    int unreadCount = unreadCountMap.getOrDefault(dto.chatRoomId(), 0); // 기본값 0 처리
+                    return new ChatActivityDto(String.valueOf(unreadCount), dto.chatRoomId(),
+                            dto.chatMessageId(), dto.senderId(), dto.message(), dto.createdAt());
                 })
                 .collect(Collectors.toList());
     }
