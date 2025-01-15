@@ -7,6 +7,7 @@ import org.prgms.locomocoserver.user.application.TokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
@@ -22,7 +23,8 @@ public class CustomHandshakeInterceptor implements HandshakeInterceptor {
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+        HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
 
         String accessToken = httpServletRequest.getHeader("Authorization");
         String provider = httpServletRequest.getHeader("provider");
