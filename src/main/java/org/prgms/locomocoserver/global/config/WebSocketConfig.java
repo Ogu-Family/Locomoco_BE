@@ -1,5 +1,7 @@
 package org.prgms.locomocoserver.global.config;
 
+import lombok.RequiredArgsConstructor;
+import org.prgms.locomocoserver.global.interceptor.CustomHandshakeInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -7,13 +9,17 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final CustomHandshakeInterceptor customHandshakeInterceptor;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
         registry.addEndpoint("/api/v1/stomp/chat")
+                .addInterceptors(customHandshakeInterceptor)
                 .setAllowedOrigins("http://localhost:8090", "http://localhost:3000", "https://locomoco.kro.kr")
                 .withSockJS(); // 웹소켓 핸드셰이크 커넥션 생성 경로
     }

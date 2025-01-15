@@ -10,7 +10,6 @@ import org.prgms.locomocoserver.global.exception.AuthException;
 import org.prgms.locomocoserver.global.exception.ErrorCode;
 import org.prgms.locomocoserver.global.property.AuthProperties;
 import org.prgms.locomocoserver.global.property.CorsProperties;
-import org.prgms.locomocoserver.user.application.AuthenticationService;
 import org.prgms.locomocoserver.user.application.TokenService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthenticationFilter implements Filter {
 
-    private final AuthenticationService authenticationService;
     private final TokenService tokenService;
     private final CorsProperties corsProperties;
     private final AuthProperties authProperties;
@@ -74,20 +72,14 @@ public class AuthenticationFilter implements Filter {
         String method = request.getMethod();
         String url = request.getRequestURI();
         List<String> authRequired = authProperties.getAuthRequired();
-        return authRequired.stream()
-                .anyMatch(pattern -> isPatternMatch(pattern, method, url));
+        return authRequired.stream().anyMatch(pattern -> isPatternMatch(pattern, method, url));
     }
 
     private void handleAuthentication(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String accessToken = request.getHeader("Authorization");
         String providerValue = request.getHeader("provider");
 
-        if (accessToken == null || providerValue == null) {
-            log.error("Authentication failed: {}", ErrorCode.NO_ACCESS_TOKEN.getMessage());
-            throw new AuthException(ErrorCode.NO_ACCESS_TOKEN);
-        }
-
-        boolean isValidToken = authenticationService.authenticateUser(providerValue, accessToken);
+        boolean isValidToken = tokenService.isValidToken(accessToken, providerValue);
 
         if (isValidToken) {
             User user = tokenService.getUserFromToken(accessToken.substring(7), providerValue);

@@ -11,10 +11,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StompChatService {
 
+    static final String DESTINATION_ROUTE = "/sub/chat/room/";
+
     private final SimpMessagingTemplate template;
 
     public void sendToSubscribers(ChatMessageDto chatMessageDto) {
         log.info("sendToSubscribers: " + chatMessageDto.message() + " " + chatMessageDto.senderNickName());
-        template.convertAndSend("/sub/chat/room/" + chatMessageDto.chatRoomId(), chatMessageDto);
+        template.convertAndSend(DESTINATION_ROUTE + chatMessageDto.chatRoomId(), chatMessageDto);
     }
 }
