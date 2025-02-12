@@ -46,6 +46,9 @@ public class CustomHandshakeInterceptor implements HandshakeInterceptor {
 
             boolean isValidToken = tokenService.isValidToken(accessToken, provider);
             if (isValidToken) {
+                if (attributes == null) {
+                    attributes = new HashMap<>();
+                }
                 attributes.put("user", tokenService.getUserFromToken(accessToken.substring(7), provider));
                 return true;
             } else {
