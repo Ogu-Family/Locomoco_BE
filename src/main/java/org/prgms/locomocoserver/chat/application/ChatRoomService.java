@@ -16,6 +16,7 @@ import org.prgms.locomocoserver.chat.dto.request.ChatEnterRequestDto;
 import org.prgms.locomocoserver.chat.dto.request.ChatMessageRequestDto;
 import org.prgms.locomocoserver.chat.exception.ChatErrorType;
 import org.prgms.locomocoserver.chat.exception.ChatException;
+import org.prgms.locomocoserver.chat.infrastructure.StompChatService;
 import org.prgms.locomocoserver.user.domain.User;
 import org.prgms.locomocoserver.user.domain.querydsl.UserCustomRepository;
 import org.springframework.stereotype.Service;
