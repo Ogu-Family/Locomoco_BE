@@ -19,10 +19,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/api/v1/stomp/chat")
-                .setAllowedOrigins("*")
+                .setAllowedOrigins("http://localhost:3000",
+                        "https://locomoco.kro.kr",
+                        "https://locomoco.shop")
                 .withSockJS();
         registry.addEndpoint("/api/v1/stomp/chat")
-                .setAllowedOrigins("*");
+                .setAllowedOrigins("http://localhost:3000",
+                        "https://locomoco.kro.kr",
+                        "https://locomoco.shop");
     }
 
     @Override
