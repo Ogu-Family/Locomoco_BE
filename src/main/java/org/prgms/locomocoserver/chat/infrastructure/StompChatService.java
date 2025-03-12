@@ -1,4 +1,4 @@
-package org.prgms.locomocoserver.chat.application;
+package org.prgms.locomocoserver.chat.infrastructure;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
