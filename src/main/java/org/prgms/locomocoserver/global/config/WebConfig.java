@@ -26,8 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000",
                         "https://locomoco.kro.kr",
-                        "https://locomoco.shop",
-                        "https://jiangxy.github.io")
+                        "https://locomoco.shop")
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization", "provider")
